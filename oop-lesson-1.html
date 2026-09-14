@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>20.1 OOP — Home Lesson 1: Classes, Attributes and the Constructor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --ink:#0F172A;
+  --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
+  --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
+  --warn:#B45309; --warn-bg:#FFFBEB;
+  --mono:"Cascadia Mono","Consolas","SF Mono",Menlo,monospace;
+  --sans:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{margin:0;background:#E2E8F0;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;background:var(--white);padding:0 0 64px;box-shadow:0 0 40px rgba(15,23,42,.10)}
+.pad{padding:0 40px}
+@media(max-width:640px){.pad{padding:0 18px} body{font-size:16px}}
+
+/* ---------- masthead ---------- */
+header.mast{background:var(--blue-dk);color:#fff;padding:30px 40px 26px}
+@media(max-width:640px){header.mast{padding:24px 18px}}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#BFDBFE;font-weight:700;margin:0 0 8px}
+.kicker a.home{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
+.kicker a.home:hover{border-bottom-color:#fff}
+header.mast h1{margin:0;font-size:31px;line-height:1.2;font-weight:700}
+header.mast .sub{margin:10px 0 0;color:#DBEAFE;font-size:15px}
+.pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;color:#EFF6FF}
+
+/* ---------- sticky nav ---------- */
+nav.sticky{position:sticky;top:0;z-index:40;background:#fff;border-bottom:2px solid var(--line);padding:0 40px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+@media(max-width:640px){nav.sticky{padding:0 10px}}
+nav.sticky a{flex:0 0 auto;padding:11px 12px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+nav.sticky a:hover{color:var(--blue);border-bottom-color:#BFDBFE}
+
+/* ---------- sections ---------- */
+section{padding-top:34px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:800;margin:0 0 4px}
+h2 + .h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25}
+h3{font-size:19px;color:var(--blue-dk);margin:26px 0 8px}
+p{margin:0 0 13px}
+.lead{font-size:18px;color:var(--muted)}
+hr.rule{border:0;border-top:2px solid var(--panel);margin:38px 0 0}
+
+/* ---------- boxes ---------- */
+.box{border:1.5px solid var(--blue);background:var(--panel);border-radius:8px;padding:16px 20px;margin:16px 0}
+.box.pinkb{border-color:var(--pink);background:#fff}
+.box .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--blue);margin:0 0 8px}
+.box.pinkb .bt{color:var(--pink)}
+.callout{border-left:5px solid var(--warn);background:var(--warn-bg);padding:13px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+.callout .bt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--warn);margin:0 0 6px}
+.callout.ex{border-left-color:var(--bad);background:var(--bad-bg)}
+.callout.ex .bt{color:var(--bad)}
+ul,ol{margin:0 0 13px;padding-left:22px}
+li{margin:0 0 7px}
+code{font-family:var(--mono);background:#E2E8F0;padding:1px 5px;border-radius:4px;font-size:.92em}
+.tick{color:var(--good);font-weight:800}
+.cross{color:var(--bad);font-weight:800}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+tbody tr:nth-child(even){background:#F8FAFC}
+td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+
+/* ---------- code ---------- */
+pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
+pre.code .cm{color:#94A3B8;font-style:italic}
+pre.code .kw{color:#F0ABFC}
+pre.code .st{color:#86EFAC}
+pre.code .fn{color:#93C5FD}
+pre.code .nm{color:#FDE68A}
+.codelabel{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:5px 5px 0 0;margin-bottom:-4px}
+
+/* ---------- runner ---------- */
+.runner{border:2px solid var(--blue);border-radius:10px;overflow:hidden;margin:16px 0;background:#0F172A}
+.runbar{background:#1E293B;padding:8px 12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid #334155}
+.runbar .ttl{color:#93C5FD;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-right:auto}
+button{font-family:var(--sans);font-size:14px;font-weight:700;border:0;border-radius:6px;padding:7px 15px;cursor:pointer;background:var(--blue);color:#fff}
+button:hover{background:#1E40AF}
+button.ghost{background:#334155;color:#CBD5E1}
+button.ghost:hover{background:#475569}
+button:disabled{opacity:.5;cursor:not-allowed}
+textarea.editor{width:100%;min-height:250px;background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;border:0;padding:14px 18px;resize:vertical;display:block;outline:none;tab-size:4}
+.outwrap{border-top:1px solid #334155;background:#020617}
+.outlabel{color:#64748B;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:7px 18px 0}
+pre.out{margin:0;padding:6px 18px 14px;color:#E2E8F0;font-family:var(--mono);font-size:14px;line-height:1.55;white-space:pre-wrap;min-height:34px}
+pre.out .err{color:#FCA5A5}
+pre.out .ok{color:#86EFAC}
+.status{font-size:12.5px;color:#94A3B8;font-family:var(--mono)}
+
+/* ---------- interactive ---------- */
+.predict{border:2px dashed var(--pink);border-radius:9px;padding:16px 20px;margin:16px 0;background:#FDF2F8}
+.predict .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--pink);margin:0 0 8px}
+.predict textarea{width:100%;min-height:70px;font-family:var(--mono);font-size:14px;padding:9px 11px;border:1.5px solid var(--line);border-radius:6px;resize:vertical}
+
+.cp{border:2px solid var(--blue);border-radius:10px;margin:20px 0;overflow:hidden}
+.cp .cph{background:var(--blue);color:#fff;padding:9px 18px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.cp .cpb{padding:16px 20px}
+.cp .q{font-weight:700;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:11px 14px;margin:0 0 9px;cursor:pointer;font-family:var(--sans);font-size:15.5px;color:var(--ink);font-weight:400;line-height:1.45}
+.opt:hover{border-color:var(--blue);background:#EFF6FF}
+.opt code{background:#E2E8F0}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.fb{display:none;margin-top:10px;padding:12px 15px;border-radius:7px;font-size:15px;line-height:1.5}
+.fb.show{display:block}
+.fb.good{background:var(--good-bg);border-left:5px solid var(--good)}
+.fb.bad{background:var(--bad-bg);border-left:5px solid var(--bad)}
+
+details.rev{border:1.5px solid var(--line);border-radius:8px;margin:14px 0;background:#fff;overflow:hidden}
+details.rev>summary{cursor:pointer;padding:12px 18px;font-weight:700;color:var(--blue);background:var(--panel);list-style:none;font-size:15.5px}
+details.rev>summary::-webkit-details-marker{display:none}
+details.rev>summary::before{content:"▸ ";color:var(--pink);font-weight:800}
+details.rev[open]>summary::before{content:"▾ "}
+details.rev .body{padding:4px 18px 14px}
+
+.tier{border:1.5px solid var(--line);border-radius:9px;margin:14px 0;overflow:hidden}
+.tier .th{padding:9px 18px;font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#fff}
+.tier.s .th{background:#0891B2} .tier.i .th{background:var(--blue)} .tier.e .th{background:#7C3AED}
+.tier .tb{padding:14px 18px}
+
+.ms{border:1.5px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0}
+.ms table{margin:0;font-size:15px}
+.ms th{background:var(--blue-dk)}
+.mp{font-family:var(--mono);font-weight:700;color:var(--blue);white-space:nowrap}
+
+.steps{counter-reset:st;list-style:none;padding:0}
+.steps li{counter-increment:st;position:relative;padding-left:44px;margin-bottom:14px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
+.tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
+.tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker"><a class="home" href="index.html">← All lessons</a> &nbsp;·&nbsp; Cambridge 9618 A Level · Unit 20.1 · Paper 4 Practical</p>
+  <h1>Object-Oriented Programming<br>Home Lesson 1 — Classes, Attributes and the Constructor</h1>
+  <p class="sub">Work through this page, then build your code in Python and submit the Evidence Document on Teams.</p>
+  <div class="pills">
+    <span class="pill">Home lesson 1 of 6</span>
+    <span class="pill">Language: Python (console)</span>
+    <span class="pill">Suggested time: 55 minutes</span>
+    <span class="pill">Submit: Evidence Document (.docx)</span>
+  </div>
+</header>
+
+<nav class="sticky">
+  <a href="#how">How this works</a>
+  <a href="#donow">Do Now</a>
+  <a href="#obj">Objectives</a>
+  <a href="#terms">Key terms</a>
+  <a href="#predict">Predict</a>
+  <a href="#run">Run</a>
+  <a href="#investigate">Investigate</a>
+  <a href="#modify">Modify</a>
+  <a href="#technique">Exam technique</a>
+  <a href="#task">Your task</a>
+  <a href="#markscheme">Mark scheme</a>
+  <a href="#submit">Submit</a>
+</nav>
+
+<div class="pad">
+
+<!-- ========== HOW THIS WORKS ========== -->
+<section id="how">
+  <h2>Start here</h2>
+  <div class="h">How this lesson works</div>
+  <p class="lead">Paper 4 is sat at a computer. You cannot learn it by reading about it, so this page teaches, then makes you type.</p>
+  <ol class="steps">
+    <li><strong>Learn on this page.</strong> Predict what code will do, run it here in the browser, then pick it apart. Nothing to install.</li>
+    <li><strong>Build it in Python on your own machine.</strong> The page's runner is for experimenting. Your assessed code is written in IDLE, Thonny or VS Code, exactly as it will be in the exam.</li>
+    <li><strong>Evidence it.</strong> Paste your code <em>as text</em> and your screenshots into the Evidence Document, and submit it on Teams. That document is a copy of the one Cambridge makes you fill in on exam day, so you are practising the exam admin as well as the code.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">Why the evidence document matters</p>
+    <p style="margin:0">Examiners report marks lost in <strong>every single series</strong> for evidence, not for code: screenshots that show the output but not the inputs, code pasted as a picture instead of text, missing tests, Python indentation destroyed. Those are free marks and you are going to get into the habit of taking them now.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== DO NOW ========== -->
+<section id="donow">
+  <h2>Retrieval</h2>
+  <div class="h">Do Now — three minutes, no notes</div>
+  <p>Answer these before you read anything else. Write them in your book, then reveal the answers and mark them.</p>
+  <div class="box">
+    <p class="bt">Questions</p>
+    <ol style="margin-bottom:0">
+      <li><strong>State</strong> what is meant by a <em>parameter</em> of a procedure. <em>[1]</em></li>
+      <li>A record type <code>Student</code> has fields <code>Name</code> and <code>Mark</code>. <strong>Describe</strong> one difference between a record type and an array. <em>[2]</em></li>
+      <li><strong>State</strong> the difference between a <em>function</em> and a <em>procedure</em>. <em>[1]</em></li>
+    </ol>
+  </div>
+  <details class="rev"><summary>Mark scheme — mark your own answers</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:60px">Q</th><th>Accepted</th><th style="width:70px">Marks</th></tr>
+      <tr><td class="mp">1</td><td>A value passed into a procedure when it is called <em>OR</em> a variable in the procedure's definition that receives a value from the call.<br><span class="cross">Reject:</span> "an input" on its own.</td><td>1</td></tr>
+      <tr><td class="mp">2</td><td>MP1 — a record groups items of <strong>different</strong> data types, an array holds items of the <strong>same</strong> data type.<br>MP2 — record elements are accessed by <strong>field name</strong>, array elements by <strong>index</strong>.<br><em>1 mark each, max 2.</em></td><td>2</td></tr>
+      <tr><td class="mp">3</td><td>A function <strong>returns a value</strong> to the point at which it was called; a procedure does not.<br><span class="cross">Reject:</span> "a function does a calculation".</td><td>1</td></tr>
+    </table></div>
+    <p style="margin:10px 0 0"><strong>Q3 is the prerequisite check.</strong> Everything in this lesson depends on the difference between <em>returning</em> and <em>outputting</em>. If you got it wrong, read that row again before you go on — it is the single biggest cause of lost marks on Paper 4.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== OBJECTIVES ========== -->
+<section id="obj">
+  <h2>Where this is going</h2>
+  <div class="h">Learning objectives</div>
+  <table>
+    <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
+    <tr><td>Use the terms <em>class</em>, <em>object</em>, <em>attribute</em>, <em>method</em>, <em>instantiation</em> and <em>encapsulation</em> in the form a mark scheme accepts.</td><td>20.1</td><td>3 &amp; 4</td></tr>
+    <tr><td>Declare a class in Python with <strong>private</strong> attributes whose <strong>data types are visible</strong>.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Write a constructor that takes <strong>exactly</strong> the parameters the class design specifies, and assigns the <strong>fixed default values</strong> the design states.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Instantiate an object and call one of its methods.</td><td>20.1</td><td>4</td></tr>
+  </table>
+  <div class="callout">
+    <p class="bt">Where this sits in the paper</p>
+    <p style="margin:0">A class appears in <strong>every one of the last 29 Paper 4 examiner reports</strong>. It is not an optional topic — it is roughly a third of the paper, every year. Examiners now say that <em>declaring</em> classes has become a national strength, and that the marks are being lost further on, at the point where candidates have to <em>create objects and use them</em>. We start at the declaration this week and spend the next five on the part that is actually costing marks.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== KEY TERMS ========== -->
+<section id="terms">
+  <h2>Vocabulary</h2>
+  <div class="h">Key terms — learn these wordings</div>
+  <p>These are written the way a mark scheme writes them. A looser paraphrase of the right idea scores nothing, so learn the wording, not the gist.</p>
+  <table>
+    <tr><th style="width:23%">Term</th><th>Definition that earns the mark</th></tr>
+    <tr><td><strong>Class</strong></td><td>A template (blueprint) that defines the attributes and methods of a type of object.</td></tr>
+    <tr><td><strong>Object</strong></td><td>An instance of a class.</td></tr>
+    <tr><td><strong>Attribute</strong><br><span style="color:var(--muted);font-size:14px">(property)</span></td><td>A data item belonging to an object, declared with a data type.</td></tr>
+    <tr><td><strong>Method</strong></td><td>A subroutine belonging to a class that defines a behaviour of its objects.</td></tr>
+    <tr><td><strong>Constructor</strong></td><td>The method that runs automatically when an object is created, which initialises the object's attributes.</td></tr>
+    <tr><td><strong>Instantiation</strong></td><td>The process of creating an object from a class.</td></tr>
+    <tr><td><strong>Encapsulation</strong></td><td>Attributes are declared private so they can only be accessed through the class's own methods.</td></tr>
+  </table>
+  <div class="callout ex">
+    <p class="bt">What examiners reject</p>
+    <p style="margin:0">"A class is an object" — <span class="cross">no mark</span>. "An object is a copy of a class" — <span class="cross">no mark</span>; it is an <em>instance</em>. "Encapsulation means hiding the code" — <span class="cross">no mark</span>; it is about the <em>data</em> being private and reached only through methods.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PREDICT ========== -->
+<section id="predict">
+  <h2>PRIMM · Step 1</h2>
+  <div class="h">Predict</div>
+  <p>Read this program carefully. <strong>Do not run it yet.</strong> Write down exactly what you think it will output, character for character.</p>
+  <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Author):
+        self.__Title = Title        <span class="cm"># STRING</span>
+        self.__Author = Author      <span class="cm"># STRING</span>
+        self.__OnLoan = <span class="kw">False</span>       <span class="cm"># BOOLEAN</span>
+
+    <span class="kw">def</span> <span class="fn">Display</span>(self):
+        <span class="fn">print</span>(<span class="st">"Title : "</span> + self.__Title)
+        <span class="fn">print</span>(<span class="st">"Author: "</span> + self.__Author)
+        <span class="fn">print</span>(<span class="st">"On loan: "</span> + <span class="fn">str</span>(self.__OnLoan))
+
+MyBook = <span class="nm">Book</span>(<span class="st">"Dune"</span>, <span class="st">"Frank Herbert"</span>)
+MyBook.<span class="fn">Display</span>()</pre>
+
+  <div class="predict">
+    <p class="bt">Commit your prediction before you scroll</p>
+    <textarea id="pred1" placeholder="Type the exact output you expect…"></textarea>
+    <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Two harder questions while you are here: how many times does the constructor run? And what is <code>self</code> actually referring to on line 3?</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== RUN ========== -->
+<section id="run">
+  <h2>PRIMM · Step 2</h2>
+  <div class="h">Run</div>
+  <p>Now run it. Press <strong>Run</strong> and compare the real output with your prediction. Python runs inside this page — nothing is sent anywhere, and you can break it as much as you like.</p>
+
+  <div class="runner">
+    <div class="runbar">
+      <span class="ttl">Python 3 — try it</span>
+      <span class="status" id="pystatus">Python is loading…</span>
+      <button id="runbtn" disabled>▶ Run</button>
+      <button class="ghost" id="resetbtn">Reset code</button>
+    </div>
+    <textarea class="editor" id="editor" spellcheck="false"></textarea>
+    <div class="outwrap">
+      <div class="outlabel">Output</div>
+      <pre class="out" id="output">Press Run to execute.</pre>
+    </div>
+  </div>
+
+  <details class="rev"><summary>Check your prediction</summary>
+  <div class="body">
+<pre class="code">Title : Dune
+Author: Frank Herbert
+On loan: False</pre>
+    <ul style="margin-bottom:0">
+      <li>The constructor runs <strong>once</strong> — on the line <code>MyBook = Book("Dune", "Frank Herbert")</code>. That line is the <strong>instantiation</strong>.</li>
+      <li><code>self</code> refers to <strong>the object being worked on</strong>. Inside the constructor it is the new <code>Book</code>; inside <code>Display()</code> it is whichever object the method was called on.</li>
+      <li><code>str(self.__OnLoan)</code> is needed because you cannot join a <code>BOOLEAN</code> to a <code>STRING</code> with <code>+</code>. Getting that wrong is a runtime crash, and a crash in the exam means the screenshot marks go too.</li>
+    </ul>
+  </div>
+  </details>
+
+  <div class="callout ex">
+    <p class="bt">Try this — then read why it matters</p>
+    <p style="margin:0 0 8px">Add this line to the bottom of the code above and run it again:</p>
+    <pre class="code" style="margin:0 0 8px"><span class="fn">print</span>(MyBook.__Title)</pre>
+    <p style="margin:0">It crashes with an <code>AttributeError</code>. That crash <em>is</em> encapsulation working. The double underscore has made <code>__Title</code> private, so code outside the class cannot touch it directly. To read it, the class has to offer you a method — which is exactly what next week's lesson builds.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== INVESTIGATE ========== -->
+<section id="investigate">
+  <h2>PRIMM · Step 3</h2>
+  <div class="h">Investigate — the four parts of a class</div>
+
+  <h3>1. The class header</h3>
+  <p><code>class Book:</code> — the name is a <strong>singular noun</strong> with a capital letter. <code>Book</code>, not <code>Books</code>, and not <code>BookClass</code>. The class describes <em>one</em> of the thing; you make as many objects from it as you like.</p>
+
+  <h3>2. Private attributes, with their data types visible</h3>
+  <p>Python has no <code>PRIVATE</code> keyword and no type declarations, so you have to <strong>show the examiner</strong> what a VB.NET or Java candidate gets for free:</p>
+  <table>
+    <tr><th style="width:34%">You write</th><th>What it evidences</th></tr>
+    <tr><td class="dt">self.__Title</td><td>The two leading underscores make the attribute <strong>private</strong>. One underscore is not enough.</td></tr>
+    <tr><td class="dt"># STRING</td><td>A comment naming the data type. Examiners accept a comment as evidence of the data type — and without it you are relying on the marker's goodwill.</td></tr>
+  </table>
+  <p>Write both, every time, on every attribute. It costs you four seconds and it is a mark.</p>
+
+  <h3>3. The constructor</h3>
+  <p>In Python the constructor is always called <code>__init__</code> — two underscores, <code>init</code>, two underscores. Its first parameter is always <code>self</code>.</p>
+  <div class="callout ex">
+    <p class="bt">The misspelling that costs the whole question</p>
+    <p style="margin:0">Examiners name <code>__int__</code> as a recurring error. Python does not complain — it simply never runs your constructor, so every attribute is missing and every method that follows crashes. If your object "has no attribute", check the spelling of <code>__init__</code> first.</p>
+  </div>
+
+  <h3>4. A method</h3>
+  <p><code>Display()</code> is a method: a subroutine that belongs to the class. Its first parameter is <code>self</code>, and it is called <strong>on an object</strong> with a dot — <code>MyBook.Display()</code>.</p>
+
+  <div class="cp" data-cp="1">
+    <div class="cph">Checkpoint 1</div>
+    <div class="cpb">
+      <p class="q">Which line correctly declares a private attribute <em>and</em> evidences its data type, in a Python class?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>self.Name = Name</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>self._Name = Name &nbsp;# STRING</code></button>
+      <button class="opt" data-ok="1">C &nbsp;<code>self.__Name = Name &nbsp;# STRING</code></button>
+      <button class="opt" data-ok="0">D &nbsp;<code>def Name(self): return self.__Name</code></button>
+      <div class="fbs" hidden>
+        <div>This attribute is <strong>public</strong> — any code anywhere can change it, so there is no encapsulation to credit, and nothing shows the data type. This is the commonest version of the error.</div>
+        <div>One underscore is a convention meaning &ldquo;please don't&rdquo;; it does not make the attribute private, and Python will happily let outside code read it. Use two.</div>
+        <div>Two underscores make it private, and the comment evidences the data type. This is the form to use on every attribute, every time.</div>
+        <div>That is a <em>get method</em>, not an attribute declaration. It is a real thing you will write next lesson, but it does not declare or store anything.</div>
+      </div>
+      <div class="fb"></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MODIFY ========== -->
+<section id="modify">
+  <h2>PRIMM · Step 4</h2>
+  <div class="h">Modify</div>
+  <p>Go back to the runner above and change the <code>Book</code> class so that it matches this <strong>class design</strong>. This is exactly the form Cambridge gives you a class in, so read it the way you will read it in the exam.</p>
+
+  <div class="box">
+    <p class="bt">Class design — Book (version 2)</p>
+    <table style="margin:0">
+      <tr><th style="width:26%">Attribute</th><th style="width:20%">Data type</th><th>Set when the object is created</th></tr>
+      <tr><td class="dt">Title</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Author</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Year</td><td class="dt">INTEGER</td><td>From a parameter</td></tr>
+      <tr><td class="dt">OnLoan</td><td class="dt">BOOLEAN</td><td>Always <code>False</code></td></tr>
+      <tr><td class="dt">TimesBorrowed</td><td class="dt">INTEGER</td><td>Always <code>0</code></td></tr>
+    </table>
+  </div>
+  <p><strong>Then:</strong> update <code>Display()</code> to output all five attributes with labels, and create a second object of your own choosing so that two different books are displayed.</p>
+
+  <div class="callout">
+    <p class="bt">Read the right-hand column very carefully</p>
+    <p style="margin:0"><code>OnLoan</code> and <code>TimesBorrowed</code> say <em>"always"</em>. That means the constructor <strong>assigns them itself</strong> — they are <strong>not</strong> parameters. A constructor that takes five parameters when the design specifies three has not followed the design, and examiners mark it as wrong even when the code runs perfectly. Count the parameters against the design before you write the header.</p>
+  </div>
+
+  <details class="rev"><summary>Model answer — check yours against this</summary>
+  <div class="body">
+    <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Author, Year):
+        self.__Title = Title             <span class="cm"># STRING</span>
+        self.__Author = Author           <span class="cm"># STRING</span>
+        self.__Year = Year               <span class="cm"># INTEGER</span>
+        self.__OnLoan = <span class="kw">False</span>            <span class="cm"># BOOLEAN</span>
+        self.__TimesBorrowed = <span class="nm">0</span>         <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">Display</span>(self):
+        <span class="fn">print</span>(<span class="st">"Title          : "</span> + self.__Title)
+        <span class="fn">print</span>(<span class="st">"Author         : "</span> + self.__Author)
+        <span class="fn">print</span>(<span class="st">"Year           : "</span> + <span class="fn">str</span>(self.__Year))
+        <span class="fn">print</span>(<span class="st">"On loan        : "</span> + <span class="fn">str</span>(self.__OnLoan))
+        <span class="fn">print</span>(<span class="st">"Times borrowed : "</span> + <span class="fn">str</span>(self.__TimesBorrowed))
+
+FirstBook = <span class="nm">Book</span>(<span class="st">"Dune"</span>, <span class="st">"Frank Herbert"</span>, <span class="nm">1965</span>)
+SecondBook = <span class="nm">Book</span>(<span class="st">"Emma"</span>, <span class="st">"Jane Austen"</span>, <span class="nm">1815</span>)
+FirstBook.<span class="fn">Display</span>()
+SecondBook.<span class="fn">Display</span>()</pre>
+    <p style="margin:10px 0 0">Three parameters, five attributes. Two objects from one class — that is the whole point of a class.</p>
+  </div>
+  </details>
+
+  <div class="cp" data-cp="2">
+    <div class="cph">Checkpoint 2</div>
+    <div class="cpb">
+      <p class="q">A class <code>Member</code> has a constructor. Which line creates an object of that class correctly?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>Member = Member("M01", "Ali", 17)</code></button>
+      <button class="opt" data-ok="1">B &nbsp;<code>NewMember = Member("M01", "Ali", 17)</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>Member("M01", "Ali", 17)</code></button>
+      <button class="opt" data-ok="0">D &nbsp;<code>NewMember = new Member("M01", "Ali", 17)</code></button>
+      <div class="fbs" hidden>
+        <div>Naming the variable after its class is an error examiners name in four separate series. You have just overwritten the class with an object, so the very next <code>Member(...)</code> in your program crashes.</div>
+        <div>The variable is named after <em>what the object is</em>, not after its class, and the constructor's arguments are passed in the order the design gives them.</div>
+        <div>This calls the class as though it were a plain procedure and stores nothing. Calling methods as free procedures instead of on an object appears in six of the last ten series — it is one of the two habitual instantiation errors.</div>
+        <div><code>new</code> is Java and C#, not Python. Every language on this paper has its own instantiation syntax and you must use the one for the language you are sitting.</div>
+      </div>
+      <div class="fb"></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== EXAM TECHNIQUE ========== -->
+<section id="technique">
+  <h2>The marks</h2>
+  <div class="h">Exam technique — the class design table is the instruction</div>
+  <p>Almost everything that goes wrong on an OOP question goes wrong before any code is written, because the candidate implemented the class they <em>remembered</em> rather than the class they were <em>given</em>. Cambridge does this deliberately: the designs change slightly every year specifically to test whether you read them.</p>
+
+  <p><strong>Predict, then reveal.</strong> A candidate is given the <code>Book</code> design above and writes this. Decide what an examiner would say before you open the answer.</p>
+  <span class="codelabel">Candidate response</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Author, Year, OnLoan, TimesBorrowed):
+        self.Title = Title
+        self.Author = Author
+        self.Year = Year
+        self.OnLoan = OnLoan
+        self.TimesBorrowed = TimesBorrowed</pre>
+  <details class="rev"><summary>What the examiner says</summary>
+  <div class="body">
+    <p>The code runs. It still loses most of the available marks.</p>
+    <ul>
+      <li><span class="cross">✗</span> <strong>Attributes are public.</strong> No double underscores, so there is no encapsulation to credit.</li>
+      <li><span class="cross">✗</span> <strong>No data types evidenced.</strong> No comments, so nothing shows what type each attribute is meant to hold.</li>
+      <li><span class="cross">✗</span> <strong>Wrong parameters.</strong> The design says <code>OnLoan</code> and <code>TimesBorrowed</code> are always set to fixed values. Taking them as parameters means the class does not meet the specification, and it lets the caller create a book that has already been borrowed 400 times.</li>
+      <li><span class="tick">✓</span> The constructor is correctly named and the three genuine parameters are assigned the right way round.</li>
+    </ul>
+    <p style="margin-bottom:0"><strong>The habit to build:</strong> before you write the class header, put a finger on the design table and count how many attributes come from a parameter. That number is how many parameters your constructor takes, after <code>self</code>. Everything else is assigned inside.</p>
+  </div>
+  </details>
+
+  <div class="cp" data-cp="3">
+    <div class="cph">Checkpoint 3</div>
+    <div class="cpb">
+      <p class="q">A class design states: <em>"Attribute <code>Balance</code>, INTEGER, set to 100 when the object is created."</em> Which constructor follows the design?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>def __init__(self, Balance): self.__Balance = Balance</code></button>
+      <button class="opt" data-ok="1">B &nbsp;<code>def __init__(self): self.__Balance = 100 &nbsp;# INTEGER</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>def __init__(self): self.__Balance = &quot;100&quot; &nbsp;# INTEGER</code></button>
+      <button class="opt" data-ok="0">D &nbsp;<code>def __init__(self): 100 = self.__Balance</code></button>
+      <div class="fbs" hidden>
+        <div>This takes <code>Balance</code> as a parameter. The design says it is set to a fixed value on creation, so it must not be a parameter.</div>
+        <div>The fixed default is assigned inside the constructor, and the data type is evidenced by a comment.</div>
+        <div><code>&quot;100&quot;</code> in quotes is a <strong>string</strong>, not an integer. Examiners have sharpened up on exactly this since 2025: <code>-1</code> and <code>&#39;-1&#39;</code> are not the same thing, and neither are these.</div>
+        <div>The assignment is the wrong way round — this copies the empty attribute into the parameter and leaves the attribute undefined. It is the classic setter error, and it appears in constructors too.</div>
+      </div>
+      <div class="fb"></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== TASK ========== -->
+<section id="task">
+  <h2>Assessed work</h2>
+  <div class="h">Over to you — write it in Python, evidence it in the document</div>
+  <p class="lead">Everyone starts at <strong>Independent</strong>. Drop to Scaffolded if you stall. Go to Exam Conditions when you have finished — and by the mock, that is where everyone needs to be.</p>
+
+  <div class="box pinkb">
+    <p class="bt">The scenario</p>
+    <p style="margin:0 0 10px">A sports club stores a record of each of its members. A programmer has produced the following class design.</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:26%">Attribute</th><th style="width:20%">Data type</th><th>Set when the object is created</th></tr>
+      <tr><td class="dt">MemberID</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Name</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Age</td><td class="dt">INTEGER</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Credits</td><td class="dt">INTEGER</td><td>Always <code>0</code></td></tr>
+      <tr><td class="dt">Active</td><td class="dt">BOOLEAN</td><td>Always <code>True</code></td></tr>
+    </table>
+    <table style="margin:0">
+      <tr><th style="width:26%">Method</th><th>Description</th></tr>
+      <tr><td class="dt">Constructor</td><td>Initialises all five attributes as described above.</td></tr>
+      <tr><td class="dt">DisplayDetails()</td><td>Outputs all five attributes, each on its own line, with a label.</td></tr>
+    </table>
+  </div>
+
+  <div class="tier i">
+    <div class="th">Independent — start here</div>
+    <div class="tb">
+      <p style="margin:0 0 8px"><strong>(a)</strong> Write program code to declare the class <code>Member</code>, including its constructor and the method <code>DisplayDetails()</code>. <em>[8]</em></p>
+      <p style="margin:0 0 8px"><strong>(b)</strong> Write program code to create <strong>one</strong> object of the class <code>Member</code> using this test data, and then display its details: <code>"M4021"</code>, <code>"Sara Ahmed"</code>, <code>16</code>. <em>[2]</em></p>
+      <p style="margin:0"><strong>(c)</strong> Take a screenshot showing the program running with that test data. The screenshot must show <strong>the input values and the output</strong>. <em>[2]</em></p>
+    </div>
+  </div>
+
+  <div class="tier s">
+    <div class="th">Scaffolded — only if you stall</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Same three questions, same marks. Copy this skeleton into your editor and complete every <code># ...</code>. Do not change anything else.</p>
+<pre class="code" style="margin:0"><span class="kw">class</span> <span class="nm">Member</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, ______, ______, ______):
+        self.__MemberID = ______      <span class="cm"># STRING</span>
+        <span class="cm"># ... Name</span>
+        <span class="cm"># ... Age</span>
+        <span class="cm"># ... Credits  (fixed value — not a parameter)</span>
+        <span class="cm"># ... Active   (fixed value — not a parameter)</span>
+
+    <span class="kw">def</span> <span class="fn">DisplayDetails</span>(self):
+        <span class="fn">print</span>(<span class="st">"Member ID : "</span> + self.__MemberID)
+        <span class="cm"># ... one print for each remaining attribute</span>
+        <span class="cm"># ... remember str() around the ones that are not strings</span>
+
+<span class="cm"># ... create the object here, with a sensible variable name</span>
+<span class="cm"># ... call DisplayDetails on it</span></pre>
+    </div>
+  </div>
+
+  <div class="tier e">
+    <div class="th">Exam conditions — where you need to be by the mock</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Close this page. Set a timer for <strong>20 minutes</strong>. Work from the class design table alone, with no notes and no skeleton. Then, as an extension, add this second class from its own design and create one object of it as well:</p>
+      <table style="margin:0 0 8px">
+        <tr><th style="width:26%">Class <code>Coach</code></th><th style="width:20%">Data type</th><th>Set when the object is created</th></tr>
+        <tr><td class="dt">CoachID</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+        <tr><td class="dt">Name</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+        <tr><td class="dt">Sport</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+        <tr><td class="dt">Qualified</td><td class="dt">BOOLEAN</td><td>Always <code>False</code></td></tr>
+      </table>
+      <p style="margin:0">Test data for the <code>Coach</code> object: <code>"C107"</code>, <code>"Tom Reilly"</code>, <code>"Athletics"</code>. Both objects' details must appear in <strong>one</strong> screenshot.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p class="bt">Before you screenshot</p>
+    <ul style="margin:0">
+      <li>Use <strong>exactly</strong> the test data given. Inventing your own loses the mark even if the program is perfect.</li>
+      <li>The screenshot must show <strong>the inputs as well as the outputs</strong>. This is the single most repeated technique failure in the examiner reports — present in all ten recent series.</li>
+      <li>Screenshot the <strong>whole console window</strong>, not a cropped strip of the answer.</li>
+      <li>Your <em>code</em> goes into the document as <strong>text</strong>, never as a screenshot. Screenshotted code scores nothing.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MARK SCHEME ========== -->
+<section id="markscheme">
+  <h2>Self-marking</h2>
+  <div class="h">Mark scheme — open it only after you have attempted the task</div>
+  <p>Mark your own work honestly against this, then record your total in the Evidence Document. Marking your own work against the real wording is how you learn what "one mark per point, max 8" actually means.</p>
+
+  <details class="rev"><summary>Reveal the mark scheme [12 marks]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Description</th><th style="width:60px">Marks</th></tr>
+      <tr><td class="mp">(a) MP1</td><td>Class <code>Member</code> declared, correctly named.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP2</td><td>Constructor correctly named for the language (<code>__init__</code>) taking <strong>exactly three</strong> parameters after <code>self</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP3</td><td>All five attributes declared <strong>private</strong> (double underscore).</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP4</td><td>Data type of every attribute evidenced (comment is accepted).</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP5</td><td><code>MemberID</code>, <code>Name</code> and <code>Age</code> assigned from the parameters, the correct way round.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP6</td><td><code>Credits</code> assigned the fixed value <code>0</code> <strong>inside</strong> the constructor, as an integer not a string.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP7</td><td><code>Active</code> assigned the fixed value <code>True</code> <strong>inside</strong> the constructor, as a Boolean not a string.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP8</td><td><code>DisplayDetails()</code> declared as a method of the class and <strong>outputs</strong> all five attributes, each labelled.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP9</td><td>An object created from the class, stored in a variable <strong>not</strong> named after the class, using the given test data in the correct order.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP10</td><td><code>DisplayDetails()</code> called <strong>on that object</strong> using dot notation.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP11</td><td>Screenshot shows the program running with the given test data, including the test data itself.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP12</td><td>Screenshot shows the complete, correct output for all five attributes.</td><td>1</td></tr>
+    </table></div>
+    <p style="margin:14px 0 6px"><strong>Accepted alternatives</strong></p>
+    <ul>
+      <li>The data type may be evidenced by a comment, by a type hint, or by an obviously typed initial value — any of the three earns MP4.</li>
+      <li><code>DisplayDetails()</code> may build one long string and print it once, or print line by line. Both are accepted.</li>
+      <li>Labels may be worded however you like, as long as each attribute is identifiable.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Not credited, however good the code looks</strong></p>
+    <ul style="margin-bottom:0">
+      <li>Public attributes — <span class="cross">MP3 lost</span>, and MP4 usually with it.</li>
+      <li><code>Credits</code> or <code>Active</code> taken as parameters — <span class="cross">MP2, MP6 and MP7 lost</span>. Three marks for not reading the table.</li>
+      <li><code>DisplayDetails()</code> that <em>returns</em> a string instead of outputting it — <span class="cross">MP8 lost</span>. The design says "outputs".</li>
+      <li>A screenshot with the output but not the test data — <span class="cross">MP11 lost</span>.</li>
+      <li>Code pasted as an image — <span class="cross">no code marks at all</span>.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== SUBMIT ========== -->
+<section id="submit">
+  <h2>Hand-in</h2>
+  <div class="h">What to submit on Teams</div>
+  <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 1.docx</code>.</p>
+  <div class="box">
+    <p class="bt">Checklist before you upload</p>
+    <ul style="margin:0">
+      <li>Your name and class are in the header of the document.</li>
+      <li>Task (a) code is pasted <strong>as text</strong>, with the indentation intact.</li>
+      <li>Task (b) code is in its own box — do not merge the two.</li>
+      <li>The screenshot shows the test data <strong>and</strong> the output, and the whole window.</li>
+      <li>Nothing is cut off at the edge of a box, and you have not widened any box past the margin.</li>
+      <li>Your self-marked total out of 12 is filled in, with the points you lost named.</li>
+      <li>You are submitting <strong>the document only</strong> — not a zip, not the <code>.py</code> file.</li>
+    </ul>
+  </div>
+  <p>Your next taught lesson opens by checking these submissions, so an empty one is visible immediately. If you got stuck, submit what you have with a note saying where — that is far more useful to me than nothing.</p>
+
+  <h3>Coming next</h3>
+  <p><strong>Home Lesson 2 — Get and set methods.</strong> Getting a value <em>out</em> of a private attribute and putting a new one <em>in</em>. It sounds trivial. A get method written with a parameter is the single most repeated OOP error in the examiner reports — all ten recent series — so it is worth a lesson of its own.</p>
+</section>
+
+<div class="tn">
+  <p class="bt">Teacher note — remove before issuing if you wish</p>
+  <p style="margin:0 0 7px"><strong>Provenance.</strong> No past-paper questions were spent on this lesson. The Do Now, the task and the mark scheme are original, written in Cambridge's Paper 4 house style, so the topical banks remain intact for the mock. Log as <em>questions used: none</em>.</p>
+  <p style="margin:0 0 7px"><strong>Retrieval bank deposit.</strong><br>
+  What is instantiation? | The process of creating an object from a class.<br>
+  Why does a Python attribute need a comment naming its data type? | Python has no type declarations, so the comment is the evidence the examiner accepts.<br>
+  A class design says an attribute is "set to 0 when created". Is it a constructor parameter? | No — the constructor assigns it directly.</p>
+  <p style="margin:0 0 7px"><strong>Vocabulary introduced.</strong> class, object, attribute, method, constructor, instantiation, encapsulation, private, parameter, class design.</p>
+  <p style="margin:0"><strong>Check before issuing.</strong> Do Now Q1–Q3 assume Year 12 coverage of parameters, records and function-vs-procedure — confirm against the teaching log. If this cohort has not met record types, drop Q2 and replace it with a second question on parameters.</p>
+</div>
+
+<footer class="foot">
+  Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 1 of 6 &nbsp;·&nbsp; Paper 4 Practical &nbsp;·&nbsp; United School International
+</footer>
+
+</div><!-- /pad -->
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- starter code ---------------- */
+const STARTER = `class Book:
+    def __init__(self, Title, Author):
+        self.__Title = Title        # STRING
+        self.__Author = Author      # STRING
+        self.__OnLoan = False       # BOOLEAN
+
+    def Display(self):
+        print("Title : " + self.__Title)
+        print("Author: " + self.__Author)
+        print("On loan: " + str(self.__OnLoan))
+
+MyBook = Book("Dune", "Frank Herbert")
+MyBook.Display()
+`;
+
+const editor  = document.getElementById('editor');
+const output  = document.getElementById('output');
+const runbtn  = document.getElementById('runbtn');
+const resetbt = document.getElementById('resetbtn');
+const statusEl= document.getElementById('pystatus');
+
+editor.value = STARTER;
+
+/* Tab inserts four spaces rather than moving focus */
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = editor.selectionStart, t = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
+    editor.selectionStart = editor.selectionEnd = s + 4;
+  }
+});
+
+resetbt.addEventListener('click', () => {
+  editor.value = STARTER;
+  output.textContent = 'Press Run to execute.';
+});
+
+/* ---------------- Pyodide ---------------- */
+let pyodide = null, loading = false;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+
+/* Runs the student's code with a traceback trimmed to their own lines —
+   the raw Pyodide trace is full of internal frames that only confuse. */
+const HARNESS = `
+import sys, traceback
+
+def __run__(src):
+    g = {"__name__": "__main__"}
+    try:
+        code = compile(src, "your program", "exec")
+    except SyntaxError:
+        etype, evalue, tb = sys.exc_info()
+        print("".join(traceback.format_exception_only(etype, evalue)), end="", file=sys.stderr)
+        return
+    try:
+        exec(code, g)
+    except SystemExit:
+        pass
+    except BaseException:
+        etype, evalue, tb = sys.exc_info()
+        if tb is not None and tb.tb_next is not None:
+            tb = tb.tb_next
+        print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+`;
+
+async function loadPy() {
+  if (pyodide || loading) return;
+  loading = true;
+  try {
+    pyodide = await loadPyodide();
+    pyodide.runPython(HARNESS);
+    statusEl.textContent = 'Python ready';
+    runbtn.disabled = false;
+  } catch (err) {
+    statusEl.textContent = 'Python unavailable';
+    setOut('The in-page Python runner could not load (this usually means no internet connection).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.', 'err');
+  }
+  loading = false;
+}
+
+function bootstrap() {
+  if (typeof loadPyodide === 'undefined') {
+    statusEl.textContent = 'Python unavailable';
+    runbtn.disabled = true;
+    setOut('The in-page Python runner could not load (this usually means no internet connection).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.', 'err');
+    return;
+  }
+  loadPy();
+}
+
+runbtn.addEventListener('click', async () => {
+  if (!pyodide) { await loadPy(); if (!pyodide) return; }
+  runbtn.disabled = true;
+  statusEl.textContent = 'Running…';
+  let out = '', err = '';
+  pyodide.setStdout({ batched: s => { out += s + '\n'; } });
+  pyodide.setStderr({ batched: s => { err += s + '\n'; } });
+  try {
+    pyodide.globals.set('__student_src__', editor.value);
+    await pyodide.runPythonAsync('__run__(__student_src__)');
+    if (err) {
+      output.textContent = '';
+      if (out) output.appendChild(document.createTextNode(out));
+      const e = document.createElement('span');
+      e.className = 'err';
+      e.textContent = err.replace(/\n$/, '');
+      output.appendChild(e);
+      statusEl.textContent = 'Error — read it carefully';
+    } else {
+      setOut(out.length ? out.replace(/\n$/, '') : '(the program produced no output)');
+      statusEl.textContent = 'Finished';
+    }
+  } catch (ex) {
+    setOut(String(ex).trim().split('\n').slice(-3).join('\n'), 'err');
+    statusEl.textContent = 'Error — read it carefully';
+  }
+  runbtn.disabled = false;
+});
+
+/* ---------------- checkpoints ---------------- */
+document.querySelectorAll('.cp').forEach(cp => {
+  const fb    = cp.querySelector('.fb');
+  const texts = cp.querySelectorAll('.fbs > div');
+  const opts  = Array.from(cp.querySelectorAll('.opt'));
+  opts.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      const ok = btn.dataset.ok === '1';
+      opts.forEach(b => b.classList.remove('right','wrong'));
+      btn.classList.add(ok ? 'right' : 'wrong');
+      if (!ok) {
+        const correct = cp.querySelector('.opt[data-ok="1"]');
+        if (correct) correct.classList.add('right');
+      }
+      fb.className = 'fb show ' + (ok ? 'good' : 'bad');
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite. </strong>')
+                   + (texts[i] ? texts[i].innerHTML : '');
+    });
+  });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js" onload="bootstrap()" onerror="bootstrap()"></script>
+</body>
+</html>
