@@ -12,6 +12,7 @@ the page falls back to "write it in your own IDE" and everything else still work
 ```
 index.html          hub — lists every lesson
 oop-lesson-1.html       20.1 OOP — Classes, Attributes and the Constructor
+oop-lesson-2.html       20.1 OOP — Get and Set Methods
 robots.txt          disallow all crawlers
 ```
 
