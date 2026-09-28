@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>20.1 OOP — Home Lesson 3: Using Objects</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
+  --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
+  --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
+  --warn:#B45309; --warn-bg:#FFFBEB;
+  --mono:"Cascadia Mono","Consolas","SF Mono",Menlo,monospace;
+  --sans:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{margin:0;background:#E2E8F0;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;background:var(--white);padding:0 0 64px;box-shadow:0 0 40px rgba(15,23,42,.10)}
+.pad{padding:0 40px}
+@media(max-width:640px){.pad{padding:0 18px} body{font-size:16px}}
+
+/* ---------- masthead ---------- */
+header.mast{background:var(--blue-dk);color:#fff;padding:30px 40px 26px}
+@media(max-width:640px){header.mast{padding:24px 18px}}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#BFDBFE;font-weight:700;margin:0 0 8px}
+.kicker a.home{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
+.kicker a.home:hover{border-bottom-color:#fff}
+header.mast h1{margin:0;font-size:31px;line-height:1.2;font-weight:700}
+header.mast .sub{margin:10px 0 0;color:#DBEAFE;font-size:15px}
+.pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;color:#EFF6FF}
+
+/* ---------- sticky nav ---------- */
+nav.sticky{position:sticky;top:0;z-index:40;background:#fff;border-bottom:2px solid var(--line);padding:0 40px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+@media(max-width:640px){nav.sticky{padding:0 10px}}
+nav.sticky a{flex:0 0 auto;padding:11px 12px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+nav.sticky a:hover{color:var(--blue);border-bottom-color:#BFDBFE}
+
+/* ---------- sections ---------- */
+section{padding-top:34px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:800;margin:0 0 4px}
+h2 + .h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25}
+h3{font-size:19px;color:var(--blue-dk);margin:26px 0 8px}
+p{margin:0 0 13px}
+.lead{font-size:18px;color:var(--muted)}
+hr.rule{border:0;border-top:2px solid var(--panel);margin:38px 0 0}
+
+/* ---------- boxes ---------- */
+.box{border:1.5px solid var(--blue);background:var(--panel);border-radius:8px;padding:16px 20px;margin:16px 0}
+.box.pinkb{border-color:var(--pink);background:#fff}
+.box .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--blue);margin:0 0 8px}
+.box.pinkb .bt{color:var(--pink)}
+.callout{border-left:5px solid var(--warn);background:var(--warn-bg);padding:13px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+.callout .bt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--warn);margin:0 0 6px}
+.callout.ex{border-left-color:var(--bad);background:var(--bad-bg)}
+.callout.ex .bt{color:var(--bad)}
+ul,ol{margin:0 0 13px;padding-left:22px}
+li{margin:0 0 7px}
+code{font-family:var(--mono);background:#E2E8F0;padding:1px 5px;border-radius:4px;font-size:.92em}
+.tick{color:var(--good);font-weight:800}
+.cross{color:var(--bad);font-weight:800}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+tbody tr:nth-child(even){background:#F8FAFC}
+td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+@media(max-width:640px){td.dt{white-space:normal;overflow-wrap:anywhere;font-size:13px} th,td{padding:7px 7px}}
+
+/* ---------- code ---------- */
+pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
+pre.code .cm{color:#94A3B8;font-style:italic}
+pre.code .kw{color:#F0ABFC}
+pre.code .st{color:#86EFAC}
+pre.code .fn{color:#93C5FD}
+pre.code .nm{color:#FDE68A}
+.codelabel{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:5px 5px 0 0;margin-bottom:-4px}
+
+/* ---------- runner ---------- */
+.runner{border:2px solid var(--blue);border-radius:10px;overflow:hidden;margin:16px 0;background:#0F172A}
+.runbar{background:#1E293B;padding:8px 12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid #334155}
+.runbar .ttl{color:#93C5FD;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-right:auto}
+button{font-family:var(--sans);font-size:14px;font-weight:700;border:0;border-radius:6px;padding:7px 15px;cursor:pointer;background:var(--blue);color:#fff}
+button:hover{background:#1E40AF}
+button.ghost{background:#334155;color:#CBD5E1}
+button.ghost:hover{background:#475569}
+button:disabled{opacity:.5;cursor:not-allowed}
+textarea.editor{width:100%;min-height:250px;background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;border:0;padding:14px 18px;resize:vertical;display:block;outline:none;tab-size:4}
+.outwrap{border-top:1px solid #334155;background:#020617}
+.outlabel{color:#64748B;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:7px 18px 0}
+pre.out{margin:0;padding:6px 18px 14px;color:#E2E8F0;font-family:var(--mono);font-size:14px;line-height:1.55;white-space:pre-wrap;min-height:34px}
+pre.out .err{color:#FCA5A5}
+pre.out .ok{color:#86EFAC}
+.status{font-size:12.5px;color:#94A3B8;font-family:var(--mono)}
+
+/* ---------- interactive ---------- */
+.predict{border:2px dashed var(--pink);border-radius:9px;padding:16px 20px;margin:16px 0;background:#FDF2F8}
+.predict .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--pink);margin:0 0 8px}
+.predict textarea{width:100%;min-height:70px;font-family:var(--mono);font-size:14px;padding:9px 11px;border:1.5px solid var(--line);border-radius:6px;resize:vertical}
+
+.cp{border:2px solid var(--blue);border-radius:10px;margin:20px 0;overflow:hidden}
+.cp .cph{background:var(--blue);color:#fff;padding:9px 18px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.cp .cpb{padding:16px 20px}
+.cp .q{font-weight:700;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:11px 14px;margin:0 0 9px;cursor:pointer;font-family:var(--sans);font-size:15.5px;color:var(--ink);font-weight:400;line-height:1.45}
+.opt:hover{border-color:var(--blue);background:#EFF6FF}
+.opt code{background:#E2E8F0}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.fb{display:none;margin-top:10px;padding:12px 15px;border-radius:7px;font-size:15px;line-height:1.5}
+.fb.show{display:block}
+.fb.good{background:var(--good-bg);border-left:5px solid var(--good)}
+.fb.bad{background:var(--bad-bg);border-left:5px solid var(--bad)}
+
+details.rev{border:1.5px solid var(--line);border-radius:8px;margin:14px 0;background:#fff;overflow:hidden}
+details.rev>summary{cursor:pointer;padding:12px 18px;font-weight:700;color:var(--blue);background:var(--panel);list-style:none;font-size:15.5px}
+details.rev>summary::-webkit-details-marker{display:none}
+details.rev>summary::before{content:"▸ ";color:var(--pink);font-weight:800}
+details.rev[open]>summary::before{content:"▾ "}
+details.rev .body{padding:4px 18px 14px}
+
+.tier{border:1.5px solid var(--line);border-radius:9px;margin:14px 0;overflow:hidden}
+.tier .th{padding:9px 18px;font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#fff}
+.tier.s .th{background:#0891B2} .tier.i .th{background:var(--blue)} .tier.e .th{background:#7C3AED}
+.tier .tb{padding:14px 18px}
+
+.ms{border:1.5px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0}
+.ms table{margin:0;font-size:15px}
+.ms th{background:var(--blue-dk)}
+.mp{font-family:var(--mono);font-weight:700;color:var(--blue);white-space:nowrap}
+
+.steps{counter-reset:st;list-style:none;padding:0}
+.steps li{counter-increment:st;position:relative;padding-left:44px;margin-bottom:14px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
+.tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
+.tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
+</style>
+</head>
+<body data-lesson="L3">
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker"><a class="home" href="index.html">← All lessons</a> &nbsp;·&nbsp; Cambridge 9618 A Level · Unit 20.1 · Paper 4 Practical</p>
+  <h1>Object-Oriented Programming<br>Home Lesson 3 — Using Objects</h1>
+  <p class="sub">Work through this page, then build a whole club of members in Python and submit the Evidence Document on Teams.</p>
+  <div class="pills">
+    <span class="pill">Home lesson 3 of 6</span>
+    <span class="pill">Language: Python (console)</span>
+    <span class="pill">Suggested time: 60 minutes</span>
+    <span class="pill">Submit: Evidence Document (.docx)</span>
+  </div>
+</header>
+
+<nav class="sticky">
+  <a href="#how">How this works</a>
+  <a href="#donow">Do Now</a>
+  <a href="#obj">Objectives</a>
+  <a href="#terms">Key terms</a>
+  <a href="#predict">Predict</a>
+  <a href="#run">Run</a>
+  <a href="#investigate">Investigate</a>
+  <a href="#modify">Modify</a>
+  <a href="#technique">Exam technique</a>
+  <a href="#task">Your task</a>
+  <a href="#markscheme">Mark scheme</a>
+  <a href="#submit">Submit</a>
+</nav>
+
+<div class="pad">
+
+<!-- ========== HOW THIS WORKS ========== -->
+<section id="how">
+  <p class="eyebrow">Start here</p>
+  <h2 class="h">How this lesson works</h2>
+  <p class="lead">Same routine. This page teaches, then makes you type — and this week your one <code>Member</code> becomes a whole club of them.</p>
+  <ol class="steps">
+    <li><strong>Learn on this page.</strong> Predict, run, investigate, modify. Nothing to install.</li>
+    <li><strong>Open your Lesson 2 code.</strong> The <code>Member</code> class does not change this week — everything new happens <em>outside</em> it. If your Lesson 2 class is not working, there is a version in the task section to start from.</li>
+    <li><strong>Evidence it.</strong> Paste your code <em>as text</em> and your screenshot into this week's Evidence Document, and submit it on Teams.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">Why this lesson matters more than the last two</p>
+    <p style="margin:0">In the two most recent November examiner reports, Cambridge put this in its Key Messages: candidates can now <em>declare</em> a class well — the marks are being lost at the point where they have to <strong>create objects, store them, and work with them through their methods</strong>. That is this lesson. Lessons 1 and 2 built the class; this one uses it.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== DO NOW ========== -->
+<section id="donow">
+  <p class="eyebrow">Retrieval</p>
+  <h2 class="h">Do Now — three minutes, no notes</h2>
+  <p>Answer these before you read anything else. Write them in your book, then reveal the answers and mark them.</p>
+  <div class="box">
+    <p class="bt">Questions</p>
+    <ol style="margin-bottom:0">
+      <li>A student writes this get method: <code>def GetAge(self, Age): return self.__Age</code>. <strong>Identify</strong> the error and <strong>write</strong> the corrected method header. <em>[2]</em></li>
+      <li>A set method must add <code>Amount</code> to an attribute and never let it go above a limit. <strong>State</strong> the three steps, in the correct order. <em>[1]</em></li>
+      <li>
+        <strong>State</strong> the output of this code, and <strong>explain</strong> why the <code>range</code> ends at 3 when the last index is 2. <em>[2]</em>
+<pre class="code" style="margin:8px 0 0">Scores = [<span class="nm">12</span>, <span class="nm">7</span>, <span class="nm">15</span>]
+Total = <span class="nm">0</span>
+<span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">3</span>):
+    Total = Total + Scores[Index]
+<span class="fn">print</span>(Total)</pre>
+      </li>
+    </ol>
+  </div>
+  <details class="rev"><summary>Mark scheme — mark your own answers</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:60px">Q</th><th>Accepted</th><th style="width:70px">Marks</th></tr>
+      <tr><td class="mp">1</td><td>MP1 — a get method must not take a parameter (other than <code>self</code>).<br>MP2 — <code>def GetAge(self):</code></td><td>2</td></tr>
+      <tr><td class="mp">2</td><td><strong>Add</strong>, then <strong>limit</strong> the new total, then <strong>store</strong> it. All three, in that order.</td><td>1</td></tr>
+      <tr><td class="mp">3</td><td>MP1 — <code>34</code><br>MP2 — the end value of <code>range</code> is <strong>not included</strong> / <code>range</code> stops one before its end value, so it must be one greater than the last index.</td><td>2</td></tr>
+    </table></div>
+    <p style="margin:10px 0 0"><strong>Q3 is the prerequisite check.</strong> Every loop in this lesson walks through an array by index. An off-by-one <code>range</code> either misses the last object or crashes past the end — examiners report it in seven of the last ten series.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== OBJECTIVES ========== -->
+<section id="obj">
+  <p class="eyebrow">Where this is going</p>
+  <h2 class="h">Learning objectives</h2>
+  <table>
+    <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
+    <tr><td>Declare an <strong>array of objects</strong> with its type evidenced, and store a new object in each element.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Call a method on <strong>one element</strong> of the array, and on <strong>every element</strong> using a loop.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Use the values that methods return to <strong>total</strong>, <strong>compare</strong> and <strong>search</strong> — comparing the right thing.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Write a <strong>linear search</strong> over an array of objects that returns the index, or <code>-1</code> only after every element has been checked.</td><td>20.1</td><td>2 &amp; 4</td></tr>
+  </table>
+</section>
+
+<hr class="rule">
+
+<!-- ========== KEY TERMS ========== -->
+<section id="terms">
+  <p class="eyebrow">Vocabulary</p>
+  <h2 class="h">Key terms — learn these wordings</h2>
+  <table>
+    <tr><th style="width:26%">Term</th><th>Definition that earns the mark</th></tr>
+    <tr><td><strong>Array of objects</strong></td><td>An array whose elements are each an object of the same class. Its data type is that class — <code>ARRAY[0:4] OF Member</code>.</td></tr>
+    <tr><td><strong>Element</strong></td><td>One position in an array, identified by its index.</td></tr>
+    <tr><td><strong>Index</strong></td><td>The number that identifies an element's position. In Python the first index is 0.</td></tr>
+    <tr><td><strong>Linear search</strong></td><td>Checks each element in turn, from the first, until the item is found or every element has been checked.</td></tr>
+    <tr><td><strong>Return value</strong></td><td>The value a function or method passes back to the point where it was called.</td></tr>
+  </table>
+  <div class="callout ex">
+    <p class="bt">What will not earn the mark</p>
+    <p style="margin:0">"An array of objects is a list of classes" — <span class="cross">no mark</span>; the elements are <em>objects</em> (instances), not classes. "A linear search looks through the array" — <span class="cross">incomplete</span>; say it checks <em>each element in turn</em> and says when it <em>stops</em>.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PREDICT ========== -->
+<section id="predict">
+  <p class="eyebrow">PRIMM · Step 1</p>
+  <h2 class="h">Predict</h2>
+  <p>Read this program carefully. <strong>Do not run it yet.</strong> Write down exactly what you think the three <code>print</code> lines will output.</p>
+  <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages):
+        self.__Title = Title        <span class="cm"># STRING</span>
+        self.__Pages = Pages        <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">GetTitle</span>(self):
+        <span class="kw">return</span> self.__Title
+
+    <span class="kw">def</span> <span class="fn">GetPages</span>(self):
+        <span class="kw">return</span> self.__Pages
+
+Shelf = [<span class="kw">None</span>] * <span class="nm">3</span>                  <span class="cm"># ARRAY[0:2] OF Book</span>
+Shelf[<span class="nm">0</span>] = <span class="nm">Book</span>(<span class="st">"Dune"</span>, <span class="nm">412</span>)
+Shelf[<span class="nm">1</span>] = <span class="nm">Book</span>(<span class="st">"Emma"</span>, <span class="nm">474</span>)
+Shelf[<span class="nm">2</span>] = <span class="nm">Book</span>(<span class="st">"Holes"</span>, <span class="nm">233</span>)
+
+<span class="fn">print</span>(Shelf[<span class="nm">1</span>].<span class="fn">GetTitle</span>())
+Longest = Shelf[<span class="nm">0</span>]
+<span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">3</span>):
+    <span class="kw">if</span> Shelf[Index].<span class="fn">GetPages</span>() > Longest.<span class="fn">GetPages</span>():
+        Longest = Shelf[Index]
+<span class="fn">print</span>(Longest.<span class="fn">GetTitle</span>() + <span class="st">" "</span> + <span class="fn">str</span>(Longest.<span class="fn">GetPages</span>()))
+<span class="fn">print</span>(Shelf[<span class="nm">2</span>])</pre>
+
+  <div class="predict">
+    <p class="bt">Commit your prediction before you scroll</p>
+    <textarea id="pred1" data-save placeholder="Type the three lines you expect…"></textarea>
+    <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Two harder questions: is <code>Longest</code> a number, a title, or something else? And why does the loop start at 1, not 0?</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== RUN ========== -->
+<section id="run">
+  <p class="eyebrow">PRIMM · Step 2</p>
+  <h2 class="h">Run</h2>
+  <p>Now run it and compare the real output with your prediction.</p>
+
+  <div class="runner">
+    <div class="runbar">
+      <span class="ttl">Python 3 — try it</span>
+      <span class="status" id="pystatus">Python is loading…</span>
+      <button id="runbtn" disabled>▶ Run</button>
+      <button class="stop" id="stopbtn" disabled>■ Stop</button>
+      <button class="ghost" id="resetbtn">Reset code</button>
+    </div>
+    <textarea class="editor" id="editor" spellcheck="false" aria-label="Python code editor"></textarea>
+    <div class="inwrap">
+      <label class="outlabel" for="stdin" style="display:block">Program input — only if your code uses input(): one value per line, in order</label>
+      <textarea class="stdin" id="stdin" spellcheck="false" rows="2"></textarea>
+    </div>
+    <div class="outwrap">
+      <div class="outlabel">Output</div>
+      <pre class="out" id="output">Press Run to execute.</pre>
+    </div>
+  </div>
+  <p class="savenote">Your code and your prediction are saved in this browser, so closing the tab does not lose them. If a program never finishes, press <strong>Stop</strong>.</p>
+
+  <details class="rev"><summary>Check your prediction</summary>
+  <div class="body">
+<pre class="code">Emma
+Emma 474
+&lt;__main__.Book object at 0x…&gt;</pre>
+    <ul style="margin-bottom:0">
+      <li><code>Shelf[1].GetTitle()</code> reads left to right: <strong>take the array</strong>, <strong>pick element 1</strong>, <strong>call its method</strong>. Element 1 is the second book, because indexes start at 0.</li>
+      <li><code>Longest</code> is <strong>a whole <code>Book</code> object</strong>, not a number and not a title. It starts as the first book and is replaced whenever a longer one turns up. Because it is an object, you can call its methods — <code>Longest.GetTitle()</code> — after the loop. The loop starts at 1 because element 0 is already in <code>Longest</code>; there is no point comparing it with itself.</li>
+      <li>The last line prints the object itself, and Python has no idea how you want a book shown, so you get its type and memory address. <strong>An object is not its data.</strong> To output what is inside it, call a method: a get method, or a <code>Display…</code> method. Printing a whole object or list instead of the values inside it is a recurring output error in the examiner reports.</li>
+    </ul>
+  </div>
+  </details>
+
+  <div class="callout ex">
+    <p class="bt">Try this — then read why it matters</p>
+    <p style="margin:0 0 8px">Add this line to the bottom and run it again:</p>
+    <pre class="code" style="margin:0 0 8px"><span class="fn">print</span>(Shelf.<span class="fn">GetTitle</span>())</pre>
+    <p style="margin:0">It crashes: <code>'list' object has no attribute 'GetTitle'</code>. <code>Shelf</code> is the whole array — a list of books — and a list does not have a <code>GetTitle</code> method. Only a <em>book</em> does. You must pick an element <strong>first</strong>, then call the method on it.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== INVESTIGATE ========== -->
+<section id="investigate">
+  <p class="eyebrow">PRIMM · Step 3</p>
+  <h2 class="h">Investigate — arrays of objects</h2>
+
+  <h3>1. Declaring the array — and showing its type</h3>
+<pre class="code">Shelf = [<span class="kw">None</span>] * <span class="nm">3</span>                  <span class="cm"># ARRAY[0:2] OF Book</span>
+Shelf[<span class="nm">0</span>] = <span class="nm">Book</span>(<span class="st">"Dune"</span>, <span class="nm">412</span>)</pre>
+  <p><code>[None] * 3</code> makes an array of three empty elements; each one then has a new object stored in it. The comment does the same job as last week's <code># STRING</code>: Python cannot declare the type, so you show the examiner that this is an array <strong>of type <code>Book</code></strong>. Building it with <code>Shelf = []</code> and <code>Shelf.append(Book(...))</code> works just as well — keep the comment either way.</p>
+
+  <h3>2. Array, then element, then method</h3>
+  <table>
+    <tr><th style="width:38%">You write</th><th>What happens</th></tr>
+    <tr><td class="dt">Shelf[1].GetTitle()</td><td><span class="tick">✓</span> Element 1's title is returned.</td></tr>
+    <tr><td class="dt">Shelf.GetTitle()</td><td><span class="cross">✗</span> Crash — the list has no such method.</td></tr>
+    <tr><td class="dt">Shelf[3].GetTitle()</td><td><span class="cross">✗</span> <code>IndexError</code> — a three-element array ends at index 2.</td></tr>
+    <tr><td class="dt">GetTitle(Shelf[1])</td><td><span class="cross">✗</span> Crash — a method is not a free-standing procedure; it is called <em>on</em> an object with a dot.</td></tr>
+  </table>
+
+  <h3>3. Looping over every element</h3>
+<pre class="code"><span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">3</span>):         <span class="cm"># pseudocode: FOR Index ← 0 TO 2</span>
+    <span class="fn">print</span>(Shelf[Index].<span class="fn">GetTitle</span>())</pre>
+  <p>The loop variable is the <strong>index</strong>, so <code>Shelf[Index]</code> is the object for this pass. The end of the <code>range</code> is <strong>one greater</strong> than the last index. When a question gives you <code>FOR Index ← 0 TO 4</code>, Python needs <code>range(0, 5)</code>.</p>
+
+  <h3>4. Using what comes back — four patterns</h3>
+  <p>Almost every Paper 4 OOP question asks for one of these. Each one calls a get method on every element and <strong>does something with the value returned</strong>.</p>
+  <table>
+    <tr><th style="width:20%">Pattern</th><th>The shape of it</th></tr>
+    <tr><td><strong>Total</strong></td><td><code>Total = 0</code> <em>before</em> the loop; <code>Total = Total + Shelf[Index].GetPages()</code> inside it; use <code>Total</code> <em>after</em> it.</td></tr>
+    <tr><td><strong>Count</strong></td><td><code>Count = 0</code> before; <code>if Shelf[Index].GetPages() &gt; 400: Count = Count + 1</code> inside.</td></tr>
+    <tr><td><strong>Best so far</strong></td><td>Start with the first object; replace it whenever an element beats it — the Predict program.</td></tr>
+    <tr><td><strong>Search</strong></td><td>Compare each element's value with the target; <code>return Index</code> the moment it matches; <code>return -1</code> only <strong>after</strong> the loop.</td></tr>
+  </table>
+
+  <h3>5. Compare the value, not the object</h3>
+  <p><code>Shelf[Index] == "Dune"</code> never crashes and is <strong>never true</strong>: it compares a whole <code>Book</code> object with a string. You want <code>Shelf[Index].GetTitle() == "Dune"</code>. Comparing the wrong thing — the index instead of the element, or the whole object instead of one field — is reported in six of the last ten series, and it is nasty because the program runs and simply never finds anything.</p>
+
+  <div class="cp" data-cp="1">
+    <div class="cph">Checkpoint 1</div>
+    <div class="cpb">
+      <p class="q"><code>Shelf</code> holds three <code>Book</code> objects. Which line outputs the title of the <strong>third</strong> book?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>print(Shelf.GetTitle(2))</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>print(Shelf[3].GetTitle())</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>print(Shelf[2].__Title)</code></button>
+      <button class="opt" data-ok="1">D &nbsp;<code>print(Shelf[2].GetTitle())</code></button>
+      <div class="fbs" hidden>
+        <div>This calls the method on the whole array and passes the index as a parameter. The list has no <code>GetTitle</code> method, and a get method takes no parameter anyway. Pick the element first: <code>Shelf[2]</code>.</div>
+        <div>The third book is at index <strong>2</strong>, because the first is at 0. <code>Shelf[3]</code> is past the end of a three-element array and crashes with an <code>IndexError</code>.</div>
+        <div>The right element, but it reaches into a private attribute from outside the class. That crashes, and it bypasses the get method the question is testing.</div>
+        <div>Array, then element, then method — and the returned title goes straight into <code>print</code>.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="cp" data-cp="2">
+    <div class="cph">Checkpoint 2</div>
+    <div class="cpb">
+      <p class="q">Inside a loop, which condition is true when the book at <code>Index</code> is called <em>Emma</em>?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>if Shelf[Index] == "Emma":</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>if Shelf[Index].GetTitle == "Emma":</code></button>
+      <button class="opt" data-ok="1">C &nbsp;<code>if Shelf[Index].GetTitle() == "Emma":</code></button>
+      <button class="opt" data-ok="0">D &nbsp;<code>if Shelf[Index].GetTitle() = "Emma":</code></button>
+      <div class="fbs" hidden>
+        <div>This compares a whole <code>Book</code> object with a string. It runs without an error and is <strong>never</strong> true, so the search silently finds nothing. Compare the <em>value returned by a get method</em>.</div>
+        <div>No brackets, so the method is never <em>called</em> — this compares the method itself with a string, which is never true. Every method call needs its <code>()</code>, even with no parameters.</div>
+        <div>The method is called on the element, and the title it returns is compared with the string.</div>
+        <div>A single <code>=</code> is assignment, not comparison. Python stops with a <code>SyntaxError</code>. Comparison is <code>==</code>.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MODIFY ========== -->
+<section id="modify">
+  <p class="eyebrow">PRIMM · Step 4</p>
+  <h2 class="h">Modify</h2>
+  <p>Go back to the runner. Keep the class and the three books, and replace everything from <code>print(Shelf[1]…</code> downwards.</p>
+
+  <div class="box">
+    <p class="bt">Changes to make</p>
+    <ol style="margin:0">
+      <li>Write a function <code>TotalPages()</code> that <strong>returns</strong> the total number of pages of all the books in <code>Shelf</code>.</li>
+      <li>Write a function <code>FindBook(SearchTitle)</code> that <strong>returns</strong> the index of the book with that title, or <code>-1</code> if it is not on the shelf.</li>
+      <li>In the main program, output <code>Total pages: 1119</code> using <code>TotalPages()</code>.</li>
+      <li>Search for <code>"Holes"</code> and output <code>Holes is at index 2</code>. Then search for <code>"Beloved"</code> and output <code>Beloved is not on the shelf</code>. <strong>Store</strong> what <code>FindBook</code> returns before you test it.</li>
+    </ol>
+  </div>
+
+  <details class="rev"><summary>Model answer — check yours against this</summary>
+  <div class="body">
+    <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">def</span> <span class="fn">TotalPages</span>():
+    Total = <span class="nm">0</span>
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">3</span>):
+        Total = Total + Shelf[Index].<span class="fn">GetPages</span>()
+    <span class="kw">return</span> Total
+
+<span class="kw">def</span> <span class="fn">FindBook</span>(SearchTitle):
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">3</span>):
+        <span class="kw">if</span> Shelf[Index].<span class="fn">GetTitle</span>() == SearchTitle:
+            <span class="kw">return</span> Index
+    <span class="kw">return</span> -<span class="nm">1</span>
+
+<span class="fn">print</span>(<span class="st">"Total pages: "</span> + <span class="fn">str</span>(<span class="fn">TotalPages</span>()))
+
+Position = <span class="fn">FindBook</span>(<span class="st">"Holes"</span>)
+<span class="kw">if</span> Position == -<span class="nm">1</span>:
+    <span class="fn">print</span>(<span class="st">"Holes is not on the shelf"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"Holes is at index "</span> + <span class="fn">str</span>(Position))
+
+Position = <span class="fn">FindBook</span>(<span class="st">"Beloved"</span>)
+<span class="kw">if</span> Position == -<span class="nm">1</span>:
+    <span class="fn">print</span>(<span class="st">"Beloved is not on the shelf"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"Beloved is at index "</span> + <span class="fn">str</span>(Position))</pre>
+    <ul style="margin:10px 0 0">
+      <li>The functions go <strong>outside</strong> the class — they work <em>with</em> books, they are not part of one. They can read <code>Shelf</code> because it is declared in the main program.</li>
+      <li>In <code>FindBook</code>, <code>return -1</code> is lined up with the <code>for</code>, not the <code>if</code>. It runs only once the loop has checked every book.</li>
+      <li><code>Position = FindBook(...)</code> calls the search <strong>once</strong> and keeps the answer. Writing <code>if FindBook("Holes") != -1:</code> and then calling <code>FindBook</code> again inside the <code>if</code> does all the work twice — and when a call <em>changes</em> something, calling it twice is a real bug that examiners report in five series.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== EXAM TECHNIQUE ========== -->
+<section id="technique">
+  <p class="eyebrow">The marks</p>
+  <h2 class="h">Exam technique — where the lines go matters</h2>
+  <p>With loops and returns, a line of code in the wrong place — inside the loop instead of before or after it — turns a correct idea into a wrong answer that still runs.</p>
+
+  <p><strong>Predict, then reveal.</strong> The question says: <em>"Write a function <code>AveragePages()</code> that returns the average number of pages of the three books in <code>Shelf</code>."</em> A candidate writes this. It runs, and returns <code>137.33…</code>. The right answer is <code>373.0</code>. Find every fault before you open the answer.</p>
+  <span class="codelabel">Candidate response</span>
+<pre class="code"><span class="kw">def</span> <span class="fn">AveragePages</span>():
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">2</span>):
+        Total = <span class="nm">0</span>
+        Total = Total + Shelf[Index].<span class="fn">GetPages</span>()
+        <span class="kw">return</span> Total / <span class="nm">3</span></pre>
+  <details class="rev"><summary>What the examiner says</summary>
+  <div class="body">
+    <ul>
+      <li><span class="cross">✗</span> <strong><code>range(0, 2)</code> misses the last book.</strong> It visits indexes 0 and 1 only. Three books need <code>range(0, 3)</code>.</li>
+      <li><span class="cross">✗</span> <strong><code>Total = 0</code> is inside the loop.</strong> It is reset on every pass, so it can never hold more than one book's pages. Initialise once, <em>before</em> the loop.</li>
+      <li><span class="cross">✗</span> <strong><code>return</code> is inside the loop.</strong> The function hands back its answer after the first book and stops — the loop never gets a second pass. That is why the answer is 412 ÷ 3.</li>
+      <li><span class="tick">✓</span> <strong><code>Shelf[Index].GetPages()</code></strong> — array, element, method, and the returned value is used. That line is credited.</li>
+    </ul>
+    <span class="codelabel">What would have scored</span>
+<pre class="code"><span class="kw">def</span> <span class="fn">AveragePages</span>():
+    Total = <span class="nm">0</span>
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">3</span>):
+        Total = Total + Shelf[Index].<span class="fn">GetPages</span>()
+    <span class="kw">return</span> Total / <span class="nm">3</span></pre>
+    <p style="margin-bottom:0"><strong>The habit to build:</strong> for every line in a loop question, ask <em>"once, or every time?"</em> Setting up a total happens once — before. Adding to it happens every time — inside. Returning the answer happens once — after. The indentation of that line is your answer to the question.</p>
+  </div>
+  </details>
+
+  <div class="cp" data-cp="3">
+    <div class="cph">Checkpoint 3</div>
+    <div class="cpb">
+      <p class="q">Using the same three books (<em>Dune</em>, <em>Emma</em>, <em>Holes</em>), what does this function return for <code>FindBook("Holes")</code>?</p>
+<pre class="code" style="margin:0 0 12px"><span class="kw">def</span> <span class="fn">FindBook</span>(SearchTitle):
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">3</span>):
+        <span class="kw">if</span> Shelf[Index].<span class="fn">GetTitle</span>() == SearchTitle:
+            <span class="kw">return</span> Index
+        <span class="kw">else</span>:
+            <span class="kw">return</span> -<span class="nm">1</span></pre>
+      <button class="opt" data-ok="0">A &nbsp;<code>2</code> — Holes is at index 2</button>
+      <button class="opt" data-ok="1">B &nbsp;<code>-1</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>None</code></button>
+      <button class="opt" data-ok="0">D &nbsp;It crashes with an <code>IndexError</code></button>
+      <div class="fbs" hidden>
+        <div>That is what it <em>should</em> return, but trace it. On the very first pass, <code>Dune</code> is not <code>Holes</code>, so the <code>else</code> runs and the function returns straight away. It never reaches index 2.</div>
+        <div>On the first pass <code>Dune</code> does not match, the <code>else</code> returns <code>-1</code>, and the function is over. This search can only ever find the <strong>first</strong> element. The fix: delete the <code>else</code>, and put <code>return -1</code> after the loop, lined up with <code>for</code>.</div>
+        <div>A function returns <code>None</code> only when it reaches the end without a <code>return</code>. Here the <code>else</code> guarantees a <code>return</code> on the very first pass.</div>
+        <div><code>range(0, 3)</code> only visits 0, 1 and 2, all of which exist — and in fact the loop never gets past index 0.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== TASK ========== -->
+<section id="task">
+  <p class="eyebrow">Assessed work</p>
+  <h2 class="h">Over to you — build the whole club</h2>
+  <p class="lead">Everyone starts at <strong>Independent</strong>. Drop to Scaffolded if you stall. Go to Exam Conditions when you have finished.</p>
+
+  <div class="box pinkb">
+    <p class="bt">The scenario</p>
+    <p style="margin:0 0 10px">The sports club now stores all of its members in one array. The class <code>Member</code> is <strong>unchanged</strong> from Lesson 2 — constructor, <code>DisplayDetails()</code>, <code>GetName()</code>, <code>GetCredits()</code>, <code>SetAge()</code> and <code>AddCredits()</code>, with credits limited to 50.</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:30%">Identifier</th><th style="width:30%">Data type</th><th>Description</th></tr>
+      <tr><td class="dt">ClubMembers</td><td class="dt">ARRAY[0:4] OF Member</td><td>Stores the five members of the club.</td></tr>
+    </table>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:12%">Index</th><th style="width:18%">MemberID</th><th>Name</th><th style="width:12%">Age</th><th style="width:22%">Credits to add</th></tr>
+      <tr><td class="dt">0</td><td class="dt">"M4021"</td><td class="dt">"Sara Ahmed"</td><td class="dt">16</td><td class="dt">20</td></tr>
+      <tr><td class="dt">1</td><td class="dt">"M4022"</td><td class="dt">"Omar Khalid"</td><td class="dt">17</td><td class="dt">45</td></tr>
+      <tr><td class="dt">2</td><td class="dt">"M4023"</td><td class="dt">"Lina Haddad"</td><td class="dt">16</td><td class="dt">60</td></tr>
+      <tr><td class="dt">3</td><td class="dt">"M4024"</td><td class="dt">"Yusuf Rahman"</td><td class="dt">18</td><td class="dt">0</td></tr>
+      <tr><td class="dt">4</td><td class="dt">"M4025"</td><td class="dt">"Mia Chen"</td><td class="dt">17</td><td class="dt">35</td></tr>
+    </table>
+    <table style="margin:0">
+      <tr><th style="width:30%">Subroutine</th><th>Description</th></tr>
+      <tr><td class="dt">TotalCredits()</td><td>A function that returns the total credits of all the members in <code>ClubMembers</code>.</td></tr>
+      <tr><td class="dt">FindMember(SearchName)</td><td>A function that returns the index of the member whose name matches <code>SearchName</code>. If no member matches, it returns <code>-1</code>.</td></tr>
+    </table>
+  </div>
+
+  <details class="rev"><summary>Lesson 2 class not working? Start from this version</summary>
+  <div class="body">
+<pre class="code"><span class="kw">class</span> <span class="nm">Member</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, MemberID, Name, Age):
+        self.__MemberID = MemberID   <span class="cm"># STRING</span>
+        self.__Name = Name           <span class="cm"># STRING</span>
+        self.__Age = Age             <span class="cm"># INTEGER</span>
+        self.__Credits = <span class="nm">0</span>           <span class="cm"># INTEGER</span>
+        self.__Active = <span class="kw">True</span>         <span class="cm"># BOOLEAN</span>
+
+    <span class="kw">def</span> <span class="fn">DisplayDetails</span>(self):
+        <span class="fn">print</span>(<span class="st">"Member ID : "</span> + self.__MemberID)
+        <span class="fn">print</span>(<span class="st">"Name      : "</span> + self.__Name)
+        <span class="fn">print</span>(<span class="st">"Age       : "</span> + <span class="fn">str</span>(self.__Age))
+        <span class="fn">print</span>(<span class="st">"Credits   : "</span> + <span class="fn">str</span>(self.__Credits))
+        <span class="fn">print</span>(<span class="st">"Active    : "</span> + <span class="fn">str</span>(self.__Active))
+
+    <span class="kw">def</span> <span class="fn">GetName</span>(self):
+        <span class="kw">return</span> self.__Name
+
+    <span class="kw">def</span> <span class="fn">GetCredits</span>(self):
+        <span class="kw">return</span> self.__Credits
+
+    <span class="kw">def</span> <span class="fn">SetAge</span>(self, NewAge):
+        self.__Age = NewAge
+
+    <span class="kw">def</span> <span class="fn">AddCredits</span>(self, Amount):
+        NewTotal = self.__Credits + Amount
+        <span class="kw">if</span> NewTotal > <span class="nm">50</span>:
+            NewTotal = <span class="nm">50</span>
+        self.__Credits = NewTotal</pre>
+  </div>
+  </details>
+
+  <div class="tier i">
+    <div class="th">Independent — start here</div>
+    <div class="tb">
+      <p style="margin:0 0 8px"><strong>(a)</strong> Write program code to declare the array <code>ClubMembers</code>, store a <code>Member</code> object in each element using the test data, and add each member's credits using <code>AddCredits()</code>. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(b)</strong> Write program code for the function <code>TotalCredits()</code>. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(c)</strong> Write program code for the function <code>FindMember()</code>. <em>[4]</em></p>
+      <p style="margin:0 0 8px"><strong>(d)</strong> Write a main program that:</p>
+      <ul style="margin:0 0 8px">
+        <li>outputs the total credits, using <code>TotalCredits()</code>, with a label</li>
+        <li>searches for <code>"Lina Haddad"</code> and, if she is found, calls <code>DisplayDetails()</code> on her object</li>
+        <li>searches for <code>"Tom Reilly"</code> and outputs <code>Tom Reilly not found</code>. <em>[3]</em></li>
+      </ul>
+      <p style="margin:0"><strong>(e)</strong> Take a screenshot showing the program running. It must show <strong>the test data and the complete output</strong>. <em>[2]</em></p>
+    </div>
+  </div>
+
+  <div class="tier s">
+    <div class="th">Scaffolded — only if you stall</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Same questions, same marks. Put this <strong>below</strong> your <code>Member</code> class and complete every <code>______</code> and <code># ...</code>.</p>
+<pre class="code" style="margin:0"><span class="kw">def</span> <span class="fn">TotalCredits</span>():
+    Total = ______                            <span class="cm"># once, before the loop</span>
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(______, ______):
+        Total = Total + ClubMembers[Index].______()
+    <span class="kw">return</span> ______                             <span class="cm"># once, after the loop</span>
+
+<span class="kw">def</span> <span class="fn">FindMember</span>(SearchName):
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">5</span>):
+        <span class="kw">if</span> ClubMembers[Index].______() == SearchName:
+            <span class="kw">return</span> ______
+    <span class="cm"># ... what goes here, lined up with the for?</span>
+
+ClubMembers = [<span class="kw">None</span>] * <span class="nm">5</span>                  <span class="cm"># ARRAY[0:4] OF Member</span>
+ClubMembers[<span class="nm">0</span>] = <span class="nm">Member</span>(<span class="st">"M4021"</span>, <span class="st">"Sara Ahmed"</span>, <span class="nm">16</span>)
+<span class="cm"># ... elements 1 to 4</span>
+StartCredits = [<span class="nm">20</span>, <span class="nm">45</span>, <span class="nm">60</span>, <span class="nm">0</span>, <span class="nm">35</span>]
+<span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">5</span>):
+    ClubMembers[Index].______(StartCredits[Index])
+
+<span class="fn">print</span>(<span class="st">"Total credits: "</span> + <span class="fn">str</span>(______))
+Position = <span class="fn">FindMember</span>(<span class="st">"Lina Haddad"</span>)
+<span class="cm"># ... if Position is not -1, call DisplayDetails on ClubMembers[Position]</span>
+<span class="cm"># ... then the same for "Tom Reilly", outputting "Tom Reilly not found"</span></pre>
+    </div>
+  </div>
+
+  <div class="tier e">
+    <div class="th">Exam conditions — where you need to be by the mock</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Close this page. Set a timer for <strong>25 minutes</strong> and work from the scenario box alone. Then, as an extension, write this function:</p>
+      <table style="margin:0 0 8px">
+        <tr><th style="width:30%">Subroutine</th><th>Description</th></tr>
+        <tr><td class="dt">HighestCredits()</td><td>A function that returns the <strong>Member object</strong> with the most credits.</td></tr>
+      </table>
+      <p style="margin:0">At the end of your main program, call it <strong>once</strong>, store the object it returns, and use that object's get methods to output <code>Most credits: Lina Haddad (50)</code>. Think carefully about what your "best so far" should start as.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p class="bt">Before you screenshot</p>
+    <ul style="margin:0">
+      <li>Your total should be <strong>150</strong>, not 160. Lina's 60 credits are limited to 50 by <code>AddCredits</code> — if you see 160, your Lesson 2 limit is in the wrong place.</li>
+      <li>If <code>FindMember</code> cannot find Lina, check that you compare the <em>name returned</em> by <code>GetName()</code>, not the object — and that <code>return -1</code> is not in an <code>else</code>.</li>
+      <li>The screenshot must show <strong>the test data as well as the output</strong> — the lines of code that create the five members, alongside the console.</li>
+      <li>Your <em>code</em> goes into the document as <strong>text</strong>, never as a screenshot.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MARK SCHEME ========== -->
+<section id="markscheme">
+  <p class="eyebrow">Self-marking</p>
+  <h2 class="h">Mark scheme — open it only after you have attempted the task</h2>
+  <p>Mark your own work honestly against this, then record your total in the Evidence Document.</p>
+
+  <details class="rev"><summary>Reveal the mark scheme [15 marks]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Description</th><th style="width:60px">Marks</th></tr>
+      <tr><td class="mp">(a) MP1</td><td><code>ClubMembers</code> declared with five elements, and its type evidenced as an array of <code>Member</code> (a comment is accepted).</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP2</td><td>A <code>Member</code> object created with the correct test data and stored in <strong>each</strong> of the five elements, in index order.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP3</td><td><code>AddCredits()</code> called on each element with that member's credits.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP4</td><td>Total initialised to 0 <strong>before</strong> a loop that visits all five elements.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP5</td><td><code>GetCredits()</code> called on each element and the value returned added to the total.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP6</td><td>Total <strong>returned</strong>, <strong>after</strong> the loop has finished.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP7</td><td>Function takes <code>SearchName</code> as a parameter and loops through the elements.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP8</td><td>…compares the value returned by <code>GetName()</code> for each element with <code>SearchName</code> — not the object itself.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP9</td><td>Returns the <strong>index</strong> when a match is found.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP10</td><td>Returns <code>-1</code> only <strong>after every element</strong> has been checked.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP11</td><td><code>TotalCredits()</code> called and the value returned output with a label.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP12</td><td><code>FindMember()</code> called, its result <strong>stored</strong>, and then tested against <code>-1</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP13</td><td><code>DisplayDetails()</code> called on the element at the returned index; not-found message output for Tom Reilly.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP14</td><td>Screenshot shows the test data being used, as well as the output.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP15</td><td>Output shows <code>150</code>, Lina Haddad's details with 50 credits, and <code>Tom Reilly not found</code>.</td><td>1</td></tr>
+    </table></div>
+    <p style="margin:14px 0 6px"><strong>Accepted alternatives</strong></p>
+    <ul>
+      <li>MP1–MP2: building the array with <code>ClubMembers = []</code> and <code>append</code>, as long as the type is evidenced and the order matches the indexes.</li>
+      <li>MP3: five separate <code>AddCredits</code> calls, or a loop over a second array of credit values.</li>
+      <li>MP4: <code>for Index in range(0, 5)</code> or <code>range(5)</code>. Looping with <code>for M in ClubMembers:</code> is accepted for (b), but (c) must return an <strong>index</strong>, so it needs one.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Not credited, however good the code looks</strong></p>
+    <ul>
+      <li>A loop of <code>range(0, 4)</code> — <span class="cross">MP4 lost</span>; Mia is never counted.</li>
+      <li><code>Total = 0</code> or <code>return</code> inside the loop — <span class="cross">MP4 or MP6 lost</span>.</li>
+      <li><code>if ClubMembers[Index] == SearchName</code> — <span class="cross">MP8 lost</span>, and nothing is ever found.</li>
+      <li><code>return -1</code> in an <code>else</code> inside the loop — <span class="cross">MP10 lost</span>; only the first member can be found.</li>
+      <li><code>print(ClubMembers[2])</code> instead of calling <code>DisplayDetails()</code> — <span class="cross">MP13 lost</span>.</li>
+      <li>Code pasted as an image — <span class="cross">no code marks at all</span>.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Extension — not counted in the 15</strong></p>
+    <ul style="margin-bottom:0">
+      <li><strong>E1</strong> "Best so far" starts as the <strong>first element</strong> (<code>ClubMembers[0]</code>), not as 0 or an empty value.</li>
+      <li><strong>E2</strong> …compares <code>GetCredits()</code> of each remaining element with the best so far, and replaces it when greater.</li>
+      <li><strong>E3</strong> Returns the <strong>object</strong>, after the loop.</li>
+      <li><strong>E4</strong> Called once; the returned object is stored and its get methods produce <code>Most credits: Lina Haddad (50)</code>.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== SUBMIT ========== -->
+<section id="submit">
+  <p class="eyebrow">Hand-in</p>
+  <h2 class="h">What to submit on Teams</h2>
+  <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 3.docx</code>.</p>
+  <div class="box">
+    <p class="bt">Checklist before you upload</p>
+    <ul style="margin:0">
+      <li>Your name and class are at the top of the document.</li>
+      <li>Parts (a) to (d) are each pasted <strong>as text</strong> into their own box, with the indentation intact.</li>
+      <li>Every loop visits <strong>all five</strong> members, and every <code>return</code> that ends a search or a total sits <strong>after</strong> the loop.</li>
+      <li>The screenshot shows the test data <strong>and</strong> the output: total 150, Lina's details, and Tom Reilly not found.</li>
+      <li>Your self-marked total out of 15 is filled in, with the points you lost named.</li>
+      <li>You are submitting <strong>the document only</strong> — not a zip, not the <code>.py</code> file.</li>
+    </ul>
+  </div>
+  <p>Your next taught lesson opens by checking these submissions. If you got stuck, submit what you have with a note saying where.</p>
+
+  <h3>Coming next</h3>
+  <p><strong>Home Lesson 4 — Containment or inheritance?</strong> What to do when a class design lists <em>another class</em> as one of its attributes — a club that <em>has</em> an array of members. It is the trap Cambridge sets almost every year, and after this week you have already built half of it.</p>
+</section>
+
+
+<footer class="foot">
+  Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 3 of 6 &nbsp;·&nbsp; Paper 4 Practical &nbsp;·&nbsp; United School International
+</footer>
+
+</div><!-- /pad -->
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- starter code ---------------- */
+const STARTER = `class Book:
+    def __init__(self, Title, Pages):
+        self.__Title = Title        # STRING
+        self.__Pages = Pages        # INTEGER
+
+    def GetTitle(self):
+        return self.__Title
+
+    def GetPages(self):
+        return self.__Pages
+
+Shelf = [None] * 3                  # ARRAY[0:2] OF Book
+Shelf[0] = Book("Dune", 412)
+Shelf[1] = Book("Emma", 474)
+Shelf[2] = Book("Holes", 233)
+
+print(Shelf[1].GetTitle())
+Longest = Shelf[0]
+for Index in range(1, 3):
+    if Shelf[Index].GetPages() > Longest.GetPages():
+        Longest = Shelf[Index]
+print(Longest.GetTitle() + " " + str(Longest.GetPages()))
+print(Shelf[2])
+`;
+
+const PAGE_KEY = '9618-oop-' + (document.body.dataset.lesson || location.pathname);
+const PY_URL   = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+const OFFLINE_MSG = 'The in-page Python runner could not load (this usually means no internet connection, or the network is blocking it).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.';
+const OUTPUT_LIMIT = 100000;   // characters — a runaway print loop is stopped here
+
+const editor  = document.getElementById('editor');
+const stdinEl = document.getElementById('stdin');
+const output  = document.getElementById('output');
+const runbtn  = document.getElementById('runbtn');
+const stopbtn = document.getElementById('stopbtn');
+const resetbt = document.getElementById('resetbtn');
+const statusEl= document.getElementById('pystatus');
+
+/* ---------------- saving work in this browser ---------------- */
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(PAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+let saved = loadSaved();
+let saveTimer = null;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { editor: editor.value, stdin: stdinEl.value, notes: {} };
+    document.querySelectorAll('textarea[data-save]').forEach(t => { data.notes[t.id] = t.value; });
+    try { localStorage.setItem(PAGE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — work is not saved */ }
+  }, 400);
+}
+editor.value  = (typeof saved.editor === 'string' && saved.editor.trim()) ? saved.editor : STARTER;
+stdinEl.value = typeof saved.stdin === 'string' ? saved.stdin : '';
+document.querySelectorAll('textarea[data-save]').forEach(t => {
+  if (saved.notes && typeof saved.notes[t.id] === 'string') t.value = saved.notes[t.id];
+  t.addEventListener('input', saveSoon);
+});
+editor.addEventListener('input', saveSoon);
+stdinEl.addEventListener('input', saveSoon);
+
+/* Tab inserts four spaces rather than moving focus */
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab' && !e.shiftKey) {
+    e.preventDefault();
+    const s = editor.selectionStart, t = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
+    editor.selectionStart = editor.selectionEnd = s + 4;
+    saveSoon();
+  }
+});
+
+resetbt.addEventListener('click', () => {
+  editor.value = STARTER;
+  output.textContent = 'Press Run to execute.';
+  saveSoon();
+});
+
+/* ---------------- Python, in a background worker ----------------
+   Running Python off the main thread means a loop that never ends
+   cannot freeze the page: Stop simply throws the worker away. */
+const WORKER_SRC = `
+let py = null, inputLines = [];
+const HARNESS = \`
+import sys, traceback
+
+def __run__(src):
+    g = {"__name__": "__main__"}
+    try:
+        code = compile(src, "your program", "exec")
+    except SyntaxError:
+        etype, evalue, tb = sys.exc_info()
+        print("".join(traceback.format_exception_only(etype, evalue)), end="", file=sys.stderr)
+        return
+    try:
+        exec(code, g)
+    except SystemExit:
+        pass
+    except EOFError:
+        print("EOFError: input() ran out of values.\\\\nType every value your program asks for in the Program input box, one per line, in order.", file=sys.stderr)
+    except BaseException:
+        etype, evalue, tb = sys.exc_info()
+        if tb is not None and tb.tb_next is not None:
+            tb = tb.tb_next
+        print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+\`;
+const dec = new TextDecoder();
+self.addEventListener('unhandledrejection', () => { if (!py) postMessage({ type: 'fail' }); });
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.url);
+      py = await loadPyodide({ indexURL: m.base });
+      py.setStdout({ write: b => { postMessage({ type: 'out', text: dec.decode(b) }); return b.length; } });
+      py.setStderr({ write: b => { postMessage({ type: 'err', text: dec.decode(b) }); return b.length; } });
+      py.setStdin({ stdin: () => {
+        if (!inputLines.length) return null;
+        const v = inputLines.shift();
+        postMessage({ type: 'echo', text: v });
+        return v;
+      } });
+      py.runPython(HARNESS);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'fail', text: String(err) });
+    }
+  } else if (m.type === 'run') {
+    inputLines = m.input.length ? m.input.replace(/\\n$/, '').split('\\n') : [];
+    try {
+      py.globals.set('__student_src__', m.src);
+      await py.runPythonAsync('__run__(__student_src__)');
+    } catch (ex) {
+      postMessage({ type: 'err', text: String(ex).trim().split('\\n').slice(-3).join('\\n') });
+    }
+    postMessage({ type: 'done' });
+  }
+};
+`;
+
+let worker = null, ready = false, running = false, outChars = 0, hadErr = false, slowTimer = null;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+function appendOut(text, cls) {
+  if (cls === 'err' && output.textContent.length && !output.textContent.endsWith('\n')) text = '\n' + text;
+  if (cls === 'err' && !output.textContent.length) text = text.replace(/^\n+/, '');
+  outChars += text.length;
+  const last = output.lastChild;
+  if (!cls && last && last.nodeType === 3) { last.appendData(text); }
+  else if (cls && last && last.nodeType === 1 && last.className === cls) { last.textContent += text; }
+  else {
+    const node = cls ? document.createElement('span') : document.createTextNode(text);
+    if (cls) { node.className = cls; node.textContent = text; }
+    output.appendChild(node);
+  }
+}
+function unavailable() {
+  ready = false;
+  statusEl.textContent = 'Python unavailable';
+  runbtn.disabled = true; stopbtn.disabled = true;
+  setOut(OFFLINE_MSG, 'err');
+}
+function finishRun(message) {
+  running = false;
+  clearTimeout(slowTimer);
+  runbtn.disabled = !ready; stopbtn.disabled = true;
+  if (message) statusEl.textContent = message;
+}
+
+function startWorker() {
+  ready = false;
+  runbtn.disabled = true;
+  let w;
+  try {
+    const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    w = new Worker(URL.createObjectURL(blob));
+  } catch (e) { unavailable(); return; }
+  worker = w;
+  w.onerror = () => { if (worker === w) unavailable(); };
+  w.onmessage = e => {
+    if (worker !== w) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ready = true; statusEl.textContent = 'Python ready'; runbtn.disabled = false;
+    } else if (m.type === 'fail') {
+      unavailable();
+    } else if (m.type === 'out' || m.type === 'err' || m.type === 'echo') {
+      if (!running) return;
+      if (m.type === 'err') hadErr = true;
+      appendOut(m.type === 'echo' ? m.text + '\n' : m.text, m.type === 'err' ? 'err' : (m.type === 'echo' ? 'in' : null));
+      if (outChars > OUTPUT_LIMIT) {
+        stopRun('\n\nStopped: the program printed far too much output. Is there a loop that never ends?');
+      }
+    } else if (m.type === 'done') {
+      if (!running) return;
+      if (!output.textContent.length) setOut('(the program produced no output)');
+      else if (output.lastChild) output.lastChild.textContent = output.lastChild.textContent.replace(/\n+$/, '');
+      finishRun(hadErr ? 'Error — read it carefully' : 'Finished');
+    }
+  };
+  statusEl.textContent = 'Python is loading…';
+  setTimeout(() => { if (worker === w && !ready) { w.terminate(); worker = null; unavailable(); } }, 90000);
+  w.postMessage({ type: 'init', url: PY_URL, base: PY_URL.replace(/[^/]*$/, '') });
+}
+
+function stopRun(note) {
+  if (!running) return;
+  if (worker) worker.terminate();
+  worker = null;
+  appendOut(note || '\n\nStopped.', 'err');
+  finishRun('Stopped — restarting Python…');
+  startWorker();
+}
+
+runbtn.addEventListener('click', () => {
+  if (!ready || running) return;
+  running = true; hadErr = false; outChars = 0;
+  output.textContent = '';
+  runbtn.disabled = true; stopbtn.disabled = false;
+  statusEl.textContent = 'Running…';
+  slowTimer = setTimeout(() => {
+    if (running) statusEl.textContent = 'Still running — press Stop if it is stuck in a loop';
+  }, 5000);
+  worker.postMessage({ type: 'run', src: editor.value, input: stdinEl.value });
+});
+stopbtn.addEventListener('click', () => stopRun());
+
+startWorker();
+
+/* ---------------- checkpoints ----------------
+   A wrong choice explains itself and is crossed out, but the right answer
+   is never shown — the student has to find it. Their first attempt is
+   recorded on the card so they can be honest about it. */
+document.querySelectorAll('.cp').forEach(cp => {
+  const fb    = cp.querySelector('.fb');
+  const texts = cp.querySelectorAll('.fbs > div');
+  const opts  = Array.from(cp.querySelectorAll('.opt'));
+  const first = cp.querySelector('.first');
+  let attempts = 0, solved = false;
+  opts.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      if (solved || btn.classList.contains('wrong')) return;
+      attempts++;
+      const ok = btn.dataset.ok === '1';
+      btn.classList.add(ok ? 'right' : 'wrong');
+      btn.setAttribute('aria-disabled', 'true');
+      fb.className = 'fb show ' + (ok ? 'good' : 'bad');
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite — try again. </strong>')
+                   + (texts[i] ? texts[i].innerHTML : '');
+      if (attempts === 1 && first) {
+        first.textContent = ok ? 'First attempt: correct' : 'First attempt: not correct';
+        first.className = 'first ' + (ok ? 'good' : 'bad');
+      }
+      if (ok) {
+        solved = true;
+        opts.forEach(b => { if (b !== btn) b.setAttribute('aria-disabled', 'true'); b.classList.add('done'); });
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

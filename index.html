@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
 <style>
 :root{
-  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --ink:#0F172A;
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
   --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
   --good:#047857; --good-bg:#ECFDF5; --warn:#B45309; --warn-bg:#FFFBEB;
   --mono:"Cascadia Mono","Consolas","SF Mono",Menlo,monospace;
@@ -47,6 +47,7 @@ a.card:hover{border-color:var(--blue);background:#EFF6FF;box-shadow:0 2px 10px r
 .card .num{flex:0 0 40px;height:40px;border-radius:8px;background:var(--blue);color:#fff;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center}
 .card.soon{opacity:.62;background:#F8FAFC}
 .card.soon .num{background:#94A3B8}
+.card .num.u{font-size:13px;flex-basis:48px}
 .card .body{flex:1;min-width:0}
 .card .t{font-weight:700;font-size:17.5px;color:var(--blue-dk);margin:0 0 3px}
 a.card:hover .t{color:var(--blue)}
@@ -61,6 +62,24 @@ code{font-family:var(--mono);background:#E2E8F0;padding:1px 5px;border-radius:4p
 ul.plain{margin:0;padding-left:22px}
 ul.plain li{margin:0 0 7px}
 footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
 </style>
 </head>
 <body>
@@ -75,8 +94,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 <div class="pad">
 
 <section>
-  <h2>Before you start</h2>
-  <div class="h">How these lessons work</div>
+  <p class="eyebrow">Before you start</p>
+  <h2 class="h">How these lessons work</h2>
   <p class="lead">Paper 4 is sat at a computer and it is worth 25% of the A Level. You cannot learn it by reading, so every lesson makes you type.</p>
   <div class="how">
     <p class="bt">The pattern, every time</p>
@@ -95,9 +114,9 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 <hr class="rule">
 
 <section>
-  <h2>Unit 20.1</h2>
-  <div class="h">Object-Oriented Programming</div>
-  <p>A class appears in <strong>every one of the last 29 Paper 4 examiner reports</strong>. This is not an optional topic — it is roughly a third of the paper, every single year. Six lessons, in the order the marks are actually being lost.</p>
+  <p class="eyebrow">Unit 20.1</p>
+  <h2 class="h">Object-Oriented Programming</h2>
+  <p>A class appears in <strong>every Paper 4 since June 2021 — all 29 papers</strong>. This is not an optional topic — it is roughly a third of the paper, every single year. Six lessons, in the order the marks are actually being lost.</p>
   <ul class="lessons">
     <li><a class="card" href="oop-lesson-1.html">
       <div class="num">1</div>
@@ -115,14 +134,14 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
       </div>
       <div class="tag live">Open</div>
     </a></li>
-    <li><div class="card soon">
+    <li><a class="card" href="oop-lesson-3.html">
       <div class="num">3</div>
       <div class="body">
         <div class="t">Using Objects</div>
         <div class="d">Arrays of objects, looping over them, and actually using what a method gives back to you.</div>
       </div>
-      <div class="tag soon">Coming</div>
-    </div></li>
+      <div class="tag live">Open</div>
+    </a></li>
     <li><div class="card soon">
       <div class="num">4</div>
       <div class="body">
@@ -153,12 +172,12 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 <hr class="rule">
 
 <section>
-  <h2>Still to come</h2>
-  <div class="h">The rest of the practical strand</div>
-  <p>The other two strands that appear in every Paper 4. They will be added here as we reach them.</p>
+  <p class="eyebrow">Still to come</p>
+  <h2 class="h">The rest of the practical strand</h2>
+  <p>Alongside OOP, abstract data types and file handling appear in every Paper 4. Sorting and searching appear in almost every paper, and recursion in more than half of recent series. They will be added here as we reach them. The badge on each card is the syllabus section.</p>
   <ul class="lessons">
     <li><div class="card soon">
-      <div class="num">19</div>
+      <div class="num u">19.1</div>
       <div class="body">
         <div class="t">Abstract Data Types</div>
         <div class="d">Stacks, queues, circular queues, linked lists, binary trees and hash tables — always built from the design you are given, never from memory.</div>
@@ -166,7 +185,23 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
       <div class="tag soon">Coming</div>
     </div></li>
     <li><div class="card soon">
-      <div class="num">20</div>
+      <div class="num u">19.1</div>
+      <div class="body">
+        <div class="t">Sorting and Searching</div>
+        <div class="d">Bubble sort, insertion sort, linear and binary search — written from the algorithm, with every field of a record moved together.</div>
+      </div>
+      <div class="tag soon">Coming</div>
+    </div></li>
+    <li><div class="card soon">
+      <div class="num u">19.2</div>
+      <div class="body">
+        <div class="t">Recursion</div>
+        <div class="d">Base case first, a return on every path, and converting between recursive and iterative versions.</div>
+      </div>
+      <div class="tag soon">Coming</div>
+    </div></li>
+    <li><div class="card soon">
+      <div class="num u">20.2</div>
       <div class="body">
         <div class="t">File Handling and Exception Handling</div>
         <div class="d">The five-line skeleton: try, open, loop to the end of the file, close, and catch the exception with a message.</div>
@@ -179,12 +214,15 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 <hr class="rule">
 
 <section>
-  <h2>If something does not work</h2>
-  <div class="h">Troubleshooting</div>
+  <p class="eyebrow">If something does not work</p>
+  <h2 class="h">Troubleshooting</h2>
   <ul class="plain">
     <li><strong>The Python box says "Python unavailable".</strong> The page downloads Python the first time you open it, so it needs an internet connection, and on the school network it may be blocked. Everything else on the page still works — write the code in IDLE or Thonny instead, which is what the assessed task needs anyway.</li>
     <li><strong>It is slow to load the first time.</strong> Python is a few megabytes. Give it twenty seconds; after that your browser keeps it.</li>
     <li><strong>Nothing happens when I press Run.</strong> Check the status text next to the button says "Python ready" first.</li>
+    <li><strong>The page seems stuck and the status says "Still running".</strong> Your program is probably in a loop that never ends. Press <strong>Stop</strong>, fix the loop, and run it again — nothing else on the page is affected.</li>
+    <li><strong>My program uses <code>input()</code>.</strong> Type the values it will ask for in the <strong>Program input</strong> box under the code, one per line, in order. They appear in the output just as they would in a console.</li>
+    <li><strong>Where did my work go?</strong> Your code and predictions are saved in the browser you used. They will not follow you to a different computer or browser, so the Evidence Document is still the thing you submit.</li>
     <li><strong>I am stuck on the task.</strong> Drop to the Scaffolded tier on the lesson page. If you are still stuck, submit what you have with a note saying where — that is far more useful to me than an empty submission.</li>
   </ul>
 </section>

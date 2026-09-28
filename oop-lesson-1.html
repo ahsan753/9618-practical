@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
 <style>
 :root{
-  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --ink:#0F172A;
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
   --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
   --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
   --warn:#B45309; --warn-bg:#FFFBEB;
@@ -69,6 +69,7 @@ th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-ali
 th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
 tbody tr:nth-child(even){background:#F8FAFC}
 td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+@media(max-width:640px){td.dt{white-space:normal;overflow-wrap:anywhere;font-size:13px} th,td{padding:7px 7px}}
 
 /* ---------- code ---------- */
 pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
@@ -139,9 +140,27 @@ details.rev .body{padding:4px 18px 14px}
 footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
 .tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
 .tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
 </style>
 </head>
-<body>
+<body data-lesson="L1">
 <div class="wrap">
 
 <header class="mast">
@@ -175,8 +194,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== HOW THIS WORKS ========== -->
 <section id="how">
-  <h2>Start here</h2>
-  <div class="h">How this lesson works</div>
+  <p class="eyebrow">Start here</p>
+  <h2 class="h">How this lesson works</h2>
   <p class="lead">Paper 4 is sat at a computer. You cannot learn it by reading about it, so this page teaches, then makes you type.</p>
   <ol class="steps">
     <li><strong>Learn on this page.</strong> Predict what code will do, run it here in the browser, then pick it apart. Nothing to install.</li>
@@ -193,8 +212,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== DO NOW ========== -->
 <section id="donow">
-  <h2>Retrieval</h2>
-  <div class="h">Do Now — three minutes, no notes</div>
+  <p class="eyebrow">Retrieval</p>
+  <h2 class="h">Do Now — three minutes, no notes</h2>
   <p>Answer these before you read anything else. Write them in your book, then reveal the answers and mark them.</p>
   <div class="box">
     <p class="bt">Questions</p>
@@ -221,8 +240,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== OBJECTIVES ========== -->
 <section id="obj">
-  <h2>Where this is going</h2>
-  <div class="h">Learning objectives</div>
+  <p class="eyebrow">Where this is going</p>
+  <h2 class="h">Learning objectives</h2>
   <table>
     <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
     <tr><td>Use the terms <em>class</em>, <em>object</em>, <em>attribute</em>, <em>method</em>, <em>instantiation</em> and <em>encapsulation</em> in the form a mark scheme accepts.</td><td>20.1</td><td>3 &amp; 4</td></tr>
@@ -232,7 +251,7 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
   </table>
   <div class="callout">
     <p class="bt">Where this sits in the paper</p>
-    <p style="margin:0">A class appears in <strong>every one of the last 29 Paper 4 examiner reports</strong>. It is not an optional topic — it is roughly a third of the paper, every year. Examiners now say that <em>declaring</em> classes has become a national strength, and that the marks are being lost further on, at the point where candidates have to <em>create objects and use them</em>. We start at the declaration this week and spend the next five on the part that is actually costing marks.</p>
+    <p style="margin:0">A class appears in <strong>every Paper 4 since June 2021 — all 29 papers</strong>. It is not an optional topic — it is roughly a third of the paper, every year. Examiners now say that <em>declaring</em> classes has become a national strength, and that the marks are being lost further on, at the point where candidates have to <em>create objects and use them</em>. We start at the declaration this week and spend the next five on the part that is actually costing marks.</p>
   </div>
 </section>
 
@@ -240,8 +259,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== KEY TERMS ========== -->
 <section id="terms">
-  <h2>Vocabulary</h2>
-  <div class="h">Key terms — learn these wordings</div>
+  <p class="eyebrow">Vocabulary</p>
+  <h2 class="h">Key terms — learn these wordings</h2>
   <p>These are written the way a mark scheme writes them. A looser paraphrase of the right idea scores nothing, so learn the wording, not the gist.</p>
   <table>
     <tr><th style="width:23%">Term</th><th>Definition that earns the mark</th></tr>
@@ -263,8 +282,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== PREDICT ========== -->
 <section id="predict">
-  <h2>PRIMM · Step 1</h2>
-  <div class="h">Predict</div>
+  <p class="eyebrow">PRIMM · Step 1</p>
+  <h2 class="h">Predict</h2>
   <p>Read this program carefully. <strong>Do not run it yet.</strong> Write down exactly what you think it will output, character for character.</p>
   <span class="codelabel">Python — Paper 4</span>
 <pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
@@ -283,7 +302,7 @@ MyBook.<span class="fn">Display</span>()</pre>
 
   <div class="predict">
     <p class="bt">Commit your prediction before you scroll</p>
-    <textarea id="pred1" placeholder="Type the exact output you expect…"></textarea>
+    <textarea id="pred1" data-save placeholder="Type the exact output you expect…"></textarea>
     <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Two harder questions while you are here: how many times does the constructor run? And what is <code>self</code> actually referring to on line 3?</p>
   </div>
 </section>
@@ -292,8 +311,8 @@ MyBook.<span class="fn">Display</span>()</pre>
 
 <!-- ========== RUN ========== -->
 <section id="run">
-  <h2>PRIMM · Step 2</h2>
-  <div class="h">Run</div>
+  <p class="eyebrow">PRIMM · Step 2</p>
+  <h2 class="h">Run</h2>
   <p>Now run it. Press <strong>Run</strong> and compare the real output with your prediction. Python runs inside this page — nothing is sent anywhere, and you can break it as much as you like.</p>
 
   <div class="runner">
@@ -301,14 +320,20 @@ MyBook.<span class="fn">Display</span>()</pre>
       <span class="ttl">Python 3 — try it</span>
       <span class="status" id="pystatus">Python is loading…</span>
       <button id="runbtn" disabled>▶ Run</button>
+      <button class="stop" id="stopbtn" disabled>■ Stop</button>
       <button class="ghost" id="resetbtn">Reset code</button>
     </div>
-    <textarea class="editor" id="editor" spellcheck="false"></textarea>
+    <textarea class="editor" id="editor" spellcheck="false" aria-label="Python code editor"></textarea>
+    <div class="inwrap">
+      <label class="outlabel" for="stdin" style="display:block">Program input — only if your code uses input(): one value per line, in order</label>
+      <textarea class="stdin" id="stdin" spellcheck="false" rows="2"></textarea>
+    </div>
     <div class="outwrap">
       <div class="outlabel">Output</div>
       <pre class="out" id="output">Press Run to execute.</pre>
     </div>
   </div>
+  <p class="savenote">Your code and your prediction are saved in this browser, so closing the tab does not lose them. If a program never finishes, press <strong>Stop</strong>.</p>
 
   <details class="rev"><summary>Check your prediction</summary>
   <div class="body">
@@ -335,8 +360,8 @@ On loan: False</pre>
 
 <!-- ========== INVESTIGATE ========== -->
 <section id="investigate">
-  <h2>PRIMM · Step 3</h2>
-  <div class="h">Investigate — the four parts of a class</div>
+  <p class="eyebrow">PRIMM · Step 3</p>
+  <h2 class="h">Investigate — the four parts of a class</h2>
 
   <h3>1. The class header</h3>
   <p><code>class Book:</code> — the name is a <strong>singular noun</strong> with a capital letter. <code>Book</code>, not <code>Books</code>, and not <code>BookClass</code>. The class describes <em>one</em> of the thing; you make as many objects from it as you like.</p>
@@ -364,17 +389,18 @@ On loan: False</pre>
     <div class="cph">Checkpoint 1</div>
     <div class="cpb">
       <p class="q">Which line correctly declares a private attribute <em>and</em> evidences its data type, in a Python class?</p>
-      <button class="opt" data-ok="0">A &nbsp;<code>self.Name = Name</code></button>
-      <button class="opt" data-ok="0">B &nbsp;<code>self._Name = Name &nbsp;# STRING</code></button>
-      <button class="opt" data-ok="1">C &nbsp;<code>self.__Name = Name &nbsp;# STRING</code></button>
+      <button class="opt" data-ok="1">A &nbsp;<code>self.__Name = Name &nbsp;# STRING</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>self.Name = Name</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>self._Name = Name &nbsp;# STRING</code></button>
       <button class="opt" data-ok="0">D &nbsp;<code>def Name(self): return self.__Name</code></button>
       <div class="fbs" hidden>
+        <div>Two underscores make it private, and the comment evidences the data type. This is the form to use on every attribute, every time.</div>
         <div>This attribute is <strong>public</strong> — any code anywhere can change it, so there is no encapsulation to credit, and nothing shows the data type. This is the commonest version of the error.</div>
         <div>One underscore is a convention meaning &ldquo;please don't&rdquo;; it does not make the attribute private, and Python will happily let outside code read it. Use two.</div>
-        <div>Two underscores make it private, and the comment evidences the data type. This is the form to use on every attribute, every time.</div>
         <div>That is a <em>get method</em>, not an attribute declaration. It is a real thing you will write next lesson, but it does not declare or store anything.</div>
       </div>
-      <div class="fb"></div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -383,8 +409,8 @@ On loan: False</pre>
 
 <!-- ========== MODIFY ========== -->
 <section id="modify">
-  <h2>PRIMM · Step 4</h2>
-  <div class="h">Modify</div>
+  <p class="eyebrow">PRIMM · Step 4</p>
+  <h2 class="h">Modify</h2>
   <p>Go back to the runner above and change the <code>Book</code> class so that it matches this <strong>class design</strong>. This is exactly the form Cambridge gives you a class in, so read it the way you will read it in the exam.</p>
 
   <div class="box">
@@ -436,16 +462,17 @@ SecondBook.<span class="fn">Display</span>()</pre>
     <div class="cpb">
       <p class="q">A class <code>Member</code> has a constructor. Which line creates an object of that class correctly?</p>
       <button class="opt" data-ok="0">A &nbsp;<code>Member = Member("M01", "Ali", 17)</code></button>
-      <button class="opt" data-ok="1">B &nbsp;<code>NewMember = Member("M01", "Ali", 17)</code></button>
-      <button class="opt" data-ok="0">C &nbsp;<code>Member("M01", "Ali", 17)</code></button>
-      <button class="opt" data-ok="0">D &nbsp;<code>NewMember = new Member("M01", "Ali", 17)</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>Member("M01", "Ali", 17)</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>NewMember = new Member("M01", "Ali", 17)</code></button>
+      <button class="opt" data-ok="1">D &nbsp;<code>NewMember = Member("M01", "Ali", 17)</code></button>
       <div class="fbs" hidden>
         <div>Naming the variable after its class is an error examiners name in four separate series. You have just overwritten the class with an object, so the very next <code>Member(...)</code> in your program crashes.</div>
-        <div>The variable is named after <em>what the object is</em>, not after its class, and the constructor's arguments are passed in the order the design gives them.</div>
         <div>This calls the class as though it were a plain procedure and stores nothing. Calling methods as free procedures instead of on an object appears in six of the last ten series — it is one of the two habitual instantiation errors.</div>
         <div><code>new</code> is Java and C#, not Python. Every language on this paper has its own instantiation syntax and you must use the one for the language you are sitting.</div>
+        <div>The variable is named after <em>what the object is</em>, not after its class, and the constructor's arguments are passed in the order the design gives them.</div>
       </div>
-      <div class="fb"></div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -454,8 +481,8 @@ SecondBook.<span class="fn">Display</span>()</pre>
 
 <!-- ========== EXAM TECHNIQUE ========== -->
 <section id="technique">
-  <h2>The marks</h2>
-  <div class="h">Exam technique — the class design table is the instruction</div>
+  <p class="eyebrow">The marks</p>
+  <h2 class="h">Exam technique — the class design table is the instruction</h2>
   <p>Almost everything that goes wrong on an OOP question goes wrong before any code is written, because the candidate implemented the class they <em>remembered</em> rather than the class they were <em>given</em>. Cambridge does this deliberately: the designs change slightly every year specifically to test whether you read them.</p>
 
   <p><strong>Predict, then reveal.</strong> A candidate is given the <code>Book</code> design above and writes this. Decide what an examiner would say before you open the answer.</p>
@@ -485,16 +512,17 @@ SecondBook.<span class="fn">Display</span>()</pre>
     <div class="cpb">
       <p class="q">A class design states: <em>"Attribute <code>Balance</code>, INTEGER, set to 100 when the object is created."</em> Which constructor follows the design?</p>
       <button class="opt" data-ok="0">A &nbsp;<code>def __init__(self, Balance): self.__Balance = Balance</code></button>
-      <button class="opt" data-ok="1">B &nbsp;<code>def __init__(self): self.__Balance = 100 &nbsp;# INTEGER</code></button>
-      <button class="opt" data-ok="0">C &nbsp;<code>def __init__(self): self.__Balance = &quot;100&quot; &nbsp;# INTEGER</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>def __init__(self): self.__Balance = &quot;100&quot; &nbsp;# INTEGER</code></button>
+      <button class="opt" data-ok="1">C &nbsp;<code>def __init__(self): self.__Balance = 100 &nbsp;# INTEGER</code></button>
       <button class="opt" data-ok="0">D &nbsp;<code>def __init__(self): 100 = self.__Balance</code></button>
       <div class="fbs" hidden>
         <div>This takes <code>Balance</code> as a parameter. The design says it is set to a fixed value on creation, so it must not be a parameter.</div>
-        <div>The fixed default is assigned inside the constructor, and the data type is evidenced by a comment.</div>
         <div><code>&quot;100&quot;</code> in quotes is a <strong>string</strong>, not an integer. Examiners have sharpened up on exactly this since 2025: <code>-1</code> and <code>&#39;-1&#39;</code> are not the same thing, and neither are these.</div>
+        <div>The fixed default is assigned inside the constructor, and the data type is evidenced by a comment.</div>
         <div>The assignment is the wrong way round — this copies the empty attribute into the parameter and leaves the attribute undefined. It is the classic setter error, and it appears in constructors too.</div>
       </div>
-      <div class="fb"></div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -503,8 +531,8 @@ SecondBook.<span class="fn">Display</span>()</pre>
 
 <!-- ========== TASK ========== -->
 <section id="task">
-  <h2>Assessed work</h2>
-  <div class="h">Over to you — write it in Python, evidence it in the document</div>
+  <p class="eyebrow">Assessed work</p>
+  <h2 class="h">Over to you — write it in Python, evidence it in the document</h2>
   <p class="lead">Everyone starts at <strong>Independent</strong>. Drop to Scaffolded if you stall. Go to Exam Conditions when you have finished — and by the mock, that is where everyone needs to be.</p>
 
   <div class="box pinkb">
@@ -530,7 +558,7 @@ SecondBook.<span class="fn">Display</span>()</pre>
     <div class="tb">
       <p style="margin:0 0 8px"><strong>(a)</strong> Write program code to declare the class <code>Member</code>, including its constructor and the method <code>DisplayDetails()</code>. <em>[8]</em></p>
       <p style="margin:0 0 8px"><strong>(b)</strong> Write program code to create <strong>one</strong> object of the class <code>Member</code> using this test data, and then display its details: <code>"M4021"</code>, <code>"Sara Ahmed"</code>, <code>16</code>. <em>[2]</em></p>
-      <p style="margin:0"><strong>(c)</strong> Take a screenshot showing the program running with that test data. The screenshot must show <strong>the input values and the output</strong>. <em>[2]</em></p>
+      <p style="margin:0"><strong>(c)</strong> Take a screenshot showing the program running with that test data. The screenshot must show <strong>the test data and the complete output</strong> — here, the line of your program that creates the object, alongside the console. <em>[2]</em></p>
     </div>
   </div>
 
@@ -575,8 +603,8 @@ SecondBook.<span class="fn">Display</span>()</pre>
     <p class="bt">Before you screenshot</p>
     <ul style="margin:0">
       <li>Use <strong>exactly</strong> the test data given. Inventing your own loses the mark even if the program is perfect.</li>
-      <li>The screenshot must show <strong>the inputs as well as the outputs</strong>. This is the single most repeated technique failure in the examiner reports — present in all ten recent series.</li>
-      <li>Screenshot the <strong>whole console window</strong>, not a cropped strip of the answer.</li>
+      <li>The screenshot must show <strong>the test data as well as the output</strong>. Your test data is typed into the line that creates the object, so put that line of code on screen next to the console and capture both. Missing inputs is the single most repeated technique failure in the examiner reports — present in all ten recent series.</li>
+      <li>Capture the <strong>complete output</strong>, not a cropped strip of the answer.</li>
       <li>Your <em>code</em> goes into the document as <strong>text</strong>, never as a screenshot. Screenshotted code scores nothing.</li>
     </ul>
   </div>
@@ -586,8 +614,8 @@ SecondBook.<span class="fn">Display</span>()</pre>
 
 <!-- ========== MARK SCHEME ========== -->
 <section id="markscheme">
-  <h2>Self-marking</h2>
-  <div class="h">Mark scheme — open it only after you have attempted the task</div>
+  <p class="eyebrow">Self-marking</p>
+  <h2 class="h">Mark scheme — open it only after you have attempted the task</h2>
   <p>Mark your own work honestly against this, then record your total in the Evidence Document. Marking your own work against the real wording is how you learn what "one mark per point, max 8" actually means.</p>
 
   <details class="rev"><summary>Reveal the mark scheme [12 marks]</summary>
@@ -629,8 +657,8 @@ SecondBook.<span class="fn">Display</span>()</pre>
 
 <!-- ========== SUBMIT ========== -->
 <section id="submit">
-  <h2>Hand-in</h2>
-  <div class="h">What to submit on Teams</div>
+  <p class="eyebrow">Hand-in</p>
+  <h2 class="h">What to submit on Teams</h2>
   <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 1.docx</code>.</p>
   <div class="box">
     <p class="bt">Checklist before you upload</p>
@@ -638,7 +666,7 @@ SecondBook.<span class="fn">Display</span>()</pre>
       <li>Your name and class are in the header of the document.</li>
       <li>Task (a) code is pasted <strong>as text</strong>, with the indentation intact.</li>
       <li>Task (b) code is in its own box — do not merge the two.</li>
-      <li>The screenshot shows the test data <strong>and</strong> the output, and the whole window.</li>
+      <li>The screenshot shows the test data (the line that creates the object) <strong>and</strong> the complete output.</li>
       <li>Nothing is cut off at the edge of a box, and you have not widened any box past the margin.</li>
       <li>Your self-marked total out of 12 is filled in, with the points you lost named.</li>
       <li>You are submitting <strong>the document only</strong> — not a zip, not the <code>.py</code> file.</li>
@@ -650,16 +678,6 @@ SecondBook.<span class="fn">Display</span>()</pre>
   <p><strong>Home Lesson 2 — Get and set methods.</strong> Getting a value <em>out</em> of a private attribute and putting a new one <em>in</em>. It sounds trivial. A get method written with a parameter is the single most repeated OOP error in the examiner reports — all ten recent series — so it is worth a lesson of its own.</p>
 </section>
 
-<div class="tn">
-  <p class="bt">Teacher note — remove before issuing if you wish</p>
-  <p style="margin:0 0 7px"><strong>Provenance.</strong> No past-paper questions were spent on this lesson. The Do Now, the task and the mark scheme are original, written in Cambridge's Paper 4 house style, so the topical banks remain intact for the mock. Log as <em>questions used: none</em>.</p>
-  <p style="margin:0 0 7px"><strong>Retrieval bank deposit.</strong><br>
-  What is instantiation? | The process of creating an object from a class.<br>
-  Why does a Python attribute need a comment naming its data type? | Python has no type declarations, so the comment is the evidence the examiner accepts.<br>
-  A class design says an attribute is "set to 0 when created". Is it a constructor parameter? | No — the constructor assigns it directly.</p>
-  <p style="margin:0 0 7px"><strong>Vocabulary introduced.</strong> class, object, attribute, method, constructor, instantiation, encapsulation, private, parameter, class design.</p>
-  <p style="margin:0"><strong>Check before issuing.</strong> Do Now Q1–Q3 assume Year 12 coverage of parameters, records and function-vs-procedure — confirm against the teaching log. If this cohort has not met record types, drop Q2 and replace it with a second question on parameters.</p>
-</div>
 
 <footer class="foot">
   Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 1 of 6 &nbsp;·&nbsp; Paper 4 Practical &nbsp;·&nbsp; United School International
@@ -685,43 +703,65 @@ MyBook = Book("Dune", "Frank Herbert")
 MyBook.Display()
 `;
 
+const PAGE_KEY = '9618-oop-' + (document.body.dataset.lesson || location.pathname);
+const PY_URL   = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+const OFFLINE_MSG = 'The in-page Python runner could not load (this usually means no internet connection, or the network is blocking it).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.';
+const OUTPUT_LIMIT = 100000;   // characters — a runaway print loop is stopped here
+
 const editor  = document.getElementById('editor');
+const stdinEl = document.getElementById('stdin');
 const output  = document.getElementById('output');
 const runbtn  = document.getElementById('runbtn');
+const stopbtn = document.getElementById('stopbtn');
 const resetbt = document.getElementById('resetbtn');
 const statusEl= document.getElementById('pystatus');
 
-editor.value = STARTER;
+/* ---------------- saving work in this browser ---------------- */
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(PAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+let saved = loadSaved();
+let saveTimer = null;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { editor: editor.value, stdin: stdinEl.value, notes: {} };
+    document.querySelectorAll('textarea[data-save]').forEach(t => { data.notes[t.id] = t.value; });
+    try { localStorage.setItem(PAGE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — work is not saved */ }
+  }, 400);
+}
+editor.value  = (typeof saved.editor === 'string' && saved.editor.trim()) ? saved.editor : STARTER;
+stdinEl.value = typeof saved.stdin === 'string' ? saved.stdin : '';
+document.querySelectorAll('textarea[data-save]').forEach(t => {
+  if (saved.notes && typeof saved.notes[t.id] === 'string') t.value = saved.notes[t.id];
+  t.addEventListener('input', saveSoon);
+});
+editor.addEventListener('input', saveSoon);
+stdinEl.addEventListener('input', saveSoon);
 
 /* Tab inserts four spaces rather than moving focus */
 editor.addEventListener('keydown', e => {
-  if (e.key === 'Tab') {
+  if (e.key === 'Tab' && !e.shiftKey) {
     e.preventDefault();
     const s = editor.selectionStart, t = editor.selectionEnd;
     editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
     editor.selectionStart = editor.selectionEnd = s + 4;
+    saveSoon();
   }
 });
 
 resetbt.addEventListener('click', () => {
   editor.value = STARTER;
   output.textContent = 'Press Run to execute.';
+  saveSoon();
 });
 
-/* ---------------- Pyodide ---------------- */
-let pyodide = null, loading = false;
-
-function setOut(text, cls) {
-  output.textContent = '';
-  const span = document.createElement('span');
-  if (cls) span.className = cls;
-  span.textContent = text;
-  output.appendChild(span);
-}
-
-/* Runs the student's code with a traceback trimmed to their own lines —
-   the raw Pyodide trace is full of internal frames that only confuse. */
-const HARNESS = `
+/* ---------------- Python, in a background worker ----------------
+   Running Python off the main thread means a loop that never ends
+   cannot freeze the page: Stop simply throws the worker away. */
+const WORKER_SRC = `
+let py = null, inputLines = [];
+const HARNESS = \`
 import sys, traceback
 
 def __run__(src):
@@ -736,88 +776,177 @@ def __run__(src):
         exec(code, g)
     except SystemExit:
         pass
+    except EOFError:
+        print("EOFError: input() ran out of values.\\\\nType every value your program asks for in the Program input box, one per line, in order.", file=sys.stderr)
     except BaseException:
         etype, evalue, tb = sys.exc_info()
         if tb is not None and tb.tb_next is not None:
             tb = tb.tb_next
         print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+\`;
+const dec = new TextDecoder();
+self.addEventListener('unhandledrejection', () => { if (!py) postMessage({ type: 'fail' }); });
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.url);
+      py = await loadPyodide({ indexURL: m.base });
+      py.setStdout({ write: b => { postMessage({ type: 'out', text: dec.decode(b) }); return b.length; } });
+      py.setStderr({ write: b => { postMessage({ type: 'err', text: dec.decode(b) }); return b.length; } });
+      py.setStdin({ stdin: () => {
+        if (!inputLines.length) return null;
+        const v = inputLines.shift();
+        postMessage({ type: 'echo', text: v });
+        return v;
+      } });
+      py.runPython(HARNESS);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'fail', text: String(err) });
+    }
+  } else if (m.type === 'run') {
+    inputLines = m.input.length ? m.input.replace(/\\n$/, '').split('\\n') : [];
+    try {
+      py.globals.set('__student_src__', m.src);
+      await py.runPythonAsync('__run__(__student_src__)');
+    } catch (ex) {
+      postMessage({ type: 'err', text: String(ex).trim().split('\\n').slice(-3).join('\\n') });
+    }
+    postMessage({ type: 'done' });
+  }
+};
 `;
 
-async function loadPy() {
-  if (pyodide || loading) return;
-  loading = true;
-  try {
-    pyodide = await loadPyodide();
-    pyodide.runPython(HARNESS);
-    statusEl.textContent = 'Python ready';
-    runbtn.disabled = false;
-  } catch (err) {
-    statusEl.textContent = 'Python unavailable';
-    setOut('The in-page Python runner could not load (this usually means no internet connection).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.', 'err');
+let worker = null, ready = false, running = false, outChars = 0, hadErr = false, slowTimer = null;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+function appendOut(text, cls) {
+  if (cls === 'err' && output.textContent.length && !output.textContent.endsWith('\n')) text = '\n' + text;
+  if (cls === 'err' && !output.textContent.length) text = text.replace(/^\n+/, '');
+  outChars += text.length;
+  const last = output.lastChild;
+  if (!cls && last && last.nodeType === 3) { last.appendData(text); }
+  else if (cls && last && last.nodeType === 1 && last.className === cls) { last.textContent += text; }
+  else {
+    const node = cls ? document.createElement('span') : document.createTextNode(text);
+    if (cls) { node.className = cls; node.textContent = text; }
+    output.appendChild(node);
   }
-  loading = false;
+}
+function unavailable() {
+  ready = false;
+  statusEl.textContent = 'Python unavailable';
+  runbtn.disabled = true; stopbtn.disabled = true;
+  setOut(OFFLINE_MSG, 'err');
+}
+function finishRun(message) {
+  running = false;
+  clearTimeout(slowTimer);
+  runbtn.disabled = !ready; stopbtn.disabled = true;
+  if (message) statusEl.textContent = message;
 }
 
-function bootstrap() {
-  if (typeof loadPyodide === 'undefined') {
-    statusEl.textContent = 'Python unavailable';
-    runbtn.disabled = true;
-    setOut('The in-page Python runner could not load (this usually means no internet connection).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.', 'err');
-    return;
-  }
-  loadPy();
-}
-
-runbtn.addEventListener('click', async () => {
-  if (!pyodide) { await loadPy(); if (!pyodide) return; }
+function startWorker() {
+  ready = false;
   runbtn.disabled = true;
-  statusEl.textContent = 'Running…';
-  let out = '', err = '';
-  pyodide.setStdout({ batched: s => { out += s + '\n'; } });
-  pyodide.setStderr({ batched: s => { err += s + '\n'; } });
+  let w;
   try {
-    pyodide.globals.set('__student_src__', editor.value);
-    await pyodide.runPythonAsync('__run__(__student_src__)');
-    if (err) {
-      output.textContent = '';
-      if (out) output.appendChild(document.createTextNode(out));
-      const e = document.createElement('span');
-      e.className = 'err';
-      e.textContent = err.replace(/\n$/, '');
-      output.appendChild(e);
-      statusEl.textContent = 'Error — read it carefully';
-    } else {
-      setOut(out.length ? out.replace(/\n$/, '') : '(the program produced no output)');
-      statusEl.textContent = 'Finished';
+    const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    w = new Worker(URL.createObjectURL(blob));
+  } catch (e) { unavailable(); return; }
+  worker = w;
+  w.onerror = () => { if (worker === w) unavailable(); };
+  w.onmessage = e => {
+    if (worker !== w) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ready = true; statusEl.textContent = 'Python ready'; runbtn.disabled = false;
+    } else if (m.type === 'fail') {
+      unavailable();
+    } else if (m.type === 'out' || m.type === 'err' || m.type === 'echo') {
+      if (!running) return;
+      if (m.type === 'err') hadErr = true;
+      appendOut(m.type === 'echo' ? m.text + '\n' : m.text, m.type === 'err' ? 'err' : (m.type === 'echo' ? 'in' : null));
+      if (outChars > OUTPUT_LIMIT) {
+        stopRun('\n\nStopped: the program printed far too much output. Is there a loop that never ends?');
+      }
+    } else if (m.type === 'done') {
+      if (!running) return;
+      if (!output.textContent.length) setOut('(the program produced no output)');
+      else if (output.lastChild) output.lastChild.textContent = output.lastChild.textContent.replace(/\n+$/, '');
+      finishRun(hadErr ? 'Error — read it carefully' : 'Finished');
     }
-  } catch (ex) {
-    setOut(String(ex).trim().split('\n').slice(-3).join('\n'), 'err');
-    statusEl.textContent = 'Error — read it carefully';
-  }
-  runbtn.disabled = false;
-});
+  };
+  statusEl.textContent = 'Python is loading…';
+  setTimeout(() => { if (worker === w && !ready) { w.terminate(); worker = null; unavailable(); } }, 90000);
+  w.postMessage({ type: 'init', url: PY_URL, base: PY_URL.replace(/[^/]*$/, '') });
+}
 
-/* ---------------- checkpoints ---------------- */
+function stopRun(note) {
+  if (!running) return;
+  if (worker) worker.terminate();
+  worker = null;
+  appendOut(note || '\n\nStopped.', 'err');
+  finishRun('Stopped — restarting Python…');
+  startWorker();
+}
+
+runbtn.addEventListener('click', () => {
+  if (!ready || running) return;
+  running = true; hadErr = false; outChars = 0;
+  output.textContent = '';
+  runbtn.disabled = true; stopbtn.disabled = false;
+  statusEl.textContent = 'Running…';
+  slowTimer = setTimeout(() => {
+    if (running) statusEl.textContent = 'Still running — press Stop if it is stuck in a loop';
+  }, 5000);
+  worker.postMessage({ type: 'run', src: editor.value, input: stdinEl.value });
+});
+stopbtn.addEventListener('click', () => stopRun());
+
+startWorker();
+
+/* ---------------- checkpoints ----------------
+   A wrong choice explains itself and is crossed out, but the right answer
+   is never shown — the student has to find it. Their first attempt is
+   recorded on the card so they can be honest about it. */
 document.querySelectorAll('.cp').forEach(cp => {
   const fb    = cp.querySelector('.fb');
   const texts = cp.querySelectorAll('.fbs > div');
   const opts  = Array.from(cp.querySelectorAll('.opt'));
+  const first = cp.querySelector('.first');
+  let attempts = 0, solved = false;
   opts.forEach((btn, i) => {
     btn.addEventListener('click', () => {
+      if (solved || btn.classList.contains('wrong')) return;
+      attempts++;
       const ok = btn.dataset.ok === '1';
-      opts.forEach(b => b.classList.remove('right','wrong'));
       btn.classList.add(ok ? 'right' : 'wrong');
-      if (!ok) {
-        const correct = cp.querySelector('.opt[data-ok="1"]');
-        if (correct) correct.classList.add('right');
-      }
+      btn.setAttribute('aria-disabled', 'true');
       fb.className = 'fb show ' + (ok ? 'good' : 'bad');
-      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite. </strong>')
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite — try again. </strong>')
                    + (texts[i] ? texts[i].innerHTML : '');
+      if (attempts === 1 && first) {
+        first.textContent = ok ? 'First attempt: correct' : 'First attempt: not correct';
+        first.className = 'first ' + (ok ? 'good' : 'bad');
+      }
+      if (ok) {
+        solved = true;
+        opts.forEach(b => { if (b !== btn) b.setAttribute('aria-disabled', 'true'); b.classList.add('done'); });
+      }
     });
   });
 });
 </script>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js" onload="bootstrap()" onerror="bootstrap()"></script>
 </body>
 </html>

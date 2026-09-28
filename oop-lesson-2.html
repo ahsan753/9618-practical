@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
 <style>
 :root{
-  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --ink:#0F172A;
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
   --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
   --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
   --warn:#B45309; --warn-bg:#FFFBEB;
@@ -69,6 +69,7 @@ th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-ali
 th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
 tbody tr:nth-child(even){background:#F8FAFC}
 td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+@media(max-width:640px){td.dt{white-space:normal;overflow-wrap:anywhere;font-size:13px} th,td{padding:7px 7px}}
 
 /* ---------- code ---------- */
 pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
@@ -139,9 +140,27 @@ details.rev .body{padding:4px 18px 14px}
 footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
 .tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
 .tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
 </style>
 </head>
-<body>
+<body data-lesson="L2">
 <div class="wrap">
 
 <header class="mast">
@@ -175,8 +194,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== HOW THIS WORKS ========== -->
 <section id="how">
-  <h2>Start here</h2>
-  <div class="h">How this lesson works</div>
+  <p class="eyebrow">Start here</p>
+  <h2 class="h">How this lesson works</h2>
   <p class="lead">Same routine as last week. This page teaches, then makes you type — and this week you build on the <code>Member</code> class you wrote in Lesson 1.</p>
   <ol class="steps">
     <li><strong>Learn on this page.</strong> Predict what code will do, run it here in the browser, then pick it apart. Nothing to install.</li>
@@ -193,8 +212,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== DO NOW ========== -->
 <section id="donow">
-  <h2>Retrieval</h2>
-  <div class="h">Do Now — three minutes, no notes</div>
+  <p class="eyebrow">Retrieval</p>
+  <h2 class="h">Do Now — three minutes, no notes</h2>
   <p>Answer these before you read anything else. Write them in your book, then reveal the answers and mark them.</p>
   <div class="box">
     <p class="bt">Questions</p>
@@ -221,8 +240,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== OBJECTIVES ========== -->
 <section id="obj">
-  <h2>Where this is going</h2>
-  <div class="h">Learning objectives</div>
+  <p class="eyebrow">Where this is going</p>
+  <h2 class="h">Learning objectives</h2>
   <table>
     <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
     <tr><td>Explain the difference between <strong>returning</strong> a value and <strong>outputting</strong> it, and tell from the wording of a question which one is required.</td><td>20.1</td><td>2 &amp; 4</td></tr>
@@ -240,8 +259,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== KEY TERMS ========== -->
 <section id="terms">
-  <h2>Vocabulary</h2>
-  <div class="h">Key terms — learn these wordings</div>
+  <p class="eyebrow">Vocabulary</p>
+  <h2 class="h">Key terms — learn these wordings</h2>
   <p>Written the way a mark scheme writes them. Learn the wording, not the gist.</p>
   <table>
     <tr><th style="width:23%">Term</th><th>Definition that earns the mark</th></tr>
@@ -261,8 +280,8 @@ footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;c
 
 <!-- ========== PREDICT ========== -->
 <section id="predict">
-  <h2>PRIMM · Step 1</h2>
-  <div class="h">Predict</div>
+  <p class="eyebrow">PRIMM · Step 1</p>
+  <h2 class="h">Predict</h2>
   <p>Read this program carefully. <strong>Do not run it yet.</strong> Two methods that look almost identical. Write down exactly what you think the program will output, line by line.</p>
   <span class="codelabel">Python — Paper 4</span>
 <pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
@@ -284,7 +303,7 @@ B = MyBook.<span class="fn">ShowTitle</span>()
 
   <div class="predict">
     <p class="bt">Commit your prediction before you scroll</p>
-    <textarea id="pred1" placeholder="Type the exact output you expect, line by line…"></textarea>
+    <textarea id="pred1" data-save placeholder="Type the exact output you expect, line by line…"></textarea>
     <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Two harder questions while you are here: which line prints the <em>first</em> thing you see? And what do you think is stored in <code>B</code>?</p>
   </div>
 </section>
@@ -293,8 +312,8 @@ B = MyBook.<span class="fn">ShowTitle</span>()
 
 <!-- ========== RUN ========== -->
 <section id="run">
-  <h2>PRIMM · Step 2</h2>
-  <div class="h">Run</div>
+  <p class="eyebrow">PRIMM · Step 2</p>
+  <h2 class="h">Run</h2>
   <p>Now run it. Press <strong>Run</strong> and compare the real output with your prediction. Python runs inside this page — nothing is sent anywhere.</p>
 
   <div class="runner">
@@ -302,14 +321,20 @@ B = MyBook.<span class="fn">ShowTitle</span>()
       <span class="ttl">Python 3 — try it</span>
       <span class="status" id="pystatus">Python is loading…</span>
       <button id="runbtn" disabled>▶ Run</button>
+      <button class="stop" id="stopbtn" disabled>■ Stop</button>
       <button class="ghost" id="resetbtn">Reset code</button>
     </div>
-    <textarea class="editor" id="editor" spellcheck="false"></textarea>
+    <textarea class="editor" id="editor" spellcheck="false" aria-label="Python code editor"></textarea>
+    <div class="inwrap">
+      <label class="outlabel" for="stdin" style="display:block">Program input — only if your code uses input(): one value per line, in order</label>
+      <textarea class="stdin" id="stdin" spellcheck="false" rows="2"></textarea>
+    </div>
     <div class="outwrap">
       <div class="outlabel">Output</div>
       <pre class="out" id="output">Press Run to execute.</pre>
     </div>
   </div>
+  <p class="savenote">Your code and your prediction are saved in this browser, so closing the tab does not lose them. If a program never finishes, press <strong>Stop</strong>.</p>
 
   <details class="rev"><summary>Check your prediction</summary>
   <div class="body">
@@ -336,8 +361,8 @@ B is None</pre>
 
 <!-- ========== INVESTIGATE ========== -->
 <section id="investigate">
-  <h2>PRIMM · Step 3</h2>
-  <div class="h">Investigate — return, output, get, set</div>
+  <p class="eyebrow">PRIMM · Step 3</p>
+  <h2 class="h">Investigate — return, output, get, set</h2>
 
   <h3>1. The question tells you which one it wants</h3>
   <p>Before you write a method, find the verb in the question or the class design. It is an instruction, not a figure of speech.</p>
@@ -392,16 +417,17 @@ B is None</pre>
     <div class="cpb">
       <p class="q">The class design says: <em>"<code>GetTitle()</code> returns the title of the book."</em> Which method follows the design?</p>
       <button class="opt" data-ok="0">A &nbsp;<code>def GetTitle(self, Title): return self.__Title</code></button>
-      <button class="opt" data-ok="0">B &nbsp;<code>def GetTitle(self): print(self.__Title)</code></button>
-      <button class="opt" data-ok="1">C &nbsp;<code>def GetTitle(self): return self.__Title</code></button>
+      <button class="opt" data-ok="1">B &nbsp;<code>def GetTitle(self): return self.__Title</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>def GetTitle(self): print(self.__Title)</code></button>
       <button class="opt" data-ok="0">D &nbsp;<code>def GetTitle(self): self.__Title = input(); return self.__Title</code></button>
       <div class="fbs" hidden>
         <div>A get method with a parameter is the single most repeated OOP error in the examiner reports — all ten recent series. The object already holds the title, so there is nothing to pass in. Worse, anyone calling <code>GetTitle()</code> the right way now gets a crash.</div>
-        <div>This <strong>outputs</strong> the title rather than <strong>returning</strong> it. It looks right on screen, but any code that calls it gets <code>None</code> back. The design says "returns".</div>
         <div>No parameter other than <code>self</code>, one <code>return</code>, and the attribute is left unchanged. That is the whole of a get method.</div>
+        <div>This <strong>outputs</strong> the title rather than <strong>returning</strong> it. It looks right on screen, but any code that calls it gets <code>None</code> back. The design says "returns".</div>
         <div>This reads input and overwrites the attribute — a get method must leave the attribute exactly as it was. Examiners reject a getter that reads input or assigns.</div>
       </div>
-      <div class="fb"></div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -410,8 +436,8 @@ B is None</pre>
 
 <!-- ========== MODIFY ========== -->
 <section id="modify">
-  <h2>PRIMM · Step 4</h2>
-  <div class="h">Modify</div>
+  <p class="eyebrow">PRIMM · Step 4</p>
+  <h2 class="h">Modify</h2>
   <p>Go back to the runner and change the program to do the following.</p>
 
   <div class="box">
@@ -463,17 +489,18 @@ BookAge = <span class="nm">2026</span> - Published
     <div class="cph">Checkpoint 2</div>
     <div class="cpb">
       <p class="q">An object <code>NewMember</code> has a get method <code>GetName()</code> that returns the member's name. Which line outputs the member's name?</p>
-      <button class="opt" data-ok="0">A &nbsp;<code>NewMember.GetName()</code></button>
-      <button class="opt" data-ok="1">B &nbsp;<code>print(NewMember.GetName())</code></button>
+      <button class="opt" data-ok="1">A &nbsp;<code>print(NewMember.GetName())</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>NewMember.GetName()</code></button>
       <button class="opt" data-ok="0">C &nbsp;<code>print(NewMember.__Name)</code></button>
       <button class="opt" data-ok="0">D &nbsp;<code>print(GetName(NewMember))</code></button>
       <div class="fbs" hidden>
-        <div>The method runs and returns the name — and then the program throws it away. Nothing is output. Not storing or using a returned value is reported in all ten recent series.</div>
         <div>The call is made on the object with dot notation, and the value it returns goes straight into <code>print</code>. Storing it first — <code>Name = NewMember.GetName()</code> then <code>print(Name)</code> — is equally good.</div>
+        <div>The method runs and returns the name — and then the program throws it away. Nothing is output. Not storing or using a returned value is reported in all ten recent series.</div>
         <div>This reaches past the method into a private attribute. It crashes with an <code>AttributeError</code>, and even in a language where it ran, it would defeat the encapsulation the question is testing.</div>
         <div>This calls the method as if it were a free-standing procedure. Python crashes with a <code>NameError</code>. Calling methods as free procedures appears in six of the last ten series — methods are always called <em>on</em> an object, with a dot.</div>
       </div>
-      <div class="fb"></div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -482,8 +509,8 @@ BookAge = <span class="nm">2026</span> - Published
 
 <!-- ========== EXAM TECHNIQUE ========== -->
 <section id="technique">
-  <h2>The marks</h2>
-  <div class="h">Exam technique — the verb is the instruction</div>
+  <p class="eyebrow">The marks</p>
+  <h2 class="h">Exam technique — the verb is the instruction</h2>
   <p>A game stores each player as an object. The design says:</p>
   <div class="box">
     <p class="bt">Class design — Player (extract)</p>
@@ -530,15 +557,16 @@ BookAge = <span class="nm">2026</span> - Published
       <p class="q">The design says: <em>"<code>AddCredits(Amount)</code> adds <code>Amount</code> to <code>Credits</code>. <code>Credits</code> can never be greater than 50."</em> <code>Credits</code> is currently 40. Which method leaves <code>Credits</code> at 50 after <code>AddCredits(25)</code>?</p>
       <button class="opt" data-ok="0">A &nbsp;<code>if self.__Credits &gt; 50: self.__Credits = 50</code> … then <code>self.__Credits = self.__Credits + Amount</code></button>
       <button class="opt" data-ok="0">B &nbsp;<code>if Amount &gt; 50: Amount = 50</code> … then <code>self.__Credits = self.__Credits + Amount</code></button>
-      <button class="opt" data-ok="1">C &nbsp;<code>NewTotal = self.__Credits + Amount</code> … <code>if NewTotal &gt; 50: NewTotal = 50</code> … <code>self.__Credits = NewTotal</code></button>
-      <button class="opt" data-ok="0">D &nbsp;<code>self.__Credits = Amount</code> … then <code>if self.__Credits &gt; 50: self.__Credits = 50</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>self.__Credits = Amount</code> … then <code>if self.__Credits &gt; 50: self.__Credits = 50</code></button>
+      <button class="opt" data-ok="1">D &nbsp;<code>NewTotal = self.__Credits + Amount</code> … <code>if NewTotal &gt; 50: NewTotal = 50</code> … <code>self.__Credits = NewTotal</code></button>
       <div class="fbs" hidden>
         <div>This checks the <em>old</em> value (40, which passes) and then adds 25, leaving 65. The limit has been applied before the addition, so it never catches anything the addition creates.</div>
         <div>This limits the <em>parameter</em>, not the total. 25 is under 50, so nothing happens, and <code>Credits</code> ends on 65.</div>
-        <div>Add first (65), then limit (50), then store. The limit is applied to the new total, after the addition — the only order that works for every starting value.</div>
         <div>This <em>replaces</em> <code>Credits</code> with 25 instead of adding to it. The limit is in the right place, but the design says "adds", so the 40 credits the member already had are lost.</div>
+        <div>Add first (65), then limit (50), then store. The limit is applied to the new total, after the addition — the only order that works for every starting value.</div>
       </div>
-      <div class="fb"></div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -547,8 +575,8 @@ BookAge = <span class="nm">2026</span> - Published
 
 <!-- ========== TASK ========== -->
 <section id="task">
-  <h2>Assessed work</h2>
-  <div class="h">Over to you — extend your Member class</div>
+  <p class="eyebrow">Assessed work</p>
+  <h2 class="h">Over to you — extend your Member class</h2>
   <p class="lead">Everyone starts at <strong>Independent</strong>. Drop to Scaffolded if you stall. Go to Exam Conditions when you have finished.</p>
 
   <div class="box pinkb">
@@ -664,8 +692,8 @@ BookAge = <span class="nm">2026</span> - Published
 
 <!-- ========== MARK SCHEME ========== -->
 <section id="markscheme">
-  <h2>Self-marking</h2>
-  <div class="h">Mark scheme — open it only after you have attempted the task</div>
+  <p class="eyebrow">Self-marking</p>
+  <h2 class="h">Mark scheme — open it only after you have attempted the task</h2>
   <p>Mark your own work honestly against this, then record your total in the Evidence Document.</p>
 
   <details class="rev"><summary>Reveal the mark scheme [14 marks]</summary>
@@ -716,8 +744,8 @@ BookAge = <span class="nm">2026</span> - Published
 
 <!-- ========== SUBMIT ========== -->
 <section id="submit">
-  <h2>Hand-in</h2>
-  <div class="h">What to submit on Teams</div>
+  <p class="eyebrow">Hand-in</p>
+  <h2 class="h">What to submit on Teams</h2>
   <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 2.docx</code>.</p>
   <div class="box">
     <p class="bt">Checklist before you upload</p>
@@ -737,17 +765,6 @@ BookAge = <span class="nm">2026</span> - Published
   <p><strong>Home Lesson 3 — Using objects.</strong> Not one member but thirty: an array of objects, a loop over it, and doing something with every value your get methods hand back. This is the skill examiners currently name as the national weakness on Paper 4, and today's lesson is the foundation for it.</p>
 </section>
 
-<div class="tn">
-  <p class="bt">Teacher note — remove before issuing if you wish</p>
-  <p style="margin:0 0 7px"><strong>Provenance.</strong> No past-paper questions were spent on this lesson. The Do Now, the task and the mark scheme are original, written in Cambridge's Paper 4 house style. Log as <em>questions used: none</em>.</p>
-  <p style="margin:0 0 7px"><strong>Retrieval bank deposit.</strong><br>
-  How many parameters does a get method take, other than self? | None.<br>
-  A method prints a value but the question said "returns". What does the calling code receive? | Nothing — in Python, None.<br>
-  A setter must add Amount and never exceed a limit. In what order? | Add, then limit the new total, then store.</p>
-  <p style="margin:0 0 7px"><strong>Vocabulary introduced.</strong> get method (accessor), set method (mutator), return, output, return value, limit.</p>
-  <p style="margin:0 0 7px"><strong>Diagnostic built into the test data.</strong> The 30-then-35 calls expose a limit applied before the addition: those students' screenshots show 65. A get method with a parameter crashes at the call site, so it cannot be hidden either.</p>
-  <p style="margin:0"><strong>Check before issuing.</strong> The task builds on the Lesson 1 <code>Member</code> class. The fallback version of that class is on this page for anyone who did not finish — check the Lesson 1 submissions first and chase those separately.</p>
-</div>
 
 <footer class="foot">
   Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 2 of 6 &nbsp;·&nbsp; Paper 4 Practical &nbsp;·&nbsp; United School International
@@ -776,43 +793,65 @@ print("A is", A)
 print("B is", B)
 `;
 
+const PAGE_KEY = '9618-oop-' + (document.body.dataset.lesson || location.pathname);
+const PY_URL   = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+const OFFLINE_MSG = 'The in-page Python runner could not load (this usually means no internet connection, or the network is blocking it).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.';
+const OUTPUT_LIMIT = 100000;   // characters — a runaway print loop is stopped here
+
 const editor  = document.getElementById('editor');
+const stdinEl = document.getElementById('stdin');
 const output  = document.getElementById('output');
 const runbtn  = document.getElementById('runbtn');
+const stopbtn = document.getElementById('stopbtn');
 const resetbt = document.getElementById('resetbtn');
 const statusEl= document.getElementById('pystatus');
 
-editor.value = STARTER;
+/* ---------------- saving work in this browser ---------------- */
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(PAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+let saved = loadSaved();
+let saveTimer = null;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { editor: editor.value, stdin: stdinEl.value, notes: {} };
+    document.querySelectorAll('textarea[data-save]').forEach(t => { data.notes[t.id] = t.value; });
+    try { localStorage.setItem(PAGE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — work is not saved */ }
+  }, 400);
+}
+editor.value  = (typeof saved.editor === 'string' && saved.editor.trim()) ? saved.editor : STARTER;
+stdinEl.value = typeof saved.stdin === 'string' ? saved.stdin : '';
+document.querySelectorAll('textarea[data-save]').forEach(t => {
+  if (saved.notes && typeof saved.notes[t.id] === 'string') t.value = saved.notes[t.id];
+  t.addEventListener('input', saveSoon);
+});
+editor.addEventListener('input', saveSoon);
+stdinEl.addEventListener('input', saveSoon);
 
 /* Tab inserts four spaces rather than moving focus */
 editor.addEventListener('keydown', e => {
-  if (e.key === 'Tab') {
+  if (e.key === 'Tab' && !e.shiftKey) {
     e.preventDefault();
     const s = editor.selectionStart, t = editor.selectionEnd;
     editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
     editor.selectionStart = editor.selectionEnd = s + 4;
+    saveSoon();
   }
 });
 
 resetbt.addEventListener('click', () => {
   editor.value = STARTER;
   output.textContent = 'Press Run to execute.';
+  saveSoon();
 });
 
-/* ---------------- Pyodide ---------------- */
-let pyodide = null, loading = false;
-
-function setOut(text, cls) {
-  output.textContent = '';
-  const span = document.createElement('span');
-  if (cls) span.className = cls;
-  span.textContent = text;
-  output.appendChild(span);
-}
-
-/* Runs the student's code with a traceback trimmed to their own lines —
-   the raw Pyodide trace is full of internal frames that only confuse. */
-const HARNESS = `
+/* ---------------- Python, in a background worker ----------------
+   Running Python off the main thread means a loop that never ends
+   cannot freeze the page: Stop simply throws the worker away. */
+const WORKER_SRC = `
+let py = null, inputLines = [];
+const HARNESS = \`
 import sys, traceback
 
 def __run__(src):
@@ -827,88 +866,177 @@ def __run__(src):
         exec(code, g)
     except SystemExit:
         pass
+    except EOFError:
+        print("EOFError: input() ran out of values.\\\\nType every value your program asks for in the Program input box, one per line, in order.", file=sys.stderr)
     except BaseException:
         etype, evalue, tb = sys.exc_info()
         if tb is not None and tb.tb_next is not None:
             tb = tb.tb_next
         print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+\`;
+const dec = new TextDecoder();
+self.addEventListener('unhandledrejection', () => { if (!py) postMessage({ type: 'fail' }); });
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.url);
+      py = await loadPyodide({ indexURL: m.base });
+      py.setStdout({ write: b => { postMessage({ type: 'out', text: dec.decode(b) }); return b.length; } });
+      py.setStderr({ write: b => { postMessage({ type: 'err', text: dec.decode(b) }); return b.length; } });
+      py.setStdin({ stdin: () => {
+        if (!inputLines.length) return null;
+        const v = inputLines.shift();
+        postMessage({ type: 'echo', text: v });
+        return v;
+      } });
+      py.runPython(HARNESS);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'fail', text: String(err) });
+    }
+  } else if (m.type === 'run') {
+    inputLines = m.input.length ? m.input.replace(/\\n$/, '').split('\\n') : [];
+    try {
+      py.globals.set('__student_src__', m.src);
+      await py.runPythonAsync('__run__(__student_src__)');
+    } catch (ex) {
+      postMessage({ type: 'err', text: String(ex).trim().split('\\n').slice(-3).join('\\n') });
+    }
+    postMessage({ type: 'done' });
+  }
+};
 `;
 
-async function loadPy() {
-  if (pyodide || loading) return;
-  loading = true;
-  try {
-    pyodide = await loadPyodide();
-    pyodide.runPython(HARNESS);
-    statusEl.textContent = 'Python ready';
-    runbtn.disabled = false;
-  } catch (err) {
-    statusEl.textContent = 'Python unavailable';
-    setOut('The in-page Python runner could not load (this usually means no internet connection).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.', 'err');
+let worker = null, ready = false, running = false, outChars = 0, hadErr = false, slowTimer = null;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+function appendOut(text, cls) {
+  if (cls === 'err' && output.textContent.length && !output.textContent.endsWith('\n')) text = '\n' + text;
+  if (cls === 'err' && !output.textContent.length) text = text.replace(/^\n+/, '');
+  outChars += text.length;
+  const last = output.lastChild;
+  if (!cls && last && last.nodeType === 3) { last.appendData(text); }
+  else if (cls && last && last.nodeType === 1 && last.className === cls) { last.textContent += text; }
+  else {
+    const node = cls ? document.createElement('span') : document.createTextNode(text);
+    if (cls) { node.className = cls; node.textContent = text; }
+    output.appendChild(node);
   }
-  loading = false;
+}
+function unavailable() {
+  ready = false;
+  statusEl.textContent = 'Python unavailable';
+  runbtn.disabled = true; stopbtn.disabled = true;
+  setOut(OFFLINE_MSG, 'err');
+}
+function finishRun(message) {
+  running = false;
+  clearTimeout(slowTimer);
+  runbtn.disabled = !ready; stopbtn.disabled = true;
+  if (message) statusEl.textContent = message;
 }
 
-function bootstrap() {
-  if (typeof loadPyodide === 'undefined') {
-    statusEl.textContent = 'Python unavailable';
-    runbtn.disabled = true;
-    setOut('The in-page Python runner could not load (this usually means no internet connection).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.', 'err');
-    return;
-  }
-  loadPy();
-}
-
-runbtn.addEventListener('click', async () => {
-  if (!pyodide) { await loadPy(); if (!pyodide) return; }
+function startWorker() {
+  ready = false;
   runbtn.disabled = true;
-  statusEl.textContent = 'Running…';
-  let out = '', err = '';
-  pyodide.setStdout({ batched: s => { out += s + '\n'; } });
-  pyodide.setStderr({ batched: s => { err += s + '\n'; } });
+  let w;
   try {
-    pyodide.globals.set('__student_src__', editor.value);
-    await pyodide.runPythonAsync('__run__(__student_src__)');
-    if (err) {
-      output.textContent = '';
-      if (out) output.appendChild(document.createTextNode(out));
-      const e = document.createElement('span');
-      e.className = 'err';
-      e.textContent = err.replace(/\n$/, '');
-      output.appendChild(e);
-      statusEl.textContent = 'Error — read it carefully';
-    } else {
-      setOut(out.length ? out.replace(/\n$/, '') : '(the program produced no output)');
-      statusEl.textContent = 'Finished';
+    const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    w = new Worker(URL.createObjectURL(blob));
+  } catch (e) { unavailable(); return; }
+  worker = w;
+  w.onerror = () => { if (worker === w) unavailable(); };
+  w.onmessage = e => {
+    if (worker !== w) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ready = true; statusEl.textContent = 'Python ready'; runbtn.disabled = false;
+    } else if (m.type === 'fail') {
+      unavailable();
+    } else if (m.type === 'out' || m.type === 'err' || m.type === 'echo') {
+      if (!running) return;
+      if (m.type === 'err') hadErr = true;
+      appendOut(m.type === 'echo' ? m.text + '\n' : m.text, m.type === 'err' ? 'err' : (m.type === 'echo' ? 'in' : null));
+      if (outChars > OUTPUT_LIMIT) {
+        stopRun('\n\nStopped: the program printed far too much output. Is there a loop that never ends?');
+      }
+    } else if (m.type === 'done') {
+      if (!running) return;
+      if (!output.textContent.length) setOut('(the program produced no output)');
+      else if (output.lastChild) output.lastChild.textContent = output.lastChild.textContent.replace(/\n+$/, '');
+      finishRun(hadErr ? 'Error — read it carefully' : 'Finished');
     }
-  } catch (ex) {
-    setOut(String(ex).trim().split('\n').slice(-3).join('\n'), 'err');
-    statusEl.textContent = 'Error — read it carefully';
-  }
-  runbtn.disabled = false;
-});
+  };
+  statusEl.textContent = 'Python is loading…';
+  setTimeout(() => { if (worker === w && !ready) { w.terminate(); worker = null; unavailable(); } }, 90000);
+  w.postMessage({ type: 'init', url: PY_URL, base: PY_URL.replace(/[^/]*$/, '') });
+}
 
-/* ---------------- checkpoints ---------------- */
+function stopRun(note) {
+  if (!running) return;
+  if (worker) worker.terminate();
+  worker = null;
+  appendOut(note || '\n\nStopped.', 'err');
+  finishRun('Stopped — restarting Python…');
+  startWorker();
+}
+
+runbtn.addEventListener('click', () => {
+  if (!ready || running) return;
+  running = true; hadErr = false; outChars = 0;
+  output.textContent = '';
+  runbtn.disabled = true; stopbtn.disabled = false;
+  statusEl.textContent = 'Running…';
+  slowTimer = setTimeout(() => {
+    if (running) statusEl.textContent = 'Still running — press Stop if it is stuck in a loop';
+  }, 5000);
+  worker.postMessage({ type: 'run', src: editor.value, input: stdinEl.value });
+});
+stopbtn.addEventListener('click', () => stopRun());
+
+startWorker();
+
+/* ---------------- checkpoints ----------------
+   A wrong choice explains itself and is crossed out, but the right answer
+   is never shown — the student has to find it. Their first attempt is
+   recorded on the card so they can be honest about it. */
 document.querySelectorAll('.cp').forEach(cp => {
   const fb    = cp.querySelector('.fb');
   const texts = cp.querySelectorAll('.fbs > div');
   const opts  = Array.from(cp.querySelectorAll('.opt'));
+  const first = cp.querySelector('.first');
+  let attempts = 0, solved = false;
   opts.forEach((btn, i) => {
     btn.addEventListener('click', () => {
+      if (solved || btn.classList.contains('wrong')) return;
+      attempts++;
       const ok = btn.dataset.ok === '1';
-      opts.forEach(b => b.classList.remove('right','wrong'));
       btn.classList.add(ok ? 'right' : 'wrong');
-      if (!ok) {
-        const correct = cp.querySelector('.opt[data-ok="1"]');
-        if (correct) correct.classList.add('right');
-      }
+      btn.setAttribute('aria-disabled', 'true');
       fb.className = 'fb show ' + (ok ? 'good' : 'bad');
-      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite. </strong>')
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite — try again. </strong>')
                    + (texts[i] ? texts[i].innerHTML : '');
+      if (attempts === 1 && first) {
+        first.textContent = ok ? 'First attempt: correct' : 'First attempt: not correct';
+        first.className = 'first ' + (ok ? 'good' : 'bad');
+      }
+      if (ok) {
+        solved = true;
+        opts.forEach(b => { if (b !== btn) b.setAttribute('aria-disabled', 'true'); b.classList.add('done'); });
+      }
     });
   });
 });
 </script>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js" onload="bootstrap()" onerror="bootstrap()"></script>
 </body>
 </html>
