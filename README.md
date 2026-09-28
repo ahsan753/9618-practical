@@ -14,6 +14,7 @@ index.html          hub — lists every lesson
 oop-lesson-1.html       20.1 OOP — Classes, Attributes and the Constructor
 oop-lesson-2.html       20.1 OOP — Get and Set Methods
 oop-lesson-3.html       20.1 OOP — Using Objects
+oop-lesson-4.html       20.1 OOP — Containment or Inheritance?
 robots.txt          disallow all crawlers
 ```
 
@@ -22,7 +23,7 @@ is reachable by link but should not appear in search results.
 
 ## Adding a lesson
 
-Add `oop-lesson-2.html` alongside the others, then add a card to the hub and
+Add `oop-lesson-<n>.html` alongside the others, then add a card to the hub and
 change its tag from `soon` to `live`.
 
 The matching Evidence Document (.docx) for each lesson is issued through Teams,

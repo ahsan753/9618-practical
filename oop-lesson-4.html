@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>20.1 OOP — Home Lesson 4: Containment or Inheritance?</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
+  --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
+  --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
+  --warn:#B45309; --warn-bg:#FFFBEB;
+  --mono:"Cascadia Mono","Consolas","SF Mono",Menlo,monospace;
+  --sans:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{margin:0;background:#E2E8F0;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;background:var(--white);padding:0 0 64px;box-shadow:0 0 40px rgba(15,23,42,.10)}
+.pad{padding:0 40px}
+@media(max-width:640px){.pad{padding:0 18px} body{font-size:16px}}
+
+/* ---------- masthead ---------- */
+header.mast{background:var(--blue-dk);color:#fff;padding:30px 40px 26px}
+@media(max-width:640px){header.mast{padding:24px 18px}}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#BFDBFE;font-weight:700;margin:0 0 8px}
+.kicker a.home{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
+.kicker a.home:hover{border-bottom-color:#fff}
+header.mast h1{margin:0;font-size:31px;line-height:1.2;font-weight:700}
+header.mast .sub{margin:10px 0 0;color:#DBEAFE;font-size:15px}
+.pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;color:#EFF6FF}
+
+/* ---------- sticky nav ---------- */
+nav.sticky{position:sticky;top:0;z-index:40;background:#fff;border-bottom:2px solid var(--line);padding:0 40px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+@media(max-width:640px){nav.sticky{padding:0 10px}}
+nav.sticky a{flex:0 0 auto;padding:11px 12px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+nav.sticky a:hover{color:var(--blue);border-bottom-color:#BFDBFE}
+
+/* ---------- sections ---------- */
+section{padding-top:34px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:800;margin:0 0 4px}
+h2 + .h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25}
+h3{font-size:19px;color:var(--blue-dk);margin:26px 0 8px}
+p{margin:0 0 13px}
+.lead{font-size:18px;color:var(--muted)}
+hr.rule{border:0;border-top:2px solid var(--panel);margin:38px 0 0}
+
+/* ---------- boxes ---------- */
+.box{border:1.5px solid var(--blue);background:var(--panel);border-radius:8px;padding:16px 20px;margin:16px 0}
+.box.pinkb{border-color:var(--pink);background:#fff}
+.box .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--blue);margin:0 0 8px}
+.box.pinkb .bt{color:var(--pink)}
+.callout{border-left:5px solid var(--warn);background:var(--warn-bg);padding:13px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+.callout .bt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--warn);margin:0 0 6px}
+.callout.ex{border-left-color:var(--bad);background:var(--bad-bg)}
+.callout.ex .bt{color:var(--bad)}
+ul,ol{margin:0 0 13px;padding-left:22px}
+li{margin:0 0 7px}
+code{font-family:var(--mono);background:#E2E8F0;padding:1px 5px;border-radius:4px;font-size:.92em}
+.tick{color:var(--good);font-weight:800}
+.cross{color:var(--bad);font-weight:800}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+tbody tr:nth-child(even){background:#F8FAFC}
+td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+@media(max-width:640px){td.dt{white-space:normal;overflow-wrap:anywhere;font-size:13px} th,td{padding:7px 7px}}
+
+/* ---------- code ---------- */
+pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
+pre.code .cm{color:#94A3B8;font-style:italic}
+pre.code .kw{color:#F0ABFC}
+pre.code .st{color:#86EFAC}
+pre.code .fn{color:#93C5FD}
+pre.code .nm{color:#FDE68A}
+.codelabel{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:5px 5px 0 0;margin-bottom:-4px}
+
+/* ---------- runner ---------- */
+.runner{border:2px solid var(--blue);border-radius:10px;overflow:hidden;margin:16px 0;background:#0F172A}
+.runbar{background:#1E293B;padding:8px 12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid #334155}
+.runbar .ttl{color:#93C5FD;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-right:auto}
+button{font-family:var(--sans);font-size:14px;font-weight:700;border:0;border-radius:6px;padding:7px 15px;cursor:pointer;background:var(--blue);color:#fff}
+button:hover{background:#1E40AF}
+button.ghost{background:#334155;color:#CBD5E1}
+button.ghost:hover{background:#475569}
+button:disabled{opacity:.5;cursor:not-allowed}
+textarea.editor{width:100%;min-height:250px;background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;border:0;padding:14px 18px;resize:vertical;display:block;outline:none;tab-size:4}
+.outwrap{border-top:1px solid #334155;background:#020617}
+.outlabel{color:#64748B;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:7px 18px 0}
+pre.out{margin:0;padding:6px 18px 14px;color:#E2E8F0;font-family:var(--mono);font-size:14px;line-height:1.55;white-space:pre-wrap;min-height:34px}
+pre.out .err{color:#FCA5A5}
+pre.out .ok{color:#86EFAC}
+.status{font-size:12.5px;color:#94A3B8;font-family:var(--mono)}
+
+/* ---------- interactive ---------- */
+.predict{border:2px dashed var(--pink);border-radius:9px;padding:16px 20px;margin:16px 0;background:#FDF2F8}
+.predict .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--pink);margin:0 0 8px}
+.predict textarea{width:100%;min-height:70px;font-family:var(--mono);font-size:14px;padding:9px 11px;border:1.5px solid var(--line);border-radius:6px;resize:vertical}
+
+.cp{border:2px solid var(--blue);border-radius:10px;margin:20px 0;overflow:hidden}
+.cp .cph{background:var(--blue);color:#fff;padding:9px 18px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.cp .cpb{padding:16px 20px}
+.cp .q{font-weight:700;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:11px 14px;margin:0 0 9px;cursor:pointer;font-family:var(--sans);font-size:15.5px;color:var(--ink);font-weight:400;line-height:1.45}
+.opt:hover{border-color:var(--blue);background:#EFF6FF}
+.opt code{background:#E2E8F0}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.fb{display:none;margin-top:10px;padding:12px 15px;border-radius:7px;font-size:15px;line-height:1.5}
+.fb.show{display:block}
+.fb.good{background:var(--good-bg);border-left:5px solid var(--good)}
+.fb.bad{background:var(--bad-bg);border-left:5px solid var(--bad)}
+
+details.rev{border:1.5px solid var(--line);border-radius:8px;margin:14px 0;background:#fff;overflow:hidden}
+details.rev>summary{cursor:pointer;padding:12px 18px;font-weight:700;color:var(--blue);background:var(--panel);list-style:none;font-size:15.5px}
+details.rev>summary::-webkit-details-marker{display:none}
+details.rev>summary::before{content:"▸ ";color:var(--pink);font-weight:800}
+details.rev[open]>summary::before{content:"▾ "}
+details.rev .body{padding:4px 18px 14px}
+
+.tier{border:1.5px solid var(--line);border-radius:9px;margin:14px 0;overflow:hidden}
+.tier .th{padding:9px 18px;font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#fff}
+.tier.s .th{background:#0891B2} .tier.i .th{background:var(--blue)} .tier.e .th{background:#7C3AED}
+.tier .tb{padding:14px 18px}
+
+.ms{border:1.5px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0}
+.ms table{margin:0;font-size:15px}
+.ms th{background:var(--blue-dk)}
+.mp{font-family:var(--mono);font-weight:700;color:var(--blue);white-space:nowrap}
+
+.steps{counter-reset:st;list-style:none;padding:0}
+.steps li{counter-increment:st;position:relative;padding-left:44px;margin-bottom:14px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
+.tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
+.tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
+</style>
+</head>
+<body data-lesson="L4">
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker"><a class="home" href="index.html">← All lessons</a> &nbsp;·&nbsp; Cambridge 9618 A Level · Unit 20.1 · Paper 4 Practical</p>
+  <h1>Object-Oriented Programming<br>Home Lesson 4 — Containment or Inheritance?</h1>
+  <p class="sub">Work through this page, then turn the club into a class that contains its members, and submit the Evidence Document on Teams.</p>
+  <div class="pills">
+    <span class="pill">Home lesson 4 of 6</span>
+    <span class="pill">Language: Python (console)</span>
+    <span class="pill">Suggested time: 60 minutes</span>
+    <span class="pill">Submit: Evidence Document (.docx)</span>
+  </div>
+</header>
+
+<nav class="sticky">
+  <a href="#how">How this works</a>
+  <a href="#donow">Do Now</a>
+  <a href="#obj">Objectives</a>
+  <a href="#terms">Key terms</a>
+  <a href="#predict">Predict</a>
+  <a href="#run">Run</a>
+  <a href="#investigate">Investigate</a>
+  <a href="#modify">Modify</a>
+  <a href="#technique">Exam technique</a>
+  <a href="#task">Your task</a>
+  <a href="#markscheme">Mark scheme</a>
+  <a href="#submit">Submit</a>
+</nav>
+
+<div class="pad">
+
+<!-- ========== HOW THIS WORKS ========== -->
+<section id="how">
+  <p class="eyebrow">Start here</p>
+  <h2 class="h">How this lesson works</h2>
+  <p class="lead">Same routine. This page teaches, then makes you type — and this week the club itself becomes a class that <em>has</em> its members inside it.</p>
+  <ol class="steps">
+    <li><strong>Learn on this page.</strong> Predict, run, investigate, modify. Nothing to install.</li>
+    <li><strong>Open your Lesson 3 code.</strong> The <code>Member</code> class does not change. Last week the array of members and the functions that worked on it sat in the main program; this week they move <em>inside</em> a new <code>Club</code> class. If your <code>Member</code> class is not working, there is a version in the task section to start from.</li>
+    <li><strong>Evidence it.</strong> Paste your code <em>as text</em> and your screenshot into this week's Evidence Document, and submit it on Teams.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">The trap this lesson is about</p>
+    <p style="margin:0">In <strong>five examiner reports since November 2022</strong>, across four exam series, Cambridge has named candidates using inheritance where the design called for containment — the equivalent of writing <code>class Club(Member):</code> when a club <em>has</em> an array of members. The code often runs. It still loses the class-declaration marks, and usually the constructor marks with them, because the candidate built the wrong relationship. The whole decision takes ten seconds once you know where to look in the design table — and that is what you are about to learn.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== DO NOW ========== -->
+<section id="donow">
+  <p class="eyebrow">Retrieval</p>
+  <h2 class="h">Do Now — three minutes, no notes</h2>
+  <p>Answer these before you read anything else. Write them in your book, then reveal the answers and mark them.</p>
+  <div class="box">
+    <p class="bt">Questions</p>
+    <ol style="margin-bottom:0">
+      <li>An array <code>Team</code> holds four <code>Player</code> objects, in <code>Team[0]</code> to <code>Team[3]</code>. Each has a get method <code>GetName()</code>. <strong>Write</strong> one line of Python that outputs the name of the <em>last</em> player. <em>[1]</em></li>
+      <li>A linear search has <code>else: return -1</code> inside its loop. <strong>State</strong> what goes wrong when the item being searched for is not in the first element. <em>[1]</em></li>
+      <li>A class design lists the attribute <code>Members : ARRAY[0:29] OF Member</code>. <strong>State</strong> how many elements the array has, and the data type of each element. <em>[2]</em></li>
+    </ol>
+  </div>
+  <details class="rev"><summary>Mark scheme — mark your own answers</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:60px">Q</th><th>Accepted</th><th style="width:70px">Marks</th></tr>
+      <tr><td class="mp">1</td><td><code>print(Team[3].GetName())</code><br><span class="cross">Reject:</span> <code>Team[4]</code> (past the end), <code>Team.GetName(3)</code>, <code>Team[3].__Name</code>.</td><td>1</td></tr>
+      <tr><td class="mp">2</td><td>The function returns <code>-1</code> after checking only the <strong>first</strong> element / the loop never reaches the other elements, so the item is reported as not found.</td><td>1</td></tr>
+      <tr><td class="mp">3</td><td>MP1 — <strong>30</strong> elements (0 to 29).<br>MP2 — each element is a <code>Member</code> — an <strong>object of the class</strong> <code>Member</code>.<br><span class="cross">Reject</span> for MP2: "ARRAY", "STRING", "a record".</td><td>2</td></tr>
+    </table></div>
+    <p style="margin:10px 0 0"><strong>Q3 is the prerequisite check.</strong> A data type can be <em>another class</em>. When you see a class name in the data type column of a design, that is the signal this whole lesson is built on. If you wrote "ARRAY" or "STRING", reread the row before you go on.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== OBJECTIVES ========== -->
+<section id="obj">
+  <p class="eyebrow">Where this is going</p>
+  <h2 class="h">Learning objectives</h2>
+  <table>
+    <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
+    <tr><td>Decide from a class design whether two classes are related by <strong>containment</strong> or <strong>inheritance</strong>, and justify it with <em>has a</em> or <em>is a</em>.</td><td>20.1</td><td>3 &amp; 4</td></tr>
+    <tr><td>Declare a class with a <strong>private attribute that is an array of objects</strong> of another class, with its type evidenced and initialised in the constructor.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Write methods of the containing class that work through the contained objects' <strong>own methods</strong>.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Write an add method that checks for space and <strong>returns a Boolean on every path</strong>.</td><td>20.1</td><td>4</td></tr>
+  </table>
+</section>
+
+<hr class="rule">
+
+<!-- ========== KEY TERMS ========== -->
+<section id="terms">
+  <p class="eyebrow">Vocabulary</p>
+  <h2 class="h">Key terms — learn these wordings</h2>
+  <table>
+    <tr><th style="width:26%">Term</th><th>Definition that earns the mark</th></tr>
+    <tr><td><strong>Containment</strong><br><span style="color:var(--muted);font-size:14px">(aggregation)</span></td><td>A relationship where one class has an attribute (property) that is an object, or an array of objects, of another class. The container <em>has</em> the other objects.</td></tr>
+    <tr><td><strong>Inheritance</strong></td><td>A relationship where a child class <strong>derives</strong> the attributes (properties) and methods of a parent class, and can add its own or override them. The child <em>is a</em> kind of the parent.</td></tr>
+    <tr><td><strong>Parent class</strong><br><span style="color:var(--muted);font-size:14px">(superclass, base class)</span></td><td>The class whose attributes and methods are inherited.</td></tr>
+    <tr><td><strong>Child class</strong><br><span style="color:var(--muted);font-size:14px">(subclass, derived class)</span></td><td>The class that inherits from a parent class.</td></tr>
+  </table>
+  <div class="callout ex">
+    <p class="bt">How definitions lose the mark</p>
+    <p style="margin:0 0 8px"><strong>Don't define a word with itself.</strong> Examiners reported (Nov 2022) that <em>"a new class inherits the attributes and methods from a parent class"</em> was not enough to define inheritance — they wanted it to <em>derive</em> them. Cambridge's standing instruction: use the words <em>property</em>, <em>method</em>, <em>class</em> and <em>object</em> when you define an OOP term.</p>
+    <p style="margin:0">"Containment is when a class is inside another class" is <span class="cross">risky</span> — it sounds as if one class is declared inside the other, which is not what happens. Say that one class has an <em>attribute</em> whose value is an object, or an array of objects, of the other class.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PREDICT ========== -->
+<section id="predict">
+  <p class="eyebrow">PRIMM · Step 1</p>
+  <h2 class="h">Predict</h2>
+  <p>Read this program carefully. <strong>Do not run it yet.</strong> There are two classes now. Write down exactly what you think the two <code>print</code> lines will output.</p>
+  <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages):
+        self.__Title = Title        <span class="cm"># STRING</span>
+        self.__Pages = Pages        <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">GetTitle</span>(self):
+        <span class="kw">return</span> self.__Title
+
+    <span class="kw">def</span> <span class="fn">GetPages</span>(self):
+        <span class="kw">return</span> self.__Pages
+
+<span class="kw">class</span> <span class="nm">Shelf</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Label):
+        self.__Label = Label        <span class="cm"># STRING</span>
+        self.__Books = [<span class="kw">None</span>] * <span class="nm">3</span>   <span class="cm"># ARRAY[0:2] OF Book</span>
+        self.__Count = <span class="nm">0</span>            <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">AddBook</span>(self, NewBook):
+        self.__Books[self.__Count] = NewBook
+        self.__Count = self.__Count + <span class="nm">1</span>
+
+    <span class="kw">def</span> <span class="fn">TotalPages</span>(self):
+        Total = <span class="nm">0</span>
+        <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, self.__Count):
+            Total = Total + self.__Books[Index].<span class="fn">GetPages</span>()
+        <span class="kw">return</span> Total
+
+Fiction = <span class="nm">Shelf</span>(<span class="st">"Fiction"</span>)
+Fiction.<span class="fn">AddBook</span>(<span class="nm">Book</span>(<span class="st">"Dune"</span>, <span class="nm">412</span>))
+Fiction.<span class="fn">AddBook</span>(<span class="nm">Book</span>(<span class="st">"Emma"</span>, <span class="nm">474</span>))
+<span class="fn">print</span>(Fiction.<span class="fn">TotalPages</span>())
+Fiction.<span class="fn">AddBook</span>(<span class="nm">Book</span>(<span class="st">"Holes"</span>, <span class="nm">233</span>))
+<span class="fn">print</span>(Fiction.<span class="fn">TotalPages</span>())</pre>
+
+  <div class="predict">
+    <p class="bt">Commit your prediction before you scroll</p>
+    <textarea id="pred1" data-save placeholder="Type the two lines you expect…"></textarea>
+    <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Two harder questions: is a <code>Shelf</code> a kind of <code>Book</code>? If not, what connects the two classes? And why does the loop run to <code>self.__Count</code> rather than to 3?</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== RUN ========== -->
+<section id="run">
+  <p class="eyebrow">PRIMM · Step 2</p>
+  <h2 class="h">Run</h2>
+  <p>Now run it and compare the real output with your prediction.</p>
+
+  <div class="runner">
+    <div class="runbar">
+      <span class="ttl">Python 3 — try it</span>
+      <span class="status" id="pystatus">Python is loading…</span>
+      <button id="runbtn" disabled>▶ Run</button>
+      <button class="stop" id="stopbtn" disabled>■ Stop</button>
+      <button class="ghost" id="resetbtn">Reset code</button>
+    </div>
+    <textarea class="editor" id="editor" spellcheck="false" aria-label="Python code editor"></textarea>
+    <div class="inwrap">
+      <label class="outlabel" for="stdin" style="display:block">Program input — only if your code uses input(): one value per line, in order</label>
+      <textarea class="stdin" id="stdin" spellcheck="false" rows="2"></textarea>
+    </div>
+    <div class="outwrap">
+      <div class="outlabel">Output</div>
+      <pre class="out" id="output">Press Run to execute.</pre>
+    </div>
+  </div>
+  <p class="savenote">Your code and your prediction are saved in this browser, so closing the tab does not lose them. If a program never finishes, press <strong>Stop</strong>.</p>
+
+  <details class="rev"><summary>Check your prediction</summary>
+  <div class="body">
+<pre class="code">886
+1119</pre>
+    <ul style="margin-bottom:0">
+      <li>The first total is taken when the shelf holds <strong>two</strong> books (412 + 474). The second is taken after a third is added. The shelf remembers its books between calls because they are stored in its own attribute.</li>
+      <li>A <code>Shelf</code> is <strong>not</strong> a kind of <code>Book</code>. A shelf <strong>has</strong> books: its attribute <code>__Books</code> is an array whose elements are <code>Book</code> objects. That relationship is called <strong>containment</strong>.</li>
+      <li>The loop runs to <code>self.__Count</code> because that is how many books are actually stored. The array has three elements, but until a book is added an element holds <code>None</code> — there is no book there to ask.</li>
+    </ul>
+  </div>
+  </details>
+
+  <div class="callout ex">
+    <p class="bt">Try this — then read why it matters</p>
+    <p style="margin:0 0 8px">In <code>TotalPages</code>, change <code>range(0, self.__Count)</code> to <code>range(0, 3)</code> and run it again.</p>
+    <p style="margin:0">It crashes: <code>'NoneType' object has no attribute 'GetPages'</code>. On the first total only two books are stored, so element 2 is still <code>None</code>, and <code>None</code> has no methods. <strong>A container loops over the objects it has, not over the size of its array.</strong> That is what the counter is for. Change it back before you go on.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== INVESTIGATE ========== -->
+<section id="investigate">
+  <p class="eyebrow">PRIMM · Step 3</p>
+  <h2 class="h">Investigate — has a, or is a?</h2>
+
+  <h3>1. The one-question test</h3>
+  <p>Say the two class names in a sentence. If <em>"A ___ is a ___"</em> is true, it is inheritance. If <em>"A ___ has ___"</em> is true, it is containment. Only one of them will sound right.</p>
+  <table>
+    <tr><th style="width:44%">Sentence</th><th style="width:22%">True?</th><th>Relationship</th></tr>
+    <tr><td>A shelf <strong>is a</strong> book.</td><td><span class="cross">✗</span> No</td><td rowspan="2">Containment — <code>Shelf</code> has an array of <code>Book</code></td></tr>
+    <tr><td>A shelf <strong>has</strong> books.</td><td><span class="tick">✓</span> Yes</td></tr>
+    <tr><td>A novel <strong>is a</strong> book.</td><td><span class="tick">✓</span> Yes</td><td>Inheritance — <code>Novel</code> is a child of <code>Book</code></td></tr>
+    <tr><td>A club <strong>has</strong> members.</td><td><span class="tick">✓</span> Yes</td><td>Containment</td></tr>
+    <tr><td>A savings account <strong>is an</strong> account.</td><td><span class="tick">✓</span> Yes</td><td>Inheritance</td></tr>
+  </table>
+
+  <h3>2. Where the design table tells you</h3>
+  <p>In the exam you do not have to guess from the names. The design says which it is — you just have to look in the right place.</p>
+  <table>
+    <tr><th style="width:50%">Containment — look for…</th><th>Inheritance — look for…</th></tr>
+    <tr><td>Another class's name in the <strong>data type column</strong> of an attribute:<br><code>Books : ARRAY[0:2] OF Book</code><br><code>Captain : Member</code></td><td>Words in the description such as <em>"is a subclass of"</em>, <em>"inherits from"</em>, <em>"child class of"</em> — or a class diagram with an arrow from the child to the parent.</td></tr>
+  </table>
+  <p><strong>The rule to apply:</strong> if the other class appears as an <em>attribute</em>, it is containment — no brackets after the class name and no <code>super()</code>.</p>
+
+  <div class="cp" data-cp="1">
+    <div class="cph">Checkpoint 1</div>
+    <div class="cpb">
+      <p class="q">A class design reads: <em>Class <code>Garage</code>. Attributes: <code>GarageName : STRING</code>; <code>Vehicles : ARRAY[0:9] OF Car</code>.</em> Which class header follows the design?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>class Garage(Car):</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>class Garage(Vehicles):</code></button>
+      <button class="opt" data-ok="1">C &nbsp;<code>class Garage:</code></button>
+      <button class="opt" data-ok="0">D &nbsp;<code>class Car(Garage):</code></button>
+      <div class="fbs" hidden>
+        <div>This makes <code>Garage</code> a child of <code>Car</code> — it says a garage <em>is a</em> car. <code>Car</code> appears in the data type column of an attribute, so a garage <em>has</em> cars. This is exactly the error examiners have reported five times since 2022.</div>
+        <div><code>Vehicles</code> is the name of an attribute, not a class. Python stops with a <code>NameError</code>. The brackets after a class name are only ever for a parent class.</div>
+        <div><code>Car</code> appears in the data type column, so this is containment: the garage <em>has</em> an array of cars. The class needs no parent, so there are no brackets — the array is declared inside the constructor.</div>
+        <div>This makes every car a kind of garage. Nothing in the design says that, and it gets the direction of the relationship backwards as well.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>3. What containment looks like in Python</h3>
+<pre class="code"><span class="kw">class</span> <span class="nm">Shelf</span>:                            <span class="cm"># 1. no parent class in brackets</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Label):
+        self.__Label = Label            <span class="cm"># STRING</span>
+        self.__Books = [<span class="kw">None</span>] * <span class="nm">3</span>       <span class="cm"># 2. ARRAY[0:2] OF Book, private</span>
+        self.__Count = <span class="nm">0</span>                <span class="cm"># 3. INTEGER — how many are stored</span></pre>
+  <ol>
+    <li><strong>No parent class.</strong> <code>class Shelf:</code> — nothing in brackets, and so no <code>super().__init__</code> anywhere.</li>
+    <li><strong>The contained objects live in a private attribute,</strong> created in the constructor, with its type shown in a comment exactly as you did for <code>STRING</code> and <code>INTEGER</code>. It is not a constructor parameter unless the design says so.</li>
+    <li><strong>A counter</strong> records how many objects are actually stored, so that methods can loop over those and no further.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">Read what "empty" means in the design</p>
+    <p style="margin:0">This design says the elements start <em>empty</em>, so <code>[None] * 3</code> with a type comment is right — examiners describe stronger Python candidates as having "used a comment to indicate the data type intended" (Nov 2021). But some designs say the array is initialised with <em>objects</em> — for example twenty nodes each holding <code>-1</code>. Then an object must be <strong>created and stored in every element</strong>; <code>None</code> will not earn the mark (Jun 2024). The design decides, not habit.</p>
+  </div>
+
+  <h3>4. Work through their methods, not their attributes</h3>
+  <p>Inside <code>Shelf</code>, a book's title is still private to <code>Book</code>. The shelf has to ask for it, exactly as the main program did last week.</p>
+  <table>
+    <tr><th style="width:52%">Inside a Shelf method you write</th><th>What happens</th></tr>
+    <tr><td class="dt">self.__Books[Index].GetPages()</td><td><span class="tick">✓</span> The book returns its pages.</td></tr>
+    <tr><td class="dt">self.__Books[Index].__Pages</td><td><span class="cross">✗</span> <code>AttributeError: 'Book' object has no attribute '_Shelf__Pages'</code>. Private means private to <em>the class that declared it</em>. <code>Shelf</code> is a different class.</td></tr>
+    <tr><td class="dt">self.__Books.GetPages(Index)</td><td><span class="cross">✗</span> Crash — the array is a list, and a list has no <code>GetPages</code>. Pick the element first.</td></tr>
+  </table>
+  <div class="callout ex">
+    <p class="bt">Pass the object, not its data</p>
+    <p style="margin:0">The design says <code>AddBook(NewBook)</code> — one parameter, and it is a <code>Book</code>. So the caller creates the object and hands it over: <code>Fiction.AddBook(Book("Dune", 412))</code>. Writing <code>AddBook(self, Title, Pages)</code> and building the book inside does not follow the design. Examiners have reported exactly this — passing the integer and string values <em>instead of the object</em> — in Nov 2022 and again in Jun 2024.</p>
+  </div>
+
+  <div class="cp" data-cp="2">
+    <div class="cph">Checkpoint 2</div>
+    <div class="cpb">
+      <p class="q">Inside a method of the class <code>Team</code>, the attribute <code>self.__Players</code> holds <code>Player</code> objects, and each <code>Player</code> has a get method <code>GetGoals()</code>. Which line, inside <code>for Index in range(0, self.__Count):</code>, adds one player's goals to <code>Total</code>?</p>
+      <button class="opt" data-ok="1">A &nbsp;<code>Total = Total + self.__Players[Index].GetGoals()</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>Total = Total + self.__Players[Index].__Goals</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>Total = Total + self.__Players.GetGoals(Index)</code></button>
+      <button class="opt" data-ok="0">D &nbsp;<code>Total = Total + Player.GetGoals()</code></button>
+      <div class="fbs" hidden>
+        <div>Array, then element, then the element's own method — and the value it returns is added to the total. The <code>Team</code> works <em>through</em> the player, never around it.</div>
+        <div><code>__Goals</code> is private to <code>Player</code>. Inside <code>Team</code>, Python renames it to <code>_Team__Goals</code>, which does not exist, so this crashes with an <code>AttributeError</code>. Call the get method.</div>
+        <div>This calls the method on the whole list and passes the index as a parameter. A list has no <code>GetGoals</code>, and a get method takes no parameter anyway. Pick the element first: <code>self.__Players[Index]</code>.</div>
+        <div>This calls the method on the <em>class</em>, not on an object, so Python does not know which player you mean — <code>TypeError: missing 1 required positional argument: 'self'</code>. Methods are called on objects.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>5. For recognition only — what inheritance looks like</h3>
+  <p>Next week is all about inheritance. For now you only need to recognise it, so that you can tell the two apart.</p>
+<pre class="code"><span class="kw">class</span> <span class="nm">Novel</span>(<span class="nm">Book</span>):                       <span class="cm"># a Novel IS A Book</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages, Genre):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Title, Pages)   <span class="cm"># the parent's constructor sets these</span>
+        self.__Genre = Genre             <span class="cm"># STRING — the one extra attribute</span></pre>
+  <table>
+    <tr><th style="width:30%"></th><th style="width:35%">Containment</th><th>Inheritance</th></tr>
+    <tr><td><strong>Sentence</strong></td><td>A shelf <em>has</em> books</td><td>A novel <em>is a</em> book</td></tr>
+    <tr><td><strong>Class header</strong></td><td class="dt">class Shelf:</td><td class="dt">class Novel(Book):</td></tr>
+    <tr><td><strong>Other class appears…</strong></td><td>as an attribute's data type</td><td>in brackets as the parent</td></tr>
+    <tr><td><strong>super().__init__</strong></td><td><span class="cross">✗</span> never</td><td><span class="tick">✓</span> always, in the constructor</td></tr>
+    <tr><td><strong>Cambridge pseudocode</strong> <span style="color:var(--muted);font-size:14px">(Paper 3)</span></td><td class="dt">CLASS Shelf<br>PRIVATE Books : ARRAY[0:2] OF Book</td><td class="dt">CLASS Novel INHERITS Book<br>SUPER.NEW(Title, Pages)</td></tr>
+  </table>
+
+  <h3>6. Design it yourself</h3>
+  <p>Paper 3 and Paper 4 both expect you to design classes from a description, not only to code a design you are given. Read this scenario and write down the classes, which ones are related by containment and which by inheritance, and each class's attributes with data types.</p>
+  <div class="box pinkb">
+    <p class="bt">Scenario — a cinema</p>
+    <p style="margin:0">A cinema has a name and five screens. Each screen has a screen number and a number of seats. A 3D screen is a screen that also records how many pairs of 3D glasses it has available.</p>
+  </div>
+  <div class="predict">
+    <p class="bt">Your design — commit it before you open the answer</p>
+    <textarea id="pred2" data-save placeholder="Classes, relationships, attributes and data types…"></textarea>
+  </div>
+  <details class="rev"><summary>A design that would score</summary>
+  <div class="body">
+    <table>
+      <tr><th style="width:24%">Class</th><th style="width:40%">Attributes</th><th>Relationship</th></tr>
+      <tr><td class="dt">Cinema</td><td class="dt">CinemaName : STRING<br>Screens : ARRAY[0:4] OF Screen</td><td>Containment — a cinema <em>has</em> screens, so <code>Screen</code> appears as a data type.</td></tr>
+      <tr><td class="dt">Screen</td><td class="dt">ScreenNumber : INTEGER<br>Seats : INTEGER</td><td>The parent class.</td></tr>
+      <tr><td class="dt">Screen3D</td><td class="dt">GlassesAvailable : INTEGER</td><td>Inheritance — a 3D screen <em>is a</em> screen. It derives <code>ScreenNumber</code> and <code>Seats</code>, and adds only its own attribute.</td></tr>
+    </table>
+    <p style="margin:0">Two traps: giving <code>Screen3D</code> its own copies of <code>ScreenNumber</code> and <code>Seats</code> (inheritance already provides them), and making <code>Cinema</code> inherit from <code>Screen</code> because the description mentions both in one sentence.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MODIFY ========== -->
+<section id="modify">
+  <p class="eyebrow">PRIMM · Step 4</p>
+  <h2 class="h">Modify</h2>
+  <p>First, add a fourth book to the end of the program — <code>Fiction.AddBook(Book("Beloved", 324))</code> — and run it. It crashes with <code>IndexError: list assignment index out of range</code>: the shelf has only three elements, and <code>AddBook</code> never checks. Now fix it.</p>
+
+  <div class="box">
+    <p class="bt">Changes to make</p>
+    <ol style="margin:0">
+      <li>Change <code>AddBook</code> so that it only stores the book when the shelf has space. It <strong>returns</strong> <code>True</code> if the book was added and <code>False</code> if the shelf was full.</li>
+      <li>Replace the main program. Add these four books, in order: Dune (412), Emma (474), Holes (233), Beloved (324).</li>
+      <li><strong>Store</strong> what each call to <code>AddBook</code> returns. When it is <code>False</code>, output the book's title followed by <code>did not fit</code>.</li>
+      <li>Finally, output <code>Total pages: 1119</code> using <code>TotalPages()</code>.</li>
+    </ol>
+  </div>
+
+  <details class="rev"><summary>Model answer — check yours against this</summary>
+  <div class="body">
+    <span class="codelabel">Python — Paper 4</span>
+<pre class="code">    <span class="kw">def</span> <span class="fn">AddBook</span>(self, NewBook):
+        <span class="kw">if</span> self.__Count &lt; <span class="nm">3</span>:
+            self.__Books[self.__Count] = NewBook
+            self.__Count = self.__Count + <span class="nm">1</span>
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">else</span>:
+            <span class="kw">return</span> <span class="kw">False</span>
+
+Fiction = <span class="nm">Shelf</span>(<span class="st">"Fiction"</span>)
+<span class="kw">for</span> NewBook <span class="kw">in</span> [<span class="nm">Book</span>(<span class="st">"Dune"</span>, <span class="nm">412</span>), <span class="nm">Book</span>(<span class="st">"Emma"</span>, <span class="nm">474</span>), <span class="nm">Book</span>(<span class="st">"Holes"</span>, <span class="nm">233</span>), <span class="nm">Book</span>(<span class="st">"Beloved"</span>, <span class="nm">324</span>)]:
+    Added = Fiction.<span class="fn">AddBook</span>(NewBook)
+    <span class="kw">if</span> Added == <span class="kw">False</span>:
+        <span class="fn">print</span>(NewBook.<span class="fn">GetTitle</span>() + <span class="st">" did not fit"</span>)
+<span class="fn">print</span>(<span class="st">"Total pages: "</span> + <span class="fn">str</span>(Fiction.<span class="fn">TotalPages</span>()))</pre>
+    <p style="margin:10px 0 6px">Expected output:</p>
+<pre class="code">Beloved did not fit
+Total pages: 1119</pre>
+    <ul style="margin-bottom:0">
+      <li><strong>Check, then store, then count.</strong> The book goes into element <code>self.__Count</code> — the next free one — and only then does the counter go up. Doing it the other way round leaves element 0 empty and runs off the end one book early.</li>
+      <li><strong>A Boolean on every path.</strong> Both branches return something. A method that returns <code>True</code> when it works and nothing at all when it does not hands the caller <code>None</code>.</li>
+      <li>Four separate lines of <code>Added = Fiction.AddBook(...)</code> and a test after each is equally good. The loop over a list of new books is just shorter.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== EXAM TECHNIQUE ========== -->
+<section id="technique">
+  <p class="eyebrow">The marks</p>
+  <h2 class="h">Exam technique — the data type column decides</h2>
+  <p>A music app stores playlists. The design says:</p>
+  <div class="box">
+    <p class="bt">Class design — Playlist</p>
+    <table style="margin:0">
+      <tr><th style="width:26%">Attribute</th><th style="width:30%">Data type</th><th>Set when the object is created</th></tr>
+      <tr><td class="dt">PlaylistName</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Songs</td><td class="dt">ARRAY[0:49] OF Song</td><td>Fifty empty elements</td></tr>
+      <tr><td class="dt">SongCount</td><td class="dt">INTEGER</td><td>Always <code>0</code></td></tr>
+    </table>
+  </div>
+  <p><strong>Predict, then reveal.</strong> A candidate writes this constructor. It runs without an error. Decide what an examiner would credit before you open the answer.</p>
+  <span class="codelabel">Candidate response</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Playlist</span>(<span class="nm">Song</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, PlaylistName, Title, Artist):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Title, Artist)
+        self.__PlaylistName = PlaylistName    <span class="cm"># STRING</span>
+        self.__SongCount = <span class="nm">0</span>                  <span class="cm"># INTEGER</span></pre>
+  <details class="rev"><summary>What the examiner says</summary>
+  <div class="body">
+    <p>It runs. It still loses most of the declaration marks.</p>
+    <ul>
+      <li><span class="cross">✗</span> <strong>Inherits from <code>Song</code>.</strong> A playlist is not a song. <code>Song</code> is in the data type column of an attribute, so this is containment. The class-header mark is lost.</li>
+      <li><span class="cross">✗</span> <strong>Wrong parameters.</strong> The design gives the constructor one parameter, <code>PlaylistName</code>. <code>Title</code> and <code>Artist</code> belong to a song, and are only here because the candidate chose inheritance.</li>
+      <li><span class="cross">✗</span> <strong>No <code>Songs</code> array.</strong> The attribute that holds the songs is missing entirely. Every later part — adding a song, listing the songs, counting them — now has nowhere to work, so the error costs marks well beyond this part.</li>
+      <li><span class="tick">✓</span> <code>PlaylistName</code> and <code>SongCount</code> are private, typed, and <code>SongCount</code> is set to the fixed value 0 inside the constructor. Credited.</li>
+    </ul>
+    <p style="margin:10px 0 6px"><strong>What would have scored</strong></p>
+<pre class="code"><span class="kw">class</span> <span class="nm">Playlist</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, PlaylistName):
+        self.__PlaylistName = PlaylistName    <span class="cm"># STRING</span>
+        self.__Songs = [<span class="kw">None</span>] * <span class="nm">50</span>            <span class="cm"># ARRAY[0:49] OF Song</span>
+        self.__SongCount = <span class="nm">0</span>                  <span class="cm"># INTEGER</span></pre>
+    <p style="margin-bottom:0"><strong>The habit to build:</strong> before you write the class header, run your finger down the <em>data type</em> column. If the name of another class is there, it is containment — no brackets after the class name, no <code>super()</code>, and that class's parameters stay out of your constructor.</p>
+  </div>
+  </details>
+
+  <div class="cp" data-cp="3">
+    <div class="cph">Checkpoint 3</div>
+    <div class="cpb">
+      <p class="q">A design reads: <em>"<code>ElectricCar</code> is a subclass of <code>Car</code>. It has one additional attribute, <code>BatteryRange : INTEGER</code>."</em> Which of these follows the design?</p>
+      <button class="opt" data-ok="0">A &nbsp;Containment — <code>class ElectricCar:</code> with an attribute that holds a <code>Car</code> object</button>
+      <button class="opt" data-ok="0">B &nbsp;Containment — give <code>Car</code> an attribute of type <code>ARRAY OF ElectricCar</code></button>
+      <button class="opt" data-ok="0">C &nbsp;Inheritance — <code>class Car(ElectricCar):</code></button>
+      <button class="opt" data-ok="1">D &nbsp;Inheritance — <code>class ElectricCar(Car):</code></button>
+      <div class="fbs" hidden>
+        <div>The design says <em>"is a subclass of"</em> — that is inheritance, not containment. An electric car does not <em>have</em> a car inside it; it <em>is</em> one. Look for the class name in the data type column first, but read the description too.</div>
+        <div>Nothing in the design gives <code>Car</code> any new attribute, and an ordinary car does not have electric cars. This invents a relationship that is not there.</div>
+        <div>Right relationship, wrong direction. The class in brackets is the <strong>parent</strong>. This makes every ordinary car a kind of electric car.</div>
+        <div><em>"Is a subclass of"</em> means inheritance, and the parent goes in the brackets: an electric car <em>is a</em> car, with one extra attribute of its own. Next lesson is about writing its constructor properly.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== TASK ========== -->
+<section id="task">
+  <p class="eyebrow">Assessed work</p>
+  <h2 class="h">Over to you — the club becomes a class</h2>
+  <p class="lead">Everyone starts at <strong>Independent</strong>. Drop to Scaffolded if you stall. Go to Exam Conditions when you have finished.</p>
+
+  <div class="callout">
+    <p class="bt">Functions become methods</p>
+    <p style="margin:0">Last week <code>TotalCredits</code> and <code>FindMember</code> were functions in the main program. This week they belong to the club, so they are written <strong>inside</strong> <code>class Club</code>, take <code>self</code>, and are called on the object — <code>TheClub.TotalCredits()</code>. Examiners reported in Nov 2024 that "some candidates wrote a function and not a method".</p>
+  </div>
+
+  <div class="box pinkb">
+    <p class="bt">The scenario</p>
+    <p style="margin:0 0 10px">The sports club is now represented by a class. The class <code>Member</code> is <strong>unchanged</strong> from Lesson 2. A new class, <code>Club</code>, has the following design.</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:26%">Attribute</th><th style="width:30%">Data type</th><th>Set when the object is created</th></tr>
+      <tr><td class="dt">ClubName</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Members</td><td class="dt">ARRAY[0:4] OF Member</td><td>Five empty elements</td></tr>
+      <tr><td class="dt">NumberOfMembers</td><td class="dt">INTEGER</td><td>Always <code>0</code></td></tr>
+    </table>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:30%">Method</th><th>Description</th></tr>
+      <tr><td class="dt">Constructor</td><td>Initialises all three attributes as described above.</td></tr>
+      <tr><td class="dt">AddMember(NewMember)</td><td>If the club has fewer than 5 members, stores <code>NewMember</code> in the next free element of <code>Members</code>, adds 1 to <code>NumberOfMembers</code> and returns <code>TRUE</code>. Otherwise returns <code>FALSE</code>.</td></tr>
+      <tr><td class="dt">TotalCredits()</td><td>Returns the total credits of all the members stored.</td></tr>
+      <tr><td class="dt">DisplayMember(SearchName)</td><td>Calls <code>DisplayDetails()</code> for the member whose name matches <code>SearchName</code>. If no stored member matches, outputs <code>SearchName</code> followed by <code>" not found"</code>.</td></tr>
+    </table>
+    <p style="margin:0 0 6px"><strong>Test data</strong> — use it in this order:</p>
+    <table style="margin:0">
+      <tr><th>MemberID</th><th>Name</th><th>Age</th><th>Credits to add</th></tr>
+      <tr><td class="dt">"M4021"</td><td class="dt">"Sara Ahmed"</td><td class="dt">16</td><td class="dt">20</td></tr>
+      <tr><td class="dt">"M4022"</td><td class="dt">"Omar Khalid"</td><td class="dt">17</td><td class="dt">45</td></tr>
+      <tr><td class="dt">"M4023"</td><td class="dt">"Lina Haddad"</td><td class="dt">16</td><td class="dt">60</td></tr>
+      <tr><td class="dt">"M4024"</td><td class="dt">"Yusuf Rahman"</td><td class="dt">18</td><td class="dt">0</td></tr>
+      <tr><td class="dt">"M4025"</td><td class="dt">"Mia Chen"</td><td class="dt">17</td><td class="dt">35</td></tr>
+      <tr><td class="dt">"M4026"</td><td class="dt">"Tom Reilly"</td><td class="dt">16</td><td class="dt">10</td></tr>
+    </table>
+  </div>
+
+  <details class="rev"><summary>Member class not working? Start from this version</summary>
+  <div class="body">
+    <p style="margin:0 0 8px">Copy this into your editor and build <code>Club</code> underneath it.</p>
+<pre class="code"><span class="kw">class</span> <span class="nm">Member</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, MemberID, Name, Age):
+        self.__MemberID = MemberID   <span class="cm"># STRING</span>
+        self.__Name = Name           <span class="cm"># STRING</span>
+        self.__Age = Age             <span class="cm"># INTEGER</span>
+        self.__Credits = <span class="nm">0</span>           <span class="cm"># INTEGER</span>
+        self.__Active = <span class="kw">True</span>         <span class="cm"># BOOLEAN</span>
+
+    <span class="kw">def</span> <span class="fn">DisplayDetails</span>(self):
+        <span class="fn">print</span>(<span class="st">"Member ID : "</span> + self.__MemberID)
+        <span class="fn">print</span>(<span class="st">"Name      : "</span> + self.__Name)
+        <span class="fn">print</span>(<span class="st">"Age       : "</span> + <span class="fn">str</span>(self.__Age))
+        <span class="fn">print</span>(<span class="st">"Credits   : "</span> + <span class="fn">str</span>(self.__Credits))
+        <span class="fn">print</span>(<span class="st">"Active    : "</span> + <span class="fn">str</span>(self.__Active))
+
+    <span class="kw">def</span> <span class="fn">GetName</span>(self):
+        <span class="kw">return</span> self.__Name
+
+    <span class="kw">def</span> <span class="fn">GetCredits</span>(self):
+        <span class="kw">return</span> self.__Credits
+
+    <span class="kw">def</span> <span class="fn">SetAge</span>(self, NewAge):
+        self.__Age = NewAge
+
+    <span class="kw">def</span> <span class="fn">AddCredits</span>(self, Amount):
+        NewTotal = self.__Credits + Amount
+        <span class="kw">if</span> NewTotal &gt; <span class="nm">50</span>:
+            NewTotal = <span class="nm">50</span>
+        self.__Credits = NewTotal</pre>
+  </div>
+  </details>
+
+  <div class="tier i">
+    <div class="th">Independent — start here</div>
+    <div class="tb">
+      <p style="margin:0 0 8px"><strong>(a)</strong> Write program code to declare the class <code>Club</code> and its constructor. <em>[4]</em></p>
+      <p style="margin:0 0 8px"><strong>(b)</strong> Write program code for the method <code>AddMember()</code>. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(c)</strong> Write program code for the method <code>TotalCredits()</code>. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(d)</strong> Write program code for the method <code>DisplayMember()</code>. <em>[2]</em></p>
+      <p style="margin:0 0 8px"><strong>(e)</strong> Write a main program that:</p>
+      <ul style="margin:0 0 8px">
+        <li>creates a <code>Club</code> object with the name <code>"Riverside Juniors"</code></li>
+        <li>for each row of test data, in order: creates a <code>Member</code> object, adds its credits using <code>AddCredits()</code>, then adds it to the club using <code>AddMember()</code> — <strong>storing</strong> the value returned and outputting the member's name followed by <code>could not be added: club full</code> when it is <code>FALSE</code></li>
+        <li>outputs the total credits, using <code>TotalCredits()</code>, with the label <code>Total credits: </code></li>
+        <li>calls <code>DisplayMember("Lina Haddad")</code> and then <code>DisplayMember("Tom Reilly")</code>. <em>[2]</em></li>
+      </ul>
+      <p style="margin:0"><strong>(f)</strong> Take a screenshot showing the program running. It must show <strong>the test data and the complete output</strong>. <em>[2]</em></p>
+    </div>
+  </div>
+
+  <div class="tier s">
+    <div class="th">Scaffolded — only if you stall</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Same questions, same marks. Put this <strong>below</strong> your <code>Member</code> class and complete every <code>______</code> and <code># ...</code>.</p>
+<pre class="code" style="margin:0"><span class="kw">class</span> <span class="nm">Club</span>:                                   <span class="cm"># no brackets: a club HAS members</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, ______):
+        self.__ClubName = ______                  <span class="cm"># STRING</span>
+        self.__Members = [<span class="kw">None</span>] * ______          <span class="cm"># ARRAY[0:4] OF Member</span>
+        <span class="cm"># ... NumberOfMembers (fixed value — not a parameter)</span>
+
+    <span class="kw">def</span> <span class="fn">AddMember</span>(self, NewMember):
+        <span class="kw">if</span> self.__NumberOfMembers &lt; ______:
+            self.__Members[______] = NewMember    <span class="cm"># the next free element</span>
+            <span class="cm"># ... add 1 to NumberOfMembers</span>
+            <span class="kw">return</span> ______
+        <span class="kw">else</span>:
+            <span class="kw">return</span> ______
+
+    <span class="kw">def</span> <span class="fn">TotalCredits</span>(self):
+        Total = <span class="nm">0</span>
+        <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, ______):            <span class="cm"># only the members stored</span>
+            Total = Total + self.__Members[Index].______()
+        <span class="kw">return</span> Total
+
+    <span class="kw">def</span> <span class="fn">DisplayMember</span>(self, SearchName):
+        Found = <span class="kw">False</span>
+        <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, self.__NumberOfMembers):
+            <span class="kw">if</span> self.__Members[Index].______() == SearchName:
+                <span class="cm"># ... call DisplayDetails on this member</span>
+                Found = <span class="kw">True</span>
+        <span class="cm"># ... if Found is still False, output the not-found message</span>
+
+<span class="cm"># ---- main program ----</span>
+TheClub = <span class="nm">Club</span>(<span class="st">"Riverside Juniors"</span>)
+NewMember = <span class="nm">Member</span>(<span class="st">"M4021"</span>, <span class="st">"Sara Ahmed"</span>, <span class="nm">16</span>)
+NewMember.<span class="fn">AddCredits</span>(<span class="nm">20</span>)
+Added = TheClub.<span class="fn">AddMember</span>(NewMember)
+<span class="cm"># ... the same three lines for the other five rows of test data</span>
+<span class="cm"># ... after Tom Reilly's AddMember, if Added is False, output the club-full message</span>
+<span class="fn">print</span>(<span class="st">"Total credits: "</span> + <span class="fn">str</span>(______))
+<span class="cm"># ... DisplayMember for "Lina Haddad", then for "Tom Reilly"</span></pre>
+    </div>
+  </div>
+
+  <div class="tier e">
+    <div class="th">Exam conditions — where you need to be by the mock</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Close this page. Set a timer for <strong>25 minutes</strong> and work from the scenario box alone. Then, as an extension, the club gets a captain — a <em>single</em> contained object rather than an array:</p>
+      <table style="margin:0 0 8px">
+        <tr><th style="width:34%">Addition to Club</th><th>Description</th></tr>
+        <tr><td class="dt">Captain : Member</td><td>A new attribute. There is no captain when the club is created.</td></tr>
+        <tr><td class="dt">SetCaptain(NewCaptain)</td><td>Assigns the parameter to <code>Captain</code>.</td></tr>
+        <tr><td class="dt">GetCaptainName()</td><td>Returns the name of the captain.</td></tr>
+      </table>
+      <p style="margin:0">In the main program, make <strong>Omar Khalid</strong> the captain, then use <code>GetCaptainName()</code> to output <code>Captain: Omar Khalid</code>. It must appear in the same screenshot.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p class="bt">Before you screenshot</p>
+    <ul style="margin:0">
+      <li>The first line of output should be <code>Tom Reilly could not be added: club full</code>. If the program crashes with <code>IndexError</code> instead, <code>AddMember</code> is not checking for space.</li>
+      <li>The total should be <strong>150</strong> — Tom's 10 credits are not counted, because he was never added. A total of <strong>160</strong>, with Tom's details appearing at the end, means your <code>AddMember</code> stored a sixth member without checking for space. A <code>'NoneType'</code> error means a loop is running past the members you have.</li>
+      <li>You should see Lina's details <strong>once</strong>, and <code>Tom Reilly not found</code> <strong>once</strong>. If "not found" appears several times, it is inside the loop.</li>
+      <li>The screenshot must show <strong>the test data as well as the output</strong> — the lines of code that create the six members, alongside the console.</li>
+      <li>Your <em>code</em> goes into the document as <strong>text</strong>, never as a screenshot.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MARK SCHEME ========== -->
+<section id="markscheme">
+  <p class="eyebrow">Self-marking</p>
+  <h2 class="h">Mark scheme — open it only after you have attempted the task</h2>
+  <p>Mark your own work honestly against this, then record your total in the Evidence Document.</p>
+
+  <details class="rev"><summary>Reveal the mark scheme [16 marks]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Description</th><th style="width:60px">Marks</th></tr>
+      <tr><td class="mp">(a) MP1</td><td>Class <code>Club</code> declared with <strong>no parent class</strong> — <code>class Club:</code>, not <code>class Club(Member):</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP2</td><td>Constructor takes <strong>exactly one</strong> parameter after <code>self</code>, assigned to a private <code>ClubName</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP3</td><td><code>Members</code> declared as a private array of five elements, its type evidenced as an array of <code>Member</code> (a comment is accepted).</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP4</td><td><code>NumberOfMembers</code> private and assigned <code>0</code> inside the constructor.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP5</td><td><code>AddMember()</code> takes one parameter and checks there is space (<code>NumberOfMembers &lt; 5</code>) before storing.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP6</td><td>…stores <code>NewMember</code> at index <code>NumberOfMembers</code>, <strong>then</strong> adds 1 to <code>NumberOfMembers</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP7</td><td>Returns <code>True</code> when added and <code>False</code> when full — a Boolean on <strong>every</strong> path.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP8</td><td>Total initialised to 0 <strong>before</strong> a loop over the <strong>stored</strong> members only (up to <code>NumberOfMembers</code>).</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP9</td><td><code>GetCredits()</code> called on each stored member and the value returned added to the total.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP10</td><td>Total <strong>returned</strong> after the loop.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP11</td><td><code>GetName()</code> of each stored member compared with <code>SearchName</code>, and <code>DisplayDetails()</code> called on the match.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP12</td><td>Not-found message output only <strong>after every</strong> stored member has been checked.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP13</td><td>A <code>Club</code> object created with <code>"Riverside Juniors"</code> in a variable not named after the class; each member created, credited and added with <code>AddMember()</code>, in order.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP14</td><td>The value returned by <code>AddMember()</code> <strong>stored</strong> and tested; club-full message output for Tom Reilly.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP15</td><td>Screenshot shows the test data being used, as well as the output.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP16</td><td>Output shows <code>Tom Reilly could not be added: club full</code>, <code>Total credits: 150</code>, Lina Haddad's details with 50 credits, and <code>Tom Reilly not found</code>.</td><td>1</td></tr>
+    </table></div>
+    <p style="margin:14px 0 6px"><strong>Accepted alternatives</strong></p>
+    <ul>
+      <li>MP5: testing for the full case first — <code>if self.__NumberOfMembers == 5: return False</code> — then storing.</li>
+      <li>MP11–MP12: a <code>Found</code> flag tested after the loop, or a <code>return</code> straight after <code>DisplayDetails()</code> with the not-found output after the loop.</li>
+      <li>MP13–MP14: six separate blocks of code, or a loop over a list of the test data — as long as the order is kept and <code>AddMember</code>'s result is stored before it is tested.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Not credited, however good the code looks</strong></p>
+    <ul>
+      <li><code>class Club(Member):</code> — <span class="cross">MP1 lost</span>, and MP2 with it if the constructor takes a member's parameters.</li>
+      <li><code>AddMember(self, MemberID, Name, Age)</code> that builds the member inside the method — <span class="cross">MP5 lost</span>. The design passes a <code>Member</code> object.</li>
+      <li>No full check — <span class="cross">MP5 lost</span>, and the program crashes on Tom Reilly, so MP16 goes too.</li>
+      <li><code>TotalCredits()</code> or <code>DisplayMember()</code> written as a function outside the class — <span class="cross">no marks for that part</span>. The design lists them as methods of <code>Club</code>.</li>
+      <li>Looping <code>range(0, 5)</code> over the array instead of up to <code>NumberOfMembers</code> — <span class="cross">MP8 lost</span>. It happens to work here because the club is full; on any club with fewer than five members it crashes on <code>None</code>.</li>
+      <li><code>self.__Members[Index].__Credits</code> — <span class="cross">MP9 lost</span>. It crashes: the attribute is private to <code>Member</code>.</li>
+      <li>The not-found message in an <code>else</code> inside the loop — <span class="cross">MP12 lost</span>.</li>
+      <li>Calling <code>AddMember</code> without keeping what it returns, or calling it a second time inside the <code>if</code> — <span class="cross">MP14 lost</span>.</li>
+      <li>Code pasted as an image — <span class="cross">no code marks at all</span>.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Extension — not counted in the 16</strong></p>
+    <ul style="margin-bottom:0">
+      <li><strong>E1</strong> <code>Captain</code> is a private attribute with its type evidenced as <code>Member</code>, created in the constructor (<code>None</code> is accepted as "no captain").</li>
+      <li><strong>E2</strong> <code>SetCaptain()</code> takes one parameter and assigns it to <code>Captain</code> — attribute on the left.</li>
+      <li><strong>E3</strong> <code>GetCaptainName()</code> <strong>returns</strong> <code>self.__Captain.GetName()</code> — it asks the contained object, rather than reaching into it.</li>
+      <li><strong>E4</strong> Omar Khalid's object is passed to <code>SetCaptain()</code>, and the output reads <code>Captain: Omar Khalid</code>.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== SUBMIT ========== -->
+<section id="submit">
+  <p class="eyebrow">Hand-in</p>
+  <h2 class="h">What to submit on Teams</h2>
+  <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 4.docx</code>.</p>
+  <div class="box">
+    <p class="bt">Checklist before you upload</p>
+    <ul style="margin:0">
+      <li>Your name and class are at the top of the document.</li>
+      <li>Parts (a) to (e) are each pasted <strong>as text</strong> into their own box, with the indentation intact.</li>
+      <li>Your class header reads <code>class Club:</code> — nothing in brackets.</li>
+      <li>The screenshot shows the test data <strong>and</strong> the output: Tom Reilly refused, total 150, Lina's details, and Tom Reilly not found.</li>
+      <li>Your self-marked total out of 16 is filled in, with the points you lost named.</li>
+      <li>You are submitting <strong>the document only</strong> — not a zip, not the <code>.py</code> file.</li>
+    </ul>
+  </div>
+  <p>Your next taught lesson opens by checking these submissions. If you got stuck, submit what you have with a note saying where.</p>
+
+  <h3>Coming next</h3>
+  <p><strong>Home Lesson 5 — Inheritance.</strong> The other side of today's decision: a child class that <em>is a</em> parent class and more. Calling the parent's constructor with <code>super().__init__</code> is a separate mark that examiners call a national weakness — and you will override a method for the first time.</p>
+</section>
+
+
+<footer class="foot">
+  Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 4 of 6 &nbsp;·&nbsp; Paper 4 Practical &nbsp;·&nbsp; United School International
+</footer>
+
+</div><!-- /pad -->
+</div><!-- /wrap -->
+
+<script>
+/* ---------------- starter code ---------------- */
+const STARTER = `class Book:
+    def __init__(self, Title, Pages):
+        self.__Title = Title        # STRING
+        self.__Pages = Pages        # INTEGER
+
+    def GetTitle(self):
+        return self.__Title
+
+    def GetPages(self):
+        return self.__Pages
+
+class Shelf:
+    def __init__(self, Label):
+        self.__Label = Label        # STRING
+        self.__Books = [None] * 3   # ARRAY[0:2] OF Book
+        self.__Count = 0            # INTEGER
+
+    def AddBook(self, NewBook):
+        self.__Books[self.__Count] = NewBook
+        self.__Count = self.__Count + 1
+
+    def TotalPages(self):
+        Total = 0
+        for Index in range(0, self.__Count):
+            Total = Total + self.__Books[Index].GetPages()
+        return Total
+
+Fiction = Shelf("Fiction")
+Fiction.AddBook(Book("Dune", 412))
+Fiction.AddBook(Book("Emma", 474))
+print(Fiction.TotalPages())
+Fiction.AddBook(Book("Holes", 233))
+print(Fiction.TotalPages())
+`;
+
+const PAGE_KEY = '9618-oop-' + (document.body.dataset.lesson || location.pathname);
+const PY_URL   = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+const OFFLINE_MSG = 'The in-page Python runner could not load (this usually means no internet connection, or the network is blocking it).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.';
+const OUTPUT_LIMIT = 100000;   // characters — a runaway print loop is stopped here
+
+const editor  = document.getElementById('editor');
+const stdinEl = document.getElementById('stdin');
+const output  = document.getElementById('output');
+const runbtn  = document.getElementById('runbtn');
+const stopbtn = document.getElementById('stopbtn');
+const resetbt = document.getElementById('resetbtn');
+const statusEl= document.getElementById('pystatus');
+
+/* ---------------- saving work in this browser ---------------- */
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(PAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+let saved = loadSaved();
+let saveTimer = null;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { editor: editor.value, stdin: stdinEl.value, notes: {} };
+    document.querySelectorAll('textarea[data-save]').forEach(t => { data.notes[t.id] = t.value; });
+    try { localStorage.setItem(PAGE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — work is not saved */ }
+  }, 400);
+}
+editor.value  = (typeof saved.editor === 'string' && saved.editor.trim()) ? saved.editor : STARTER;
+stdinEl.value = typeof saved.stdin === 'string' ? saved.stdin : '';
+document.querySelectorAll('textarea[data-save]').forEach(t => {
+  if (saved.notes && typeof saved.notes[t.id] === 'string') t.value = saved.notes[t.id];
+  t.addEventListener('input', saveSoon);
+});
+editor.addEventListener('input', saveSoon);
+stdinEl.addEventListener('input', saveSoon);
+
+/* Tab inserts four spaces rather than moving focus */
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab' && !e.shiftKey) {
+    e.preventDefault();
+    const s = editor.selectionStart, t = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
+    editor.selectionStart = editor.selectionEnd = s + 4;
+    saveSoon();
+  }
+});
+
+resetbt.addEventListener('click', () => {
+  editor.value = STARTER;
+  output.textContent = 'Press Run to execute.';
+  saveSoon();
+});
+
+/* ---------------- Python, in a background worker ----------------
+   Running Python off the main thread means a loop that never ends
+   cannot freeze the page: Stop simply throws the worker away. */
+const WORKER_SRC = `
+let py = null, inputLines = [];
+const HARNESS = \`
+import sys, traceback
+
+def __run__(src):
+    g = {"__name__": "__main__"}
+    try:
+        code = compile(src, "your program", "exec")
+    except SyntaxError:
+        etype, evalue, tb = sys.exc_info()
+        print("".join(traceback.format_exception_only(etype, evalue)), end="", file=sys.stderr)
+        return
+    try:
+        exec(code, g)
+    except SystemExit:
+        pass
+    except EOFError:
+        print("EOFError: input() ran out of values.\\\\nType every value your program asks for in the Program input box, one per line, in order.", file=sys.stderr)
+    except BaseException:
+        etype, evalue, tb = sys.exc_info()
+        if tb is not None and tb.tb_next is not None:
+            tb = tb.tb_next
+        print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+\`;
+const dec = new TextDecoder();
+self.addEventListener('unhandledrejection', () => { if (!py) postMessage({ type: 'fail' }); });
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.url);
+      py = await loadPyodide({ indexURL: m.base });
+      py.setStdout({ write: b => { postMessage({ type: 'out', text: dec.decode(b) }); return b.length; } });
+      py.setStderr({ write: b => { postMessage({ type: 'err', text: dec.decode(b) }); return b.length; } });
+      py.setStdin({ stdin: () => {
+        if (!inputLines.length) return null;
+        const v = inputLines.shift();
+        postMessage({ type: 'echo', text: v });
+        return v;
+      } });
+      py.runPython(HARNESS);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'fail', text: String(err) });
+    }
+  } else if (m.type === 'run') {
+    inputLines = m.input.length ? m.input.replace(/\\n$/, '').split('\\n') : [];
+    try {
+      py.globals.set('__student_src__', m.src);
+      await py.runPythonAsync('__run__(__student_src__)');
+    } catch (ex) {
+      postMessage({ type: 'err', text: String(ex).trim().split('\\n').slice(-3).join('\\n') });
+    }
+    postMessage({ type: 'done' });
+  }
+};
+`;
+
+let worker = null, ready = false, running = false, outChars = 0, hadErr = false, slowTimer = null;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+function appendOut(text, cls) {
+  if (cls === 'err' && output.textContent.length && !output.textContent.endsWith('\n')) text = '\n' + text;
+  if (cls === 'err' && !output.textContent.length) text = text.replace(/^\n+/, '');
+  outChars += text.length;
+  const last = output.lastChild;
+  if (!cls && last && last.nodeType === 3) { last.appendData(text); }
+  else if (cls && last && last.nodeType === 1 && last.className === cls) { last.textContent += text; }
+  else {
+    const node = cls ? document.createElement('span') : document.createTextNode(text);
+    if (cls) { node.className = cls; node.textContent = text; }
+    output.appendChild(node);
+  }
+}
+function unavailable() {
+  ready = false;
+  statusEl.textContent = 'Python unavailable';
+  runbtn.disabled = true; stopbtn.disabled = true;
+  setOut(OFFLINE_MSG, 'err');
+}
+function finishRun(message) {
+  running = false;
+  clearTimeout(slowTimer);
+  runbtn.disabled = !ready; stopbtn.disabled = true;
+  if (message) statusEl.textContent = message;
+}
+
+function startWorker() {
+  ready = false;
+  runbtn.disabled = true;
+  let w;
+  try {
+    const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    w = new Worker(URL.createObjectURL(blob));
+  } catch (e) { unavailable(); return; }
+  worker = w;
+  w.onerror = () => { if (worker === w) unavailable(); };
+  w.onmessage = e => {
+    if (worker !== w) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ready = true; statusEl.textContent = 'Python ready'; runbtn.disabled = false;
+    } else if (m.type === 'fail') {
+      unavailable();
+    } else if (m.type === 'out' || m.type === 'err' || m.type === 'echo') {
+      if (!running) return;
+      if (m.type === 'err') hadErr = true;
+      appendOut(m.type === 'echo' ? m.text + '\n' : m.text, m.type === 'err' ? 'err' : (m.type === 'echo' ? 'in' : null));
+      if (outChars > OUTPUT_LIMIT) {
+        stopRun('\n\nStopped: the program printed far too much output. Is there a loop that never ends?');
+      }
+    } else if (m.type === 'done') {
+      if (!running) return;
+      if (!output.textContent.length) setOut('(the program produced no output)');
+      else if (output.lastChild) output.lastChild.textContent = output.lastChild.textContent.replace(/\n+$/, '');
+      finishRun(hadErr ? 'Error — read it carefully' : 'Finished');
+    }
+  };
+  statusEl.textContent = 'Python is loading…';
+  setTimeout(() => { if (worker === w && !ready) { w.terminate(); worker = null; unavailable(); } }, 90000);
+  w.postMessage({ type: 'init', url: PY_URL, base: PY_URL.replace(/[^/]*$/, '') });
+}
+
+function stopRun(note) {
+  if (!running) return;
+  if (worker) worker.terminate();
+  worker = null;
+  appendOut(note || '\n\nStopped.', 'err');
+  finishRun('Stopped — restarting Python…');
+  startWorker();
+}
+
+runbtn.addEventListener('click', () => {
+  if (!ready || running) return;
+  running = true; hadErr = false; outChars = 0;
+  output.textContent = '';
+  runbtn.disabled = true; stopbtn.disabled = false;
+  statusEl.textContent = 'Running…';
+  slowTimer = setTimeout(() => {
+    if (running) statusEl.textContent = 'Still running — press Stop if it is stuck in a loop';
+  }, 5000);
+  worker.postMessage({ type: 'run', src: editor.value, input: stdinEl.value });
+});
+stopbtn.addEventListener('click', () => stopRun());
+
+startWorker();
+
+/* ---------------- checkpoints ----------------
+   A wrong choice explains itself and is crossed out, but the right answer
+   is never shown — the student has to find it. Their first attempt is
+   recorded on the card so they can be honest about it. */
+document.querySelectorAll('.cp').forEach(cp => {
+  const fb    = cp.querySelector('.fb');
+  const texts = cp.querySelectorAll('.fbs > div');
+  const opts  = Array.from(cp.querySelectorAll('.opt'));
+  const first = cp.querySelector('.first');
+  let attempts = 0, solved = false;
+  opts.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      if (solved || btn.classList.contains('wrong')) return;
+      attempts++;
+      const ok = btn.dataset.ok === '1';
+      btn.classList.add(ok ? 'right' : 'wrong');
+      btn.setAttribute('aria-disabled', 'true');
+      fb.className = 'fb show ' + (ok ? 'good' : 'bad');
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite — try again. </strong>')
+                   + (texts[i] ? texts[i].innerHTML : '');
+      if (attempts === 1 && first) {
+        first.textContent = ok ? 'First attempt: correct' : 'First attempt: not correct';
+        first.className = 'first ' + (ok ? 'good' : 'bad');
+      }
+      if (ok) {
+        solved = true;
+        opts.forEach(b => { if (b !== btn) b.setAttribute('aria-disabled', 'true'); b.classList.add('done'); });
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
