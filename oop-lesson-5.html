@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>20.1 OOP — Home Lesson 5: Inheritance</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
+  --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
+  --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
+  --warn:#B45309; --warn-bg:#FFFBEB;
+  --mono:"Cascadia Mono","Consolas","SF Mono",Menlo,monospace;
+  --sans:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{margin:0;background:#E2E8F0;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;background:var(--white);padding:0 0 64px;box-shadow:0 0 40px rgba(15,23,42,.10)}
+.pad{padding:0 40px}
+@media(max-width:640px){.pad{padding:0 18px} body{font-size:16px}}
+
+/* ---------- masthead ---------- */
+header.mast{background:var(--blue-dk);color:#fff;padding:30px 40px 26px}
+@media(max-width:640px){header.mast{padding:24px 18px}}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#BFDBFE;font-weight:700;margin:0 0 8px}
+.kicker a.home{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
+.kicker a.home:hover{border-bottom-color:#fff}
+header.mast h1{margin:0;font-size:31px;line-height:1.2;font-weight:700}
+header.mast .sub{margin:10px 0 0;color:#DBEAFE;font-size:15px}
+.pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;color:#EFF6FF}
+
+/* ---------- sticky nav ---------- */
+nav.sticky{position:sticky;top:0;z-index:40;background:#fff;border-bottom:2px solid var(--line);padding:0 40px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+@media(max-width:640px){nav.sticky{padding:0 10px}}
+nav.sticky a{flex:0 0 auto;padding:11px 12px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+nav.sticky a:hover{color:var(--blue);border-bottom-color:#BFDBFE}
+
+/* ---------- sections ---------- */
+section{padding-top:34px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:800;margin:0 0 4px}
+h2 + .h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25}
+h3{font-size:19px;color:var(--blue-dk);margin:26px 0 8px}
+p{margin:0 0 13px}
+.lead{font-size:18px;color:var(--muted)}
+hr.rule{border:0;border-top:2px solid var(--panel);margin:38px 0 0}
+
+/* ---------- boxes ---------- */
+.box{border:1.5px solid var(--blue);background:var(--panel);border-radius:8px;padding:16px 20px;margin:16px 0}
+.box.pinkb{border-color:var(--pink);background:#fff}
+.box .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--blue);margin:0 0 8px}
+.box.pinkb .bt{color:var(--pink)}
+.callout{border-left:5px solid var(--warn);background:var(--warn-bg);padding:13px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+.callout .bt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--warn);margin:0 0 6px}
+.callout.ex{border-left-color:var(--bad);background:var(--bad-bg)}
+.callout.ex .bt{color:var(--bad)}
+ul,ol{margin:0 0 13px;padding-left:22px}
+li{margin:0 0 7px}
+code{font-family:var(--mono);background:#E2E8F0;padding:1px 5px;border-radius:4px;font-size:.92em}
+.tick{color:var(--good);font-weight:800}
+.cross{color:var(--bad);font-weight:800}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+tbody tr:nth-child(even){background:#F8FAFC}
+td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+@media(max-width:640px){td.dt{white-space:normal;overflow-wrap:anywhere;font-size:13px} th,td{padding:7px 7px}}
+
+/* ---------- code ---------- */
+pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
+pre.code .cm{color:#94A3B8;font-style:italic}
+pre.code .kw{color:#F0ABFC}
+pre.code .st{color:#86EFAC}
+pre.code .fn{color:#93C5FD}
+pre.code .nm{color:#FDE68A}
+.codelabel{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:5px 5px 0 0;margin-bottom:-4px}
+
+/* ---------- runner ---------- */
+.runner{border:2px solid var(--blue);border-radius:10px;overflow:hidden;margin:16px 0;background:#0F172A}
+.runbar{background:#1E293B;padding:8px 12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid #334155}
+.runbar .ttl{color:#93C5FD;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-right:auto}
+button{font-family:var(--sans);font-size:14px;font-weight:700;border:0;border-radius:6px;padding:7px 15px;cursor:pointer;background:var(--blue);color:#fff}
+button:hover{background:#1E40AF}
+button.ghost{background:#334155;color:#CBD5E1}
+button.ghost:hover{background:#475569}
+button:disabled{opacity:.5;cursor:not-allowed}
+textarea.editor{width:100%;min-height:250px;background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;border:0;padding:14px 18px;resize:vertical;display:block;outline:none;tab-size:4}
+.outwrap{border-top:1px solid #334155;background:#020617}
+.outlabel{color:#64748B;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:7px 18px 0}
+pre.out{margin:0;padding:6px 18px 14px;color:#E2E8F0;font-family:var(--mono);font-size:14px;line-height:1.55;white-space:pre-wrap;min-height:34px}
+pre.out .err{color:#FCA5A5}
+pre.out .ok{color:#86EFAC}
+.status{font-size:12.5px;color:#94A3B8;font-family:var(--mono)}
+
+/* ---------- interactive ---------- */
+.predict{border:2px dashed var(--pink);border-radius:9px;padding:16px 20px;margin:16px 0;background:#FDF2F8}
+.predict .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--pink);margin:0 0 8px}
+.predict textarea{width:100%;min-height:70px;font-family:var(--mono);font-size:14px;padding:9px 11px;border:1.5px solid var(--line);border-radius:6px;resize:vertical}
+
+.cp{border:2px solid var(--blue);border-radius:10px;margin:20px 0;overflow:hidden}
+.cp .cph{background:var(--blue);color:#fff;padding:9px 18px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.cp .cpb{padding:16px 20px}
+.cp .q{font-weight:700;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:11px 14px;margin:0 0 9px;cursor:pointer;font-family:var(--sans);font-size:15.5px;color:var(--ink);font-weight:400;line-height:1.45}
+.opt:hover{border-color:var(--blue);background:#EFF6FF}
+.opt code{background:#E2E8F0}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.fb{display:none;margin-top:10px;padding:12px 15px;border-radius:7px;font-size:15px;line-height:1.5}
+.fb.show{display:block}
+.fb.good{background:var(--good-bg);border-left:5px solid var(--good)}
+.fb.bad{background:var(--bad-bg);border-left:5px solid var(--bad)}
+
+details.rev{border:1.5px solid var(--line);border-radius:8px;margin:14px 0;background:#fff;overflow:hidden}
+details.rev>summary{cursor:pointer;padding:12px 18px;font-weight:700;color:var(--blue);background:var(--panel);list-style:none;font-size:15.5px}
+details.rev>summary::-webkit-details-marker{display:none}
+details.rev>summary::before{content:"▸ ";color:var(--pink);font-weight:800}
+details.rev[open]>summary::before{content:"▾ "}
+details.rev .body{padding:4px 18px 14px}
+
+.tier{border:1.5px solid var(--line);border-radius:9px;margin:14px 0;overflow:hidden}
+.tier .th{padding:9px 18px;font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#fff}
+.tier.s .th{background:#0891B2} .tier.i .th{background:var(--blue)} .tier.e .th{background:#7C3AED}
+.tier .tb{padding:14px 18px}
+
+.ms{border:1.5px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0}
+.ms table{margin:0;font-size:15px}
+.ms th{background:var(--blue-dk)}
+.mp{font-family:var(--mono);font-weight:700;color:var(--blue);white-space:nowrap}
+
+.steps{counter-reset:st;list-style:none;padding:0}
+.steps li{counter-increment:st;position:relative;padding-left:44px;margin-bottom:14px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
+.tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
+.tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
+
+/* ---------- Lesson 5 additions ---------- */
+td code,li code{overflow-wrap:anywhere}
+.opt .oc{display:block;margin:7px 0 0;font-family:var(--mono);font-size:13.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;background:#F1F5F9;padding:7px 10px;border-radius:5px;color:var(--ink)}
+.opt.right .oc{background:#D1FAE5} .opt.wrong .oc{background:#FEE2E2}
+.cd-wrap{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px}
+.cd{border:1.5px solid var(--ink);background:#fff;font-family:var(--mono);font-size:13.5px;line-height:1.55;min-width:0}
+.cd.parent{max-width:270px;margin:0 auto 18px}
+.cdh{font-weight:700;text-align:center;border-bottom:1.5px solid var(--ink);padding:5px 8px}
+.cdb{padding:6px 10px;border-bottom:1.5px solid var(--ink)} .cdb:last-child{border-bottom:0}
+.cd-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:640px){.cd-row{grid-template-columns:1fr} .cd.parent{max-width:none}}
+.blank{color:var(--muted)}
+</style>
+</head>
+<body data-lesson="L5">
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker"><a class="home" href="index.html">← All lessons</a> &nbsp;·&nbsp; Cambridge 9618 A Level · Unit 20.1 · Paper 4 Practical</p>
+  <h1>Object-Oriented Programming<br>Home Lesson 5 — Inheritance</h1>
+  <p class="sub">Work through this page, then give the club a junior member class that inherits from <code style="background:rgba(255,255,255,.15);color:#fff">Member</code>, and submit the Evidence Document on Teams.</p>
+  <div class="pills">
+    <span class="pill">Home lesson 5 of 6</span>
+    <span class="pill">Language: Python (console)</span>
+    <span class="pill">Suggested time: 60 minutes</span>
+    <span class="pill">Submit: Evidence Document (.docx)</span>
+  </div>
+</header>
+
+<nav class="sticky">
+  <a href="#how">How this works</a>
+  <a href="#donow">Do Now</a>
+  <a href="#obj">Objectives</a>
+  <a href="#terms">Key terms</a>
+  <a href="#predict">Predict</a>
+  <a href="#run">Run</a>
+  <a href="#investigate">Investigate</a>
+  <a href="#modify">Modify</a>
+  <a href="#technique">Exam technique</a>
+  <a href="#task">Your task</a>
+  <a href="#markscheme">Mark scheme</a>
+  <a href="#submit">Submit</a>
+</nav>
+
+<div class="pad">
+
+<!-- ========== HOW THIS WORKS ========== -->
+<section id="how">
+  <p class="eyebrow">Start here</p>
+  <h2 class="h">How this lesson works</h2>
+  <p class="lead">Last week you learned to tell <em>has a</em> from <em>is a</em>. This week is the <em>is a</em> side: a child class that is everything its parent is, plus a little more.</p>
+  <ol class="steps">
+    <li><strong>Learn on this page.</strong> Predict, run, investigate, modify. Nothing to install.</li>
+    <li><strong>Open your Lesson 4 code.</strong> The <code>Member</code> class does not change at all. You will write a new class, <code>JuniorMember</code>, that inherits from it. If your <code>Member</code> class is not working, there is a version in the task section to start from.</li>
+    <li><strong>Evidence it.</strong> Paste your code <em>as text</em> and your screenshot into this week's Evidence Document, and submit it on Teams.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">The two traps this lesson is about</p>
+    <p style="margin:0 0 8px"><strong>1. Not calling the parent's constructor.</strong> A child class must pass the parent's parameters up to the parent's constructor. That call is a separate mark in almost every Paper 4 inheritance question, and in June 2025 examiners named the parent-constructor call a <strong>national weakness</strong>.</p>
+    <p style="margin:0"><strong>2. Reaching into the parent's private attributes.</strong> A child class inherits the parent's attributes, but its code cannot use them by name. In Python, <code>self.__Name</code> inside the child crashes. You go through the parent's methods instead — and once you see why, it stops being a surprise.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== DO NOW ========== -->
+<section id="donow">
+  <p class="eyebrow">Retrieval · real past-paper questions</p>
+  <h2 class="h">Do Now — four minutes, no notes</h2>
+  <p>Questions 1 and 2 are real Cambridge Paper 3 questions. Write your answers in your book, then reveal the mark scheme and mark them — strictly.</p>
+  <div class="box">
+    <p class="bt">Questions</p>
+    <ol style="margin-bottom:0">
+      <li>Define these Object-Oriented Programming (OOP) terms: <strong>encapsulation</strong>, <strong>getter</strong>, <strong>setter</strong>. <em>[3]</em><br><span style="font-size:14px;color:var(--muted)">9618 Paper 3, November 2022 (variant 2), Q10(a)</span></li>
+      <li>Define these OOP terms: <strong>instance</strong>, <strong>inheritance</strong>. <em>[2]</em><br><span style="font-size:14px;color:var(--muted)">9618 Paper 3, November 2022 (variant 1), Q11(a) — the third term in that question, polymorphism, is in today's lesson</span></li>
+      <li>The design for the class <code>Club</code> lists the attribute <code>Captain : Member</code>. <strong>Write</strong> the class header for <code>Club</code> in Python. <em>[1]</em></li>
+    </ol>
+  </div>
+  <details class="rev"><summary>Mark scheme — mark your own answers</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:60px">Q</th><th>Accepted (Cambridge mark scheme wording)</th><th style="width:70px">Marks</th></tr>
+      <tr><td class="mp">1</td><td><strong>Encapsulation</strong> — putting properties and methods inside a class // ensures sensitive data is hidden from users by hiding values of a structured data object inside a class.<br><strong>Getter</strong> — a method that is used to <strong>return</strong> the value of a property.<br><strong>Setter</strong> — a method that is used to <strong>update</strong> the value of a property.<br><span class="cross">Reject:</span> "a getter gets the value" — it defines the word with itself. Examiners want <em>returns</em>.</td><td>3</td></tr>
+      <tr><td class="mp">2</td><td><strong>Instance</strong> — an occurrence of an object // a specific object based on the class // an instantiation of a class.<br><strong>Inheritance</strong> — the capability of defining a new class of objects that has all the attributes and methods from a parent class.<br><span class="cross">Reject:</span> "when a class inherits from another class" — the word being defined cannot be the definition.</td><td>2</td></tr>
+      <tr><td class="mp">3</td><td><code>class Club:</code> — nothing in brackets. <code>Member</code> is in the data type column, so a club <em>has</em> a captain: containment.<br><span class="cross">Reject:</span> <code>class Club(Member):</code></td><td>1</td></tr>
+    </table></div>
+    <p style="margin:10px 0 0"><strong>Q2 is the bridge into today.</strong> Notice the word in the mark scheme: a new class that <em>has all</em> the attributes and methods of its parent. That is a promise, and today you will see exactly how Python keeps it — and the one place where it surprises people.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== OBJECTIVES ========== -->
+<section id="obj">
+  <p class="eyebrow">Where this is going</p>
+  <h2 class="h">Learning objectives</h2>
+  <table>
+    <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
+    <tr><td>Declare a <strong>child class</strong> whose constructor takes the parent's parameters plus its own, and <strong>calls the parent's constructor</strong>.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Explain why a child class cannot use the parent's <strong>private</strong> attributes by name, and use the parent's methods instead.</td><td>20.1</td><td>4</td></tr>
+    <tr><td><strong>Override</strong> a parent method, extending it by calling the parent's version.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Define <strong>inheritance</strong> and <strong>polymorphism</strong>, and complete a class inheritance diagram.</td><td>20.1</td><td>3</td></tr>
+  </table>
+</section>
+
+<hr class="rule">
+
+<!-- ========== KEY TERMS ========== -->
+<section id="terms">
+  <p class="eyebrow">Vocabulary</p>
+  <h2 class="h">Key terms — learn these wordings</h2>
+  <table>
+    <tr><th style="width:26%">Term</th><th>Definition that earns the mark</th></tr>
+    <tr><td><strong>Inheritance</strong></td><td>The capability of defining a new class that <strong>has all the attributes and methods</strong> of a parent class. The methods and properties of the parent (base) class are made available to, and reused by, the child (derived) class.</td></tr>
+    <tr><td><strong>Parent constructor call</strong><br><span style="color:var(--muted);font-size:14px">super().__init__</span></td><td>The first line of a child's constructor. It passes the parent's parameters to the parent's constructor, which sets the parent's attributes for this object.</td></tr>
+    <tr><td><strong>Overriding</strong></td><td>Writing a method in the child class with the <strong>same identifier</strong> as a method in the parent class. For objects of the child class, the child's version is used instead of the parent's.</td></tr>
+    <tr><td><strong>Polymorphism</strong></td><td>Allows the same method to take on different behaviours depending on which class is instantiated // methods can be redefined for derived classes.</td></tr>
+  </table>
+  <div class="callout ex">
+    <p class="bt">How definitions lose the mark</p>
+    <p style="margin:0">"Inheritance is when a class inherits from another class" scores nothing — it uses the word to define itself. Examiners have rejected exactly this (November 2022). Say what the child class <em>gets</em>: <em>all the attributes and methods</em> of the parent. And for polymorphism, "a method with many forms" is a translation of the Greek, not a definition. Say what happens: <em>the same method behaves differently depending on the class of the object</em>.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PREDICT ========== -->
+<section id="predict">
+  <p class="eyebrow">PRIMM · Step 1</p>
+  <h2 class="h">Predict</h2>
+  <p>Read this program carefully. <strong>Do not run it yet.</strong> <code>Novel</code> is a child of <code>Book</code>. Write down exactly what you think the program will output — every line.</p>
+  <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages):
+        self.__Title = Title        <span class="cm"># STRING</span>
+        self.__Pages = Pages        <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">GetTitle</span>(self):
+        <span class="kw">return</span> self.__Title
+
+    <span class="kw">def</span> <span class="fn">Describe</span>(self):
+        <span class="fn">print</span>(self.__Title + <span class="st">", "</span> + <span class="fn">str</span>(self.__Pages) + <span class="st">" pages"</span>)
+
+<span class="kw">class</span> <span class="nm">Novel</span>(<span class="nm">Book</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages, Genre):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Title, Pages)
+        self.__Genre = Genre        <span class="cm"># STRING</span>
+
+    <span class="kw">def</span> <span class="fn">Describe</span>(self):
+        <span class="fn">super</span>().<span class="fn">Describe</span>()
+        <span class="fn">print</span>(<span class="st">"Genre: "</span> + self.__Genre)
+
+Books = [<span class="nm">Book</span>(<span class="st">"Atlas of the World"</span>, <span class="nm">320</span>), <span class="nm">Novel</span>(<span class="st">"Dune"</span>, <span class="nm">412</span>, <span class="st">"Science fiction"</span>)]
+<span class="kw">for</span> Item <span class="kw">in</span> Books:
+    Item.<span class="fn">Describe</span>()
+<span class="fn">print</span>(Books[<span class="nm">1</span>].<span class="fn">GetTitle</span>())</pre>
+
+  <div class="predict">
+    <p class="bt">Commit your prediction before you scroll</p>
+    <textarea id="pred1" data-save placeholder="Type every line you expect…"></textarea>
+    <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Two harder questions: <code>Novel</code> has no <code>GetTitle</code> method — so what happens on the last line? And <code>Item.Describe()</code> is the same line of code both times round the loop — will it print the same thing both times?</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== RUN ========== -->
+<section id="run">
+  <p class="eyebrow">PRIMM · Step 2</p>
+  <h2 class="h">Run</h2>
+  <p>Now run it and compare the real output with your prediction.</p>
+
+  <div class="runner">
+    <div class="runbar">
+      <span class="ttl">Python 3 — try it</span>
+      <span class="status" id="pystatus">Python is loading…</span>
+      <button id="runbtn" disabled>▶ Run</button>
+      <button class="stop" id="stopbtn" disabled>■ Stop</button>
+      <button class="ghost" id="resetbtn">Reset code</button>
+    </div>
+    <textarea class="editor" id="editor" spellcheck="false" aria-label="Python code editor"></textarea>
+    <div class="inwrap">
+      <label class="outlabel" for="stdin" style="display:block">Program input — only if your code uses input(): one value per line, in order</label>
+      <textarea class="stdin" id="stdin" spellcheck="false" rows="2"></textarea>
+    </div>
+    <div class="outwrap">
+      <div class="outlabel">Output</div>
+      <pre class="out" id="output">Press Run to execute.</pre>
+    </div>
+  </div>
+  <p class="savenote">Your code and your prediction are saved in this browser, so closing the tab does not lose them. If a program never finishes, press <strong>Stop</strong>.</p>
+
+  <details class="rev"><summary>Check your prediction</summary>
+  <div class="body">
+<pre class="code">Atlas of the World, 320 pages
+Dune, 412 pages
+Genre: Science fiction
+Dune</pre>
+    <ul style="margin-bottom:0">
+      <li><strong>The same line, two behaviours.</strong> For the <code>Book</code>, <code>Item.Describe()</code> runs <code>Book</code>'s version — one line. For the <code>Novel</code>, it runs <code>Novel</code>'s own version, which first calls the parent's version and then adds the genre — two lines. Python picks the version that belongs to the object's own class. That is <strong>polymorphism</strong>.</li>
+      <li><strong>The last line works</strong> even though <code>Novel</code> never defines <code>GetTitle</code>. A novel <em>is a</em> book, so it has every method a book has. Python looks in <code>Novel</code> first, does not find it, and uses <code>Book</code>'s.</li>
+      <li>The title of the novel is set by <code>Book</code>'s constructor, which <code>Novel</code>'s constructor calls on its first line. Nothing in <code>Novel</code> mentions <code>__Title</code> at all.</li>
+    </ul>
+  </div>
+  </details>
+
+  <div class="callout ex">
+    <p class="bt">Try this — then read why it matters</p>
+    <p style="margin:0 0 8px">In <code>Novel</code>'s constructor, delete the line <code>super().__init__(Title, Pages)</code> and run it again.</p>
+    <p style="margin:0">The atlas still prints, then it crashes on Dune: <code>AttributeError: 'Novel' object has no attribute '_Book__Title'</code>. Without that line the parent's constructor never runs for the novel, so the novel never gets a title or a page count — and the first time a parent method needs them, there is nothing there. <strong>That one line is the mark examiners keep finding missing.</strong> Put it back before you go on.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== INVESTIGATE ========== -->
+<section id="investigate">
+  <p class="eyebrow">PRIMM · Step 3</p>
+  <h2 class="h">Investigate — how a child class is built</h2>
+
+  <h3>1. The anatomy of a child class</h3>
+<pre class="code"><span class="kw">class</span> <span class="nm">Novel</span>(<span class="nm">Book</span>):                              <span class="cm"># 1. the parent goes in the brackets</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages, Genre):    <span class="cm"># 2. the parent's parameters, then its own</span>
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Title, Pages)          <span class="cm"># 3. the parent's constructor sets Title and Pages</span>
+        self.__Genre = Genre                    <span class="cm"># 4. only the child's own attribute — STRING</span></pre>
+  <ol>
+    <li><strong>The parent goes in the brackets.</strong> <code>class Novel(Book):</code> — a novel <em>is a</em> book.</li>
+    <li><strong>The constructor takes everything a <code>Book</code> needs, plus what a <code>Novel</code> adds.</strong> Here that is <code>Title</code> and <code>Pages</code> for the parent, and <code>Genre</code> for the child. Follow the order the design gives.</li>
+    <li><strong>The first line passes the parent's parameters up.</strong> <code>super().__init__(Title, Pages)</code> runs <code>Book</code>'s constructor for this object. <code>Book.__init__(self, Title, Pages)</code> is also accepted — note that this form needs <code>self</code>.</li>
+    <li><strong>Then only the child's own attributes.</strong> Never re-declare <code>Title</code> or <code>Pages</code> in the child. The parent already has them, and copies made in the child are different attributes that the parent's methods cannot see.</li>
+  </ol>
+  <table>
+    <tr><th style="width:36%"></th><th>Python (Paper 4)</th><th>Cambridge pseudocode (Paper 3)</th></tr>
+    <tr><td><strong>Class header</strong></td><td class="dt">class Novel(Book):</td><td class="dt">CLASS Novel INHERITS Book</td></tr>
+    <tr><td><strong>Parent constructor call</strong></td><td class="dt">super().__init__(Title, Pages)</td><td class="dt">SUPER.NEW(Title, Pages)</td></tr>
+  </table>
+
+  <div class="cp" data-cp="1">
+    <div class="cph">Checkpoint 1</div>
+    <div class="cpb">
+      <p class="q">The parent class <code>Car</code> has the constructor <code>__init__(self, Make, Model, Price)</code>. The design says: <em>"<code>ElectricCar</code> is a subclass of <code>Car</code>. Its constructor takes the make, model and price, and the battery range, <code>BatteryRange : INTEGER</code>."</em> Which constructor follows the design?</p>
+      <button class="opt" data-ok="0">A<span class="oc">def __init__(self, BatteryRange):
+    super().__init__()
+    self.__BatteryRange = BatteryRange</span></button>
+      <button class="opt" data-ok="0">B<span class="oc">def __init__(self, Make, Model, Price, BatteryRange):
+    self.__Make = Make
+    self.__Model = Model
+    self.__Price = Price
+    self.__BatteryRange = BatteryRange</span></button>
+      <button class="opt" data-ok="1">C<span class="oc">def __init__(self, Make, Model, Price, BatteryRange):
+    super().__init__(Make, Model, Price)
+    self.__BatteryRange = BatteryRange</span></button>
+      <button class="opt" data-ok="0">D<span class="oc">def __init__(self, Make, Model, Price, BatteryRange):
+    super().__init__(Make, Model, Price, BatteryRange)</span></button>
+      <div class="fbs" hidden>
+        <div>The child's constructor has to receive the parent's parameters before it can pass them on. Here the parent's constructor is called with nothing, so Python stops: <code>TypeError: Car.__init__() missing 3 required positional arguments</code>.</div>
+        <div>The tempting one — it runs without an error. But it never calls the parent's constructor, so it loses that mark, and the four attributes it creates belong to <code>ElectricCar</code>, not to <code>Car</code>. The first time a <code>Car</code> method such as <code>GetMake()</code> is used on an electric car, it crashes: <code>'ElectricCar' object has no attribute '_Car__Make'</code>.</div>
+        <div>The parent's three parameters, then the child's own. The parent's constructor sets the make, model and price; the child stores only what it adds. This is the shape of every child constructor you will write.</div>
+        <div><code>Car</code>'s constructor takes three values, not four, so Python stops: <code>TypeError: Car.__init__() takes 4 positional arguments but 5 were given</code> (it counts <code>self</code>). The battery range belongs to the child, so the child stores it itself.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>2. Private means private — even to the child</h3>
+  <p>Every <code>Novel</code> object really does hold a title: the parent's constructor put it there. But the title is <strong>private to <code>Book</code></strong>, the class that declared it. Code written inside <code>Novel</code> is not code written inside <code>Book</code>, so it has to ask, exactly as the main program does.</p>
+  <table>
+    <tr><th style="width:44%">Inside a Novel method you write</th><th>What happens</th></tr>
+    <tr><td class="dt">self.GetTitle()</td><td><span class="tick">✓</span> Returns the title. <code>GetTitle</code> is inherited from <code>Book</code>, and <code>Book</code>'s own code is allowed to read <code>__Title</code>.</td></tr>
+    <tr><td class="dt">self.__Title</td><td><span class="cross">✗</span> <code>AttributeError: 'Novel' object has no attribute '_Novel__Title'</code>. Python renames a private attribute after the class it is written in, so inside <code>Novel</code> it looks for a <code>Novel</code> title — and there isn't one.</td></tr>
+  </table>
+  <div class="callout">
+    <p class="bt">Do not take Python's hint</p>
+    <p style="margin:0">Python sometimes adds <code>Did you mean: '_Book__Title'?</code> to that error. Typing <code>self._Book__Title</code> would work — and it is reaching round the privacy that earned you the attribute marks in the first place. This is not a Python quirk, either: <code>Private</code> in VB.NET and <code>private</code> in Java hide the attribute from the child class in just the same way. <strong>The child uses the parent's methods.</strong></p>
+  </div>
+
+  <div class="cp" data-cp="2">
+    <div class="cph">Checkpoint 2</div>
+    <div class="cpb">
+      <p class="q">You add a method to <code>Novel</code> that outputs, for example, <code>Dune is a novel</code>. Which line works <em>and</em> respects the design?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>print(self.__Title + " is a novel")</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>print(super().__Title + " is a novel")</code></button>
+      <button class="opt" data-ok="1">C &nbsp;<code>print(self.GetTitle() + " is a novel")</code></button>
+      <button class="opt" data-ok="0">D &nbsp;<code>print(Book.__Title + " is a novel")</code></button>
+      <div class="fbs" hidden>
+        <div>Inside <code>Novel</code>, Python reads <code>self.__Title</code> as <code>self._Novel__Title</code>. The title was stored by <code>Book</code> as <code>_Book__Title</code>, so this crashes with an <code>AttributeError</code>. Private means private to the class that declared it.</div>
+        <div>A good instinct — "the title belongs to the parent, so ask the parent" — but <code>super()</code> gives you the parent's <em>methods</em>, not its private attributes. Python still renames <code>__Title</code> to <code>_Novel__Title</code> and crashes: <code>'super' object has no attribute '_Novel__Title'</code>.</div>
+        <div><code>GetTitle</code> is inherited from <code>Book</code>, so every novel has it, and it is <code>Book</code>'s own code that reads the private attribute. The child goes through the parent's methods, not round them.</div>
+        <div>This asks the <em>class</em> <code>Book</code> for a title, not this particular novel — and the class itself has no title, only its objects do. It also hits the private renaming, so it crashes with an <code>AttributeError</code>.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>3. Overriding — replace, or extend</h3>
+  <p>A child <strong>overrides</strong> a method by defining one with the same identifier. There are two ways to write the new version, and Cambridge credits both — the mark schemes accept "overriding / overloading / extending / <strong>using the parent method</strong>".</p>
+  <table>
+    <tr><th style="width:24%">Way</th><th style="width:40%">Looks like</th><th>Use it when</th></tr>
+    <tr><td><strong>Extend</strong></td><td class="dt">def Describe(self):<br>&nbsp;&nbsp;&nbsp;&nbsp;super().Describe()<br>&nbsp;&nbsp;&nbsp;&nbsp;print("Genre: " + self.__Genre)</td><td>The child does everything the parent does, and more. Almost always the right choice in Paper 4 — and it reuses the parent's output without retyping it.</td></tr>
+    <tr><td><strong>Replace</strong></td><td class="dt">def Describe(self):<br>&nbsp;&nbsp;&nbsp;&nbsp;print("A novel: " + self.GetTitle())</td><td>The child behaves differently and does not need the parent's version at all.</td></tr>
+  </table>
+  <p><strong>Polymorphism</strong> is what you saw in the loop: one call, <code>Item.Describe()</code>, and Python runs the version that belongs to the object's own class. Python and Java need no keyword to override. VB.NET does — <code>Overridable</code> on the parent's method and <code>Overrides</code> on the child's.</p>
+
+  <div class="cp" data-cp="3">
+    <div class="cph">Checkpoint 3</div>
+    <div class="cpb">
+      <p class="q">The class <code>Mix</code> is a child of <code>Yarn</code>. It overrides <code>YarnInfo()</code> like this:</p>
+<pre class="code" style="margin:0 0 12px">    <span class="kw">def</span> <span class="fn">YarnInfo</span>(self):                     <span class="cm"># inside class Mix</span>
+        <span class="fn">super</span>().<span class="fn">YarnInfo</span>()
+        <span class="fn">print</span>(<span class="st">"Acrylic: "</span> + <span class="fn">str</span>(self.__Percentage) + <span class="st">"%"</span>)</pre>
+      <p class="q">The main program then runs <code>Plain = Yarn("Plain", "Red", 3)</code> and <code>Plain.YarnInfo()</code>. <code>Plain</code> is a <code>Yarn</code>, not a <code>Mix</code>. What is output?</p>
+      <button class="opt" data-ok="0">A &nbsp;Yarn's lines, then an <code>Acrylic:</code> line — the newest version of <code>YarnInfo</code> is the one that runs</button>
+      <button class="opt" data-ok="1">B &nbsp;Yarn's lines only</button>
+      <button class="opt" data-ok="0">C &nbsp;An error — <code>Yarn</code>'s <code>YarnInfo</code> was replaced when <code>Mix</code> overrode it</button>
+      <button class="opt" data-ok="0">D &nbsp;Nothing — once a method is overridden, the parent's version only runs through <code>super()</code></button>
+      <div class="fbs" hidden>
+        <div>There is no "newest version" across the program. Which version runs depends only on the class of the object it is called on. <code>Plain</code> is a <code>Yarn</code>, so it runs <code>Yarn</code>'s method — and a plain yarn does not even have a <code>__Percentage</code>.</div>
+        <div>Overriding changes what happens for objects of the <strong>child</strong> class only. The parent class is untouched, so a plain <code>Yarn</code> object still uses <code>Yarn</code>'s own method. That is polymorphism working in both directions.</div>
+        <div>Overriding never edits the parent class. <code>Yarn</code> still has its own <code>YarnInfo</code>; <code>Mix</code> simply has a different one for its own objects.</div>
+        <div>The parent's method runs normally for parent objects. <code>super()</code> is only how a <em>child</em> reaches the parent's version from inside its own override.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>4. The same idea on paper — a real Paper 3 question</h3>
+  <p>Paper 3 asks you to <em>design</em> inheritance rather than code it. This is the yarn shop from June 2022, which Checkpoint 3 borrowed. Read it and complete the diagram in the box below before you open the mark scheme.</p>
+  <div class="box pinkb">
+    <p class="bt">9618 Paper 3, June 2022 (variant 1), Q7(a) &nbsp;[5]</p>
+    <p style="margin:0 0 8px">A program is to be written using Object-Oriented Programming (OOP) for a shop that sells knitting yarn. There are three types of yarn: acrylic, wool or mix. The following data are stored for each type: name; colour; batch code; weight; number of balls of yarn in stock (can be edited); type of yarn.</p>
+    <p style="margin:0 0 8px">The following statements apply to yarn: acrylic can be soft or not soft; wool can be lamb, merino or alpaca; mix contains a percentage of acrylic. Each type of yarn has a method that will display all the information about the yarn.</p>
+    <p style="margin:0 0 10px"><strong>Complete this class inheritance diagram to show the properties, methods and inheritance.</strong></p>
+    <div class="cd-wrap">
+      <div class="cd parent"><div class="cdh">Yarn</div><div class="cdb">Name: STRING<br>Colour: STRING<br>BatchCode: STRING<br>Weight: INTEGER<br>NumberBalls: INTEGER<br>Type: STRING</div><div class="cdb">Constructor()<br>EditNumberBalls()<br>YarnInfo()</div></div>
+      <div class="cd-row">
+        <div class="cd"><div class="cdh">Acrylic</div><div class="cdb blank">………………</div><div class="cdb">Constructor()<br><span class="blank">………………</span></div></div>
+        <div class="cd"><div class="cdh">Wool</div><div class="cdb blank">………………</div><div class="cdb">Constructor()<br><span class="blank">………………</span></div></div>
+        <div class="cd"><div class="cdh">Mix</div><div class="cdb">Percentage: INTEGER</div><div class="cdb">Constructor()<br>YarnInfo()</div></div>
+      </div>
+      <p style="margin:6px 0 0;font-size:14px;color:var(--muted)">On paper you would also draw the inheritance arrows. Say in your answer which way they point.</p>
+    </div>
+  </div>
+  <div class="predict">
+    <p class="bt">Your answer — commit it before you open the mark scheme</p>
+    <textarea id="pred2" data-save placeholder="What goes in each blank, and where do the arrows go?"></textarea>
+  </div>
+  <details class="rev"><summary>Cambridge mark scheme [5]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>One mark per point</th></tr>
+      <tr><td class="mp">1</td><td><code>Acrylic</code> has attribute <code>Soft</code> of type <code>BOOLEAN</code>.</td></tr>
+      <tr><td class="mp">2</td><td><code>Wool</code> has attribute <code>WoolType</code> with a suitable data type (<code>STRING</code>).</td></tr>
+      <tr><td class="mp">3</td><td><code>Acrylic</code> <strong>and</strong> <code>Wool</code> have the method <code>YarnInfo()</code>.</td></tr>
+      <tr><td class="mp">4</td><td><code>Acrylic</code>, <code>Wool</code> and <code>Mix</code>: <strong>at least one</strong> inherits from <code>Yarn</code> (one arrow correct)…</td></tr>
+      <tr><td class="mp">5</td><td>…<strong>all three</strong> inherit from <code>Yarn</code> (all arrows correct).</td></tr>
+    </table></div>
+    <ul style="margin:12px 0 0">
+      <li><strong>The arrows point from each child up to the parent</strong> — "Acrylic is a Yarn". An arrow from Yarn down to the children is the most common way to lose marks 4 and 5.</li>
+      <li><strong>Mark 3 is the one people miss.</strong> "Each type of yarn has a method that will display all the information" — and each type holds different information, so each child <em>overrides</em> <code>YarnInfo()</code>. <code>Mix</code> was given to you as the pattern.</li>
+      <li>Do not repeat <code>Name</code>, <code>Colour</code> and the rest in the children. They are inherited — exactly as in Python, where the child never re-declares the parent's attributes.</li>
+      <li>Notice the <code>…</code> at the end of mark 4 and the start of mark 5: in Cambridge mark schemes that means mark 5 cannot be awarded without mark 4.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MODIFY ========== -->
+<section id="modify">
+  <p class="eyebrow">PRIMM · Step 4</p>
+  <h2 class="h">Modify</h2>
+  <p>Go back to the Predict program in the runner. Make these changes one at a time, running after each.</p>
+
+  <div class="box">
+    <p class="bt">Changes to make</p>
+    <ol style="margin:0">
+      <li>Add a method <code>IsLong()</code> to <code>Novel</code>. It <strong>returns</strong> <code>True</code> if the book has more than 400 pages, and <code>False</code> otherwise. Try writing it with <code>self.__Pages</code> first, and read the error. Then fix it properly: give <code>Book</code> a get method <code>GetPages()</code>, and call that.</li>
+      <li>Add a second child class, <code>Textbook</code>, which inherits from <code>Book</code> and has one extra attribute, <code>Subject : STRING</code>, taken from a parameter. It overrides <code>Describe()</code> so that it outputs everything a book outputs, then <code>Subject: </code> followed by the subject.</li>
+      <li>Add <code>Textbook("Cambridge A Level CS", 560, "Computer Science")</code> and <code>Novel("Holes", 233, "Adventure")</code> to the end of the list. Replace the last line with two lines that output <code>IsLong()</code> for Dune and for Holes.</li>
+    </ol>
+  </div>
+
+  <details class="rev"><summary>Model answer — check yours against this</summary>
+  <div class="body">
+    <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages):
+        self.__Title = Title        <span class="cm"># STRING</span>
+        self.__Pages = Pages        <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">GetTitle</span>(self):
+        <span class="kw">return</span> self.__Title
+
+    <span class="kw">def</span> <span class="fn">GetPages</span>(self):             <span class="cm"># new: the child needs it</span>
+        <span class="kw">return</span> self.__Pages
+
+    <span class="kw">def</span> <span class="fn">Describe</span>(self):
+        <span class="fn">print</span>(self.__Title + <span class="st">", "</span> + <span class="fn">str</span>(self.__Pages) + <span class="st">" pages"</span>)
+
+<span class="kw">class</span> <span class="nm">Novel</span>(<span class="nm">Book</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages, Genre):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Title, Pages)
+        self.__Genre = Genre        <span class="cm"># STRING</span>
+
+    <span class="kw">def</span> <span class="fn">Describe</span>(self):
+        <span class="fn">super</span>().<span class="fn">Describe</span>()
+        <span class="fn">print</span>(<span class="st">"Genre: "</span> + self.__Genre)
+
+    <span class="kw">def</span> <span class="fn">IsLong</span>(self):
+        <span class="kw">if</span> self.<span class="fn">GetPages</span>() &gt; <span class="nm">400</span>:
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">else</span>:
+            <span class="kw">return</span> <span class="kw">False</span>
+
+<span class="kw">class</span> <span class="nm">Textbook</span>(<span class="nm">Book</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Title, Pages, Subject):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Title, Pages)
+        self.__Subject = Subject    <span class="cm"># STRING</span>
+
+    <span class="kw">def</span> <span class="fn">Describe</span>(self):
+        <span class="fn">super</span>().<span class="fn">Describe</span>()
+        <span class="fn">print</span>(<span class="st">"Subject: "</span> + self.__Subject)
+
+Books = [<span class="nm">Book</span>(<span class="st">"Atlas of the World"</span>, <span class="nm">320</span>), <span class="nm">Novel</span>(<span class="st">"Dune"</span>, <span class="nm">412</span>, <span class="st">"Science fiction"</span>),
+         <span class="nm">Textbook</span>(<span class="st">"Cambridge A Level CS"</span>, <span class="nm">560</span>, <span class="st">"Computer Science"</span>), <span class="nm">Novel</span>(<span class="st">"Holes"</span>, <span class="nm">233</span>, <span class="st">"Adventure"</span>)]
+<span class="kw">for</span> Item <span class="kw">in</span> Books:
+    Item.<span class="fn">Describe</span>()
+<span class="fn">print</span>(Books[<span class="nm">1</span>].<span class="fn">IsLong</span>())
+<span class="fn">print</span>(Books[<span class="nm">3</span>].<span class="fn">IsLong</span>())</pre>
+    <p style="margin:10px 0 6px">Expected output:</p>
+<pre class="code">Atlas of the World, 320 pages
+Dune, 412 pages
+Genre: Science fiction
+Cambridge A Level CS, 560 pages
+Subject: Computer Science
+Holes, 233 pages
+Genre: Adventure
+True
+False</pre>
+    <ul style="margin-bottom:0">
+      <li><strong>The error you met first</strong> was <code>'Novel' object has no attribute '_Novel__Pages'</code> — the private renaming from section 2. The fix is a get method in the <em>parent</em>, used by the child. In the exam the design usually gives you the get methods you need; if a child method needs parent data, look for one.</li>
+      <li><code>return self.GetPages() &gt; 400</code> on one line is equally correct. The <code>if</code> version makes it obvious that there is a return on every path.</li>
+      <li>The loop did not change at all, yet it now handles three classes. Each object brings its own <code>Describe</code>. That is why polymorphism matters: code that works with a parent class keeps working when new children arrive.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== EXAM TECHNIQUE ========== -->
+<section id="technique">
+  <p class="eyebrow">The marks</p>
+  <h2 class="h">Exam technique — code that runs is not code that scores</h2>
+  <p>A Paper 4 version of the yarn shop. The parent class is given; you write the child.</p>
+  <div class="box">
+    <p class="bt">Class design</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:30%">Yarn — the parent</th><th>Description</th></tr>
+      <tr><td class="dt">Name : STRING<br>Colour : STRING<br>NumberBalls : INTEGER</td><td>All three set from the constructor's parameters, in that order.</td></tr>
+      <tr><td class="dt">EditNumberBalls(Change)</td><td>Adds <code>Change</code> to <code>NumberBalls</code>.</td></tr>
+      <tr><td class="dt">YarnInfo()</td><td>Outputs the name, colour and number of balls.</td></tr>
+    </table>
+    <table style="margin:0">
+      <tr><th style="width:30%">Mix — a subclass of Yarn</th><th>Description</th></tr>
+      <tr><td class="dt">Percentage : INTEGER</td><td>From a parameter, after the parent's three.</td></tr>
+      <tr><td class="dt">YarnInfo()</td><td>Overrides the parent method. Outputs all the information that <code>Yarn</code> outputs, then <code>Acrylic: </code>, the percentage and <code>%</code>.</td></tr>
+    </table>
+  </div>
+  <p><strong>Predict, then reveal.</strong> A candidate writes this. Decide what an examiner would credit before you open the answer.</p>
+  <span class="codelabel">Candidate response</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Mix</span>(<span class="nm">Yarn</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Name, Colour, NumberBalls, Percentage):
+        self.__Name = Name
+        self.__Colour = Colour
+        self.__NumberBalls = NumberBalls
+        self.__Percentage = Percentage    <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">YarnInfo</span>(self):
+        <span class="fn">print</span>(<span class="st">"Name: "</span> + self.__Name)
+        <span class="fn">print</span>(<span class="st">"Colour: "</span> + self.__Colour)
+        <span class="fn">print</span>(<span class="st">"Acrylic: "</span> + self.__Percentage + <span class="st">"%"</span>)</pre>
+  <details class="rev"><summary>What the examiner says</summary>
+  <div class="body">
+    <ul>
+      <li><span class="tick">✓</span> <strong>Class header.</strong> <code>class Mix(Yarn):</code> — right relationship, right direction.</li>
+      <li><span class="tick">✓</span> <strong>Parameters.</strong> All four, the parent's three first.</li>
+      <li><span class="cross">✗</span> <strong>No call to the parent's constructor.</strong> The discrete mark is lost. Worse, the three lines that replace it create <em>new</em> attributes that belong to <code>Mix</code> — <code>_Mix__Name</code> and so on. <code>Yarn</code>'s attributes are never set, so the first time a parent method runs on a mix — <code>EditNumberBalls(5)</code>, say — it crashes with <code>'Mix' object has no attribute '_Yarn__NumberBalls'</code>.</li>
+      <li><span class="tick">✓</span> <code>Percentage</code> is private and its type is evidenced.</li>
+      <li><span class="cross">✗</span> <strong>The override is re-typed, not extended.</strong> It forgets the number of balls, so it no longer outputs "all the information that <code>Yarn</code> outputs".</li>
+      <li><span class="cross">✗</span> <code>"Acrylic: " + self.__Percentage</code> joins a string to an integer — <code>TypeError</code> after two lines of output. In Python, build strings with <code>+</code> and <code>str()</code>.</li>
+    </ul>
+    <p style="margin:10px 0 6px"><strong>What would have scored</strong></p>
+<pre class="code"><span class="kw">class</span> <span class="nm">Mix</span>(<span class="nm">Yarn</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Name, Colour, NumberBalls, Percentage):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Name, Colour, NumberBalls)
+        self.__Percentage = Percentage    <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">YarnInfo</span>(self):
+        <span class="fn">super</span>().<span class="fn">YarnInfo</span>()
+        <span class="fn">print</span>(<span class="st">"Acrylic: "</span> + <span class="fn">str</span>(self.__Percentage) + <span class="st">"%"</span>)</pre>
+    <p style="margin-bottom:0"><strong>The habit to build:</strong> the moment you type a child's constructor header, the very next line is <code>super().__init__(</code> with the parent's parameters. And when a design says the child outputs "all the information the parent outputs, then…", the override's first line is <code>super().</code> plus the method's name. Shorter, safer, and it reaches data the child is not allowed to touch.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== TASK ========== -->
+<section id="task">
+  <p class="eyebrow">Assessed work</p>
+  <h2 class="h">Over to you — junior members</h2>
+  <p class="lead">Everyone starts at <strong>Independent</strong>. Drop to Scaffolded if you stall. Go to Exam Conditions when you have finished.</p>
+
+  <div class="box pinkb">
+    <p class="bt">The scenario</p>
+    <p style="margin:0 0 10px">The sports club now takes members under 14. A junior member <strong>is a</strong> member — they have everything a <code>Member</code> has — but they also need a guardian, and they cannot earn credits until their guardian has given consent. The class <code>Member</code> is <strong>unchanged</strong>. A new class, <code>JuniorMember</code>, inherits from <code>Member</code> and has the following design.</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:26%">Attribute</th><th style="width:22%">Data type</th><th>Set when the object is created</th></tr>
+      <tr><td class="dt">GuardianName</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">ConsentGiven</td><td class="dt">BOOLEAN</td><td>Always <code>FALSE</code></td></tr>
+    </table>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:32%">Method</th><th>Description</th></tr>
+      <tr><td class="dt">Constructor</td><td>Takes the member ID, name and age, then the guardian's name. Calls the parent constructor, then initialises the two new attributes as described above.</td></tr>
+      <tr><td class="dt">SetConsentGiven(NewConsent)</td><td>Assigns <code>NewConsent</code> to <code>ConsentGiven</code>.</td></tr>
+      <tr><td class="dt">DisplayDetails()</td><td>Overrides the parent method. Outputs all the details that <code>Member</code> outputs, then <code>"Guardian  : "</code> followed by the guardian's name and <code>"Consent   : "</code> followed by <code>ConsentGiven</code>.</td></tr>
+      <tr><td class="dt">AddCredits(Amount)</td><td>Overrides the parent method. If consent has not been given, outputs the member's name followed by <code>" needs consent before earning credits"</code> and adds nothing. Otherwise adds <code>Amount</code> exactly as the parent method does, including the limit of 50.</td></tr>
+    </table>
+    <p style="margin:0 0 6px"><strong>Test data</strong> — use it in this order:</p>
+    <table style="margin:0">
+      <tr><th style="width:8%">#</th><th>Step</th></tr>
+      <tr><td>1</td><td>Create a junior member: <code>"J5101"</code>, <code>"Ava Brooks"</code>, <code>13</code>, guardian <code>"Helen Brooks"</code></td></tr>
+      <tr><td>2</td><td>Add <code>25</code> credits</td></tr>
+      <tr><td>3</td><td>Set consent to <code>TRUE</code></td></tr>
+      <tr><td>4</td><td>Add <code>10</code> credits, then add <code>30</code> credits</td></tr>
+      <tr><td>5</td><td>Display the member's details</td></tr>
+    </table>
+  </div>
+
+  <details class="rev"><summary>Member class not working? Start from this version</summary>
+  <div class="body">
+    <p style="margin:0 0 8px">Copy this into your editor and build <code>JuniorMember</code> underneath it. Do not change it — the whole point is that the child class adds to it without editing it.</p>
+<pre class="code"><span class="kw">class</span> <span class="nm">Member</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, MemberID, Name, Age):
+        self.__MemberID = MemberID   <span class="cm"># STRING</span>
+        self.__Name = Name           <span class="cm"># STRING</span>
+        self.__Age = Age             <span class="cm"># INTEGER</span>
+        self.__Credits = <span class="nm">0</span>           <span class="cm"># INTEGER</span>
+        self.__Active = <span class="kw">True</span>         <span class="cm"># BOOLEAN</span>
+
+    <span class="kw">def</span> <span class="fn">DisplayDetails</span>(self):
+        <span class="fn">print</span>(<span class="st">"Member ID : "</span> + self.__MemberID)
+        <span class="fn">print</span>(<span class="st">"Name      : "</span> + self.__Name)
+        <span class="fn">print</span>(<span class="st">"Age       : "</span> + <span class="fn">str</span>(self.__Age))
+        <span class="fn">print</span>(<span class="st">"Credits   : "</span> + <span class="fn">str</span>(self.__Credits))
+        <span class="fn">print</span>(<span class="st">"Active    : "</span> + <span class="fn">str</span>(self.__Active))
+
+    <span class="kw">def</span> <span class="fn">GetName</span>(self):
+        <span class="kw">return</span> self.__Name
+
+    <span class="kw">def</span> <span class="fn">GetCredits</span>(self):
+        <span class="kw">return</span> self.__Credits
+
+    <span class="kw">def</span> <span class="fn">SetAge</span>(self, NewAge):
+        self.__Age = NewAge
+
+    <span class="kw">def</span> <span class="fn">AddCredits</span>(self, Amount):
+        NewTotal = self.__Credits + Amount
+        <span class="kw">if</span> NewTotal &gt; <span class="nm">50</span>:
+            NewTotal = <span class="nm">50</span>
+        self.__Credits = NewTotal</pre>
+  </div>
+  </details>
+
+  <div class="tier i">
+    <div class="th">Independent — start here</div>
+    <div class="tb">
+      <p style="margin:0 0 8px"><strong>(a)</strong> Write program code to declare the class <code>JuniorMember</code> and its constructor. <em>[5]</em></p>
+      <p style="margin:0 0 8px"><strong>(b)</strong> Write program code for the method <code>SetConsentGiven()</code>. <em>[1]</em></p>
+      <p style="margin:0 0 8px"><strong>(c)</strong> Write program code for the method <code>DisplayDetails()</code> in <code>JuniorMember</code>. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(d)</strong> Write program code for the method <code>AddCredits()</code> in <code>JuniorMember</code>. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(e)</strong> Write a main program that carries out the five steps of the test data, in order, on one <code>JuniorMember</code> object. <em>[2]</em></p>
+      <p style="margin:0"><strong>(f)</strong> Take a screenshot showing the program running. It must show <strong>the test data and the complete output</strong>. <em>[2]</em></p>
+    </div>
+  </div>
+
+  <div class="tier s">
+    <div class="th">Scaffolded — only if you stall</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Same questions, same marks. Put this <strong>below</strong> your <code>Member</code> class and complete every <code>______</code> and <code># ...</code>.</p>
+<pre class="code" style="margin:0"><span class="kw">class</span> <span class="nm">JuniorMember</span>(______):                         <span class="cm"># a junior member IS A member</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, MemberID, Name, Age, ______):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(______, ______, ______)    <span class="cm"># the parent's three parameters</span>
+        self.__GuardianName = ______                <span class="cm"># STRING</span>
+        <span class="cm"># ... ConsentGiven (fixed value — not a parameter)  # BOOLEAN</span>
+
+    <span class="kw">def</span> <span class="fn">SetConsentGiven</span>(self, NewConsent):
+        <span class="cm"># ... attribute on the left, parameter on the right</span>
+
+    <span class="kw">def</span> <span class="fn">DisplayDetails</span>(self):
+        <span class="fn">super</span>().<span class="fn">______</span>()                            <span class="cm"># everything a Member outputs</span>
+        <span class="fn">print</span>(<span class="st">"Guardian  : "</span> + ______)
+        <span class="fn">print</span>(<span class="st">"Consent   : "</span> + <span class="fn">str</span>(______))
+
+    <span class="kw">def</span> <span class="fn">AddCredits</span>(self, Amount):
+        <span class="kw">if</span> self.__ConsentGiven == ______:
+            <span class="fn">print</span>(self.<span class="fn">______</span>() + <span class="st">" needs consent before earning credits"</span>)
+        <span class="kw">else</span>:
+            <span class="cm"># ... let the parent's AddCredits do the adding (and the limit)</span>
+
+<span class="cm"># ---- main program ----</span>
+Junior = <span class="nm">JuniorMember</span>(<span class="st">"J5101"</span>, <span class="st">"Ava Brooks"</span>, <span class="nm">13</span>, <span class="st">"Helen Brooks"</span>)
+Junior.<span class="fn">AddCredits</span>(<span class="nm">25</span>)
+<span class="cm"># ... set consent to True</span>
+<span class="cm"># ... add 10 credits, then 30 credits</span>
+<span class="cm"># ... display the details</span></pre>
+      <p style="margin:10px 0 0;font-size:14.5px;color:var(--muted)">Why <code>self.GetName()</code> and not <code>self.__Name</code>? Section 2 of Investigate.</p>
+    </div>
+  </div>
+
+  <div class="tier e">
+    <div class="th">Exam conditions — where you need to be by the mock</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Close this page. Set a timer for <strong>20 minutes</strong> and work from the scenario box alone. Then, as an extension, put a junior member into last week's club — and watch the club cope without a single change.</p>
+      <table style="margin:0 0 8px">
+        <tr><th style="width:8%">#</th><th>Extension steps — add to the end of your main program</th></tr>
+        <tr><td>1</td><td>Add your <strong>Lesson 4 <code>Club</code> class</strong> to the program, <strong>unchanged</strong>.</td></tr>
+        <tr><td>2</td><td>Create a club <code>"Riverside Juniors"</code>. Create an ordinary <code>Member</code> <code>"M4021"</code>, <code>"Sara Ahmed"</code>, <code>16</code>, and add <code>20</code> credits.</td></tr>
+        <tr><td>3</td><td>Add Sara, then your junior member Ava, to the club with <code>AddMember()</code>.</td></tr>
+        <tr><td>4</td><td>Output the total credits with the label <code>Total credits: </code>, then call <code>DisplayMember("Ava Brooks")</code>.</td></tr>
+      </table>
+      <p style="margin:0">Then answer in one sentence, in the Evidence Document: <em>the <code>Club</code> class was not changed, so why does it output Ava's guardian?</em></p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p class="bt">Before you screenshot</p>
+    <ul style="margin:0">
+      <li>The first line of output should be <code>Ava Brooks needs consent before earning credits</code>, then seven lines of details ending with <code>Consent   : True</code>.</li>
+      <li>Credits should be <strong>40</strong>. If you see <strong>50</strong> and no consent message, your <code>AddCredits</code> is not checking consent — the 25 was added too, and the limit hid it.</li>
+      <li><code>AttributeError: ... '_Member__Name'</code> (or <code>_Member__</code> anything) means the parent's constructor never ran. Check the <code>super().__init__</code> line.</li>
+      <li><code>AttributeError: ... '_JuniorMember__Name'</code> (or <code>_JuniorMember__Credits</code>) means the child is reaching into the parent's private attributes. Use <code>GetName()</code>, and let <code>super().AddCredits(Amount)</code> do the adding.</li>
+      <li>If only the guardian and consent lines appear, your <code>DisplayDetails</code> replaces the parent's instead of extending it.</li>
+      <li>The screenshot must show <strong>the test data as well as the output</strong> — the main-program lines alongside the console. Your <em>code</em> goes into the document as <strong>text</strong>, never as a screenshot.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MARK SCHEME ========== -->
+<section id="markscheme">
+  <p class="eyebrow">Self-marking</p>
+  <h2 class="h">Mark scheme — open it only after you have attempted the task</h2>
+  <p>Mark your own work honestly against this, then record your total in the Evidence Document.</p>
+
+  <details class="rev"><summary>Reveal the mark scheme [16 marks]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Description</th><th style="width:60px">Marks</th></tr>
+      <tr><td class="mp">(a) MP1</td><td>Class header shows inheritance from <code>Member</code> — <code>class JuniorMember(Member):</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP2</td><td>Constructor takes <strong>four</strong> parameters after <code>self</code>: the parent's three, then <code>GuardianName</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP3</td><td><strong>Calls the parent's constructor</strong>, passing the member ID, name and age.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP4</td><td><code>GuardianName</code> private, type evidenced, assigned from the parameter.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP5</td><td><code>ConsentGiven</code> private, type evidenced, assigned <code>False</code> inside the constructor — not taken as a parameter.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP6</td><td><code>SetConsentGiven()</code> takes one parameter and assigns it to <code>ConsentGiven</code> — attribute on the left.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP7</td><td>A method <code>DisplayDetails()</code> defined in <code>JuniorMember</code>, with no extra parameters — it overrides the parent's.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP8</td><td>…calls the <strong>parent's</strong> <code>DisplayDetails()</code>, so all five of the member's details are output.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP9</td><td>Outputs the guardian's name and the consent value with their labels, using <code>str()</code> for the Boolean.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP10</td><td>A method <code>AddCredits()</code> defined in <code>JuniorMember</code>, with one parameter — it overrides the parent's.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP11</td><td>Tests <code>ConsentGiven</code>; when it is <code>False</code>, outputs the message using <code>GetName()</code> and adds nothing.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP12</td><td>Otherwise calls the <strong>parent's</strong> <code>AddCredits(Amount)</code>, so the limit of 50 still applies.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP13</td><td>A <code>JuniorMember</code> object created with the test data, in a variable not named after the class.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP14</td><td>All five steps called on that object, in order, through its methods.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP15</td><td>Screenshot shows the test data being used, as well as the output.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP16</td><td>Output shows the consent message first, then the details with <code>Credits   : 40</code>, <code>Guardian  : Helen Brooks</code> and <code>Consent   : True</code>.</td><td>1</td></tr>
+    </table></div>
+    <p style="margin:14px 0 6px"><strong>Accepted alternatives</strong></p>
+    <ul>
+      <li>MP3: <code>Member.__init__(self, MemberID, Name, Age)</code> in place of <code>super().__init__(MemberID, Name, Age)</code>.</li>
+      <li>MP8 and MP12: <code>Member.DisplayDetails(self)</code> and <code>Member.AddCredits(self, Amount)</code>.</li>
+      <li>MP11: <code>if not self.__ConsentGiven:</code>, or testing for <code>True</code> first and putting the message in the <code>else</code>.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Not credited, however good the code looks</strong></p>
+    <ul>
+      <li>No call to the parent's constructor — <span class="cross">MP3 lost</span>, and the program crashes the first time a parent method runs, so MP16 goes too.</li>
+      <li>Re-declaring <code>MemberID</code>, <code>Name</code>, <code>Age</code>, <code>Credits</code> or <code>Active</code> in the child — <span class="cross">MP3 lost</span>. The parent already has them.</li>
+      <li><code>ConsentGiven</code> taken as a constructor parameter — <span class="cross">MP2 and MP5 lost</span>. The design fixes it at <code>FALSE</code>.</li>
+      <li>Re-typing the five <code>print</code> lines in the child's <code>DisplayDetails()</code> — <span class="cross">MP8 lost</span>, and it crashes on <code>self.__MemberID</code> anyway.</li>
+      <li><code>self.__Name</code> or <code>self.__Credits</code> anywhere in <code>JuniorMember</code> — <span class="cross">MP11 or MP12 lost</span>. Private to <code>Member</code>.</li>
+      <li>Editing the <code>Member</code> class to add consent — <span class="cross">no marks for (c) and (d)</span>. The design asks for a child class that overrides; the parent is not yours to change.</li>
+      <li>Code pasted as an image — <span class="cross">no code marks at all</span>.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Extension — not counted in the 16</strong></p>
+    <ul style="margin-bottom:0">
+      <li><strong>E1</strong> The Lesson 4 <code>Club</code> class used without any change.</li>
+      <li><strong>E2</strong> Sara and Ava both added with <code>AddMember()</code>; the output reads <code>Total credits: 60</code>.</li>
+      <li><strong>E3</strong> <code>DisplayMember("Ava Brooks")</code> outputs all seven of Ava's detail lines, including the guardian and consent.</li>
+      <li><strong>E4</strong> The explanation names polymorphism: <code>Club</code> calls <code>DisplayDetails()</code> on each object, and because Ava is a <code>JuniorMember</code>, her class's overriding version runs.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== SUBMIT ========== -->
+<section id="submit">
+  <p class="eyebrow">Hand-in</p>
+  <h2 class="h">What to submit on Teams</h2>
+  <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 5.docx</code>.</p>
+  <div class="box">
+    <p class="bt">Checklist before you upload</p>
+    <ul style="margin:0">
+      <li>Your name and class are at the top of the document.</li>
+      <li>Parts (a) to (e) are each pasted <strong>as text</strong> into their own box, with the indentation intact.</li>
+      <li>The line straight after your constructor header is <code>super().__init__(MemberID, Name, Age)</code>.</li>
+      <li>The screenshot shows the test data <strong>and</strong> the output: the consent message, then the details with 40 credits.</li>
+      <li>Your self-marked total out of 16 is filled in, with the points you lost named.</li>
+      <li>You are submitting <strong>the document only</strong> — not a zip, not the <code>.py</code> file.</li>
+    </ul>
+  </div>
+  <p>Your next taught lesson opens by checking these submissions. If you got stuck, submit what you have with a note saying where.</p>
+
+  <h3>Coming next</h3>
+  <p><strong>Home Lesson 6 — A Full Paper 4 Question.</strong> Everything from the last five weeks in one exam-style question: a class, a child class, a container, and a main program — against the clock, then marked and evidenced exactly as in June.</p>
+</section>
+
+
+<footer class="foot">
+  Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 5 of 6 &nbsp;·&nbsp; Paper 4 Practical &nbsp;·&nbsp; United School International
+</footer>
+
+</div><!-- /pad -->
+</div><!-- /wrap -->
+
+
+<script>
+/* ---------------- starter code ---------------- */
+const STARTER = `class Book:
+    def __init__(self, Title, Pages):
+        self.__Title = Title        # STRING
+        self.__Pages = Pages        # INTEGER
+
+    def GetTitle(self):
+        return self.__Title
+
+    def Describe(self):
+        print(self.__Title + ", " + str(self.__Pages) + " pages")
+
+class Novel(Book):
+    def __init__(self, Title, Pages, Genre):
+        super().__init__(Title, Pages)
+        self.__Genre = Genre        # STRING
+
+    def Describe(self):
+        super().Describe()
+        print("Genre: " + self.__Genre)
+
+Books = [Book("Atlas of the World", 320), Novel("Dune", 412, "Science fiction")]
+for Item in Books:
+    Item.Describe()
+print(Books[1].GetTitle())
+`;
+
+const PAGE_KEY = '9618-oop-' + (document.body.dataset.lesson || location.pathname);
+const PY_URL   = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+const OFFLINE_MSG = 'The in-page Python runner could not load (this usually means no internet connection, or the network is blocking it).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.';
+const OUTPUT_LIMIT = 100000;   // characters — a runaway print loop is stopped here
+
+const editor  = document.getElementById('editor');
+const stdinEl = document.getElementById('stdin');
+const output  = document.getElementById('output');
+const runbtn  = document.getElementById('runbtn');
+const stopbtn = document.getElementById('stopbtn');
+const resetbt = document.getElementById('resetbtn');
+const statusEl= document.getElementById('pystatus');
+
+/* ---------------- saving work in this browser ---------------- */
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(PAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+let saved = loadSaved();
+let saveTimer = null;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { editor: editor.value, stdin: stdinEl.value, notes: {} };
+    document.querySelectorAll('textarea[data-save]').forEach(t => { data.notes[t.id] = t.value; });
+    try { localStorage.setItem(PAGE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — work is not saved */ }
+  }, 400);
+}
+editor.value  = (typeof saved.editor === 'string' && saved.editor.trim()) ? saved.editor : STARTER;
+stdinEl.value = typeof saved.stdin === 'string' ? saved.stdin : '';
+document.querySelectorAll('textarea[data-save]').forEach(t => {
+  if (saved.notes && typeof saved.notes[t.id] === 'string') t.value = saved.notes[t.id];
+  t.addEventListener('input', saveSoon);
+});
+editor.addEventListener('input', saveSoon);
+stdinEl.addEventListener('input', saveSoon);
+
+/* Tab inserts four spaces rather than moving focus */
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab' && !e.shiftKey) {
+    e.preventDefault();
+    const s = editor.selectionStart, t = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
+    editor.selectionStart = editor.selectionEnd = s + 4;
+    saveSoon();
+  }
+});
+
+resetbt.addEventListener('click', () => {
+  editor.value = STARTER;
+  output.textContent = 'Press Run to execute.';
+  saveSoon();
+});
+
+/* ---------------- Python, in a background worker ----------------
+   Running Python off the main thread means a loop that never ends
+   cannot freeze the page: Stop simply throws the worker away. */
+const WORKER_SRC = `
+let py = null, inputLines = [];
+const HARNESS = \`
+import sys, traceback
+
+def __run__(src):
+    g = {"__name__": "__main__"}
+    try:
+        code = compile(src, "your program", "exec")
+    except SyntaxError:
+        etype, evalue, tb = sys.exc_info()
+        print("".join(traceback.format_exception_only(etype, evalue)), end="", file=sys.stderr)
+        return
+    try:
+        exec(code, g)
+    except SystemExit:
+        pass
+    except EOFError:
+        print("EOFError: input() ran out of values.\\\\nType every value your program asks for in the Program input box, one per line, in order.", file=sys.stderr)
+    except BaseException:
+        etype, evalue, tb = sys.exc_info()
+        if tb is not None and tb.tb_next is not None:
+            tb = tb.tb_next
+        print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+\`;
+const dec = new TextDecoder();
+self.addEventListener('unhandledrejection', () => { if (!py) postMessage({ type: 'fail' }); });
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.url);
+      py = await loadPyodide({ indexURL: m.base });
+      py.setStdout({ write: b => { postMessage({ type: 'out', text: dec.decode(b) }); return b.length; } });
+      py.setStderr({ write: b => { postMessage({ type: 'err', text: dec.decode(b) }); return b.length; } });
+      py.setStdin({ stdin: () => {
+        if (!inputLines.length) return null;
+        const v = inputLines.shift();
+        postMessage({ type: 'echo', text: v });
+        return v;
+      } });
+      py.runPython(HARNESS);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'fail', text: String(err) });
+    }
+  } else if (m.type === 'run') {
+    inputLines = m.input.length ? m.input.replace(/\\n$/, '').split('\\n') : [];
+    try {
+      py.globals.set('__student_src__', m.src);
+      await py.runPythonAsync('__run__(__student_src__)');
+    } catch (ex) {
+      postMessage({ type: 'err', text: String(ex).trim().split('\\n').slice(-3).join('\\n') });
+    }
+    postMessage({ type: 'done' });
+  }
+};
+`;
+
+let worker = null, ready = false, running = false, outChars = 0, hadErr = false, slowTimer = null;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+function appendOut(text, cls) {
+  if (cls === 'err' && output.textContent.length && !output.textContent.endsWith('\n')) text = '\n' + text;
+  if (cls === 'err' && !output.textContent.length) text = text.replace(/^\n+/, '');
+  outChars += text.length;
+  const last = output.lastChild;
+  if (!cls && last && last.nodeType === 3) { last.appendData(text); }
+  else if (cls && last && last.nodeType === 1 && last.className === cls) { last.textContent += text; }
+  else {
+    const node = cls ? document.createElement('span') : document.createTextNode(text);
+    if (cls) { node.className = cls; node.textContent = text; }
+    output.appendChild(node);
+  }
+}
+function unavailable() {
+  ready = false;
+  statusEl.textContent = 'Python unavailable';
+  runbtn.disabled = true; stopbtn.disabled = true;
+  setOut(OFFLINE_MSG, 'err');
+}
+function finishRun(message) {
+  running = false;
+  clearTimeout(slowTimer);
+  runbtn.disabled = !ready; stopbtn.disabled = true;
+  if (message) statusEl.textContent = message;
+}
+
+function startWorker() {
+  ready = false;
+  runbtn.disabled = true;
+  let w;
+  try {
+    const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    w = new Worker(URL.createObjectURL(blob));
+  } catch (e) { unavailable(); return; }
+  worker = w;
+  w.onerror = () => { if (worker === w) unavailable(); };
+  w.onmessage = e => {
+    if (worker !== w) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ready = true; statusEl.textContent = 'Python ready'; runbtn.disabled = false;
+    } else if (m.type === 'fail') {
+      unavailable();
+    } else if (m.type === 'out' || m.type === 'err' || m.type === 'echo') {
+      if (!running) return;
+      if (m.type === 'err') hadErr = true;
+      appendOut(m.type === 'echo' ? m.text + '\n' : m.text, m.type === 'err' ? 'err' : (m.type === 'echo' ? 'in' : null));
+      if (outChars > OUTPUT_LIMIT) {
+        stopRun('\n\nStopped: the program printed far too much output. Is there a loop that never ends?');
+      }
+    } else if (m.type === 'done') {
+      if (!running) return;
+      if (!output.textContent.length) setOut('(the program produced no output)');
+      else if (output.lastChild) output.lastChild.textContent = output.lastChild.textContent.replace(/\n+$/, '');
+      finishRun(hadErr ? 'Error — read it carefully' : 'Finished');
+    }
+  };
+  statusEl.textContent = 'Python is loading…';
+  setTimeout(() => { if (worker === w && !ready) { w.terminate(); worker = null; unavailable(); } }, 90000);
+  w.postMessage({ type: 'init', url: PY_URL, base: PY_URL.replace(/[^/]*$/, '') });
+}
+
+function stopRun(note) {
+  if (!running) return;
+  if (worker) worker.terminate();
+  worker = null;
+  appendOut(note || '\n\nStopped.', 'err');
+  finishRun('Stopped — restarting Python…');
+  startWorker();
+}
+
+runbtn.addEventListener('click', () => {
+  if (!ready || running) return;
+  running = true; hadErr = false; outChars = 0;
+  output.textContent = '';
+  runbtn.disabled = true; stopbtn.disabled = false;
+  statusEl.textContent = 'Running…';
+  slowTimer = setTimeout(() => {
+    if (running) statusEl.textContent = 'Still running — press Stop if it is stuck in a loop';
+  }, 5000);
+  worker.postMessage({ type: 'run', src: editor.value, input: stdinEl.value });
+});
+stopbtn.addEventListener('click', () => stopRun());
+
+startWorker();
+
+/* ---------------- checkpoints ----------------
+   A wrong choice explains itself and is crossed out, but the right answer
+   is never shown — the student has to find it. Their first attempt is
+   recorded on the card so they can be honest about it. */
+document.querySelectorAll('.cp').forEach(cp => {
+  const fb    = cp.querySelector('.fb');
+  const texts = cp.querySelectorAll('.fbs > div');
+  const opts  = Array.from(cp.querySelectorAll('.opt'));
+  const first = cp.querySelector('.first');
+  let attempts = 0, solved = false;
+  opts.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      if (solved || btn.classList.contains('wrong')) return;
+      attempts++;
+      const ok = btn.dataset.ok === '1';
+      btn.classList.add(ok ? 'right' : 'wrong');
+      btn.setAttribute('aria-disabled', 'true');
+      fb.className = 'fb show ' + (ok ? 'good' : 'bad');
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite — try again. </strong>')
+                   + (texts[i] ? texts[i].innerHTML : '');
+      if (attempts === 1 && first) {
+        first.textContent = ok ? 'First attempt: correct' : 'First attempt: not correct';
+        first.className = 'first ' + (ok ? 'good' : 'bad');
+      }
+      if (ok) {
+        solved = true;
+        opts.forEach(b => { if (b !== btn) b.setAttribute('aria-disabled', 'true'); b.classList.add('done'); });
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

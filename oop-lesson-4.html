@@ -425,7 +425,7 @@ Fiction.<span class="fn">AddBook</span>(<span class="nm">Book</span>(<span class
   </ol>
   <div class="callout">
     <p class="bt">Read what "empty" means in the design</p>
-    <p style="margin:0">This design says the elements start <em>empty</em>, so <code>[None] * 3</code> with a type comment is right — examiners describe stronger Python candidates as having "used a comment to indicate the data type intended" (Nov 2021). But some designs say the array is initialised with <em>objects</em> — for example twenty nodes each holding <code>-1</code>. Then an object must be <strong>created and stored in every element</strong>; <code>None</code> will not earn the mark (Jun 2024). The design decides, not habit.</p>
+    <p style="margin:0">Here the elements start <em>empty</em> — the comment says so — so <code>[None] * 3</code> with a type comment is right — examiners describe stronger Python candidates as having "used a comment to indicate the data type intended" (Nov 2021). But some designs say the array is initialised with <em>objects</em> — for example twenty nodes each holding <code>-1</code>. Then an object must be <strong>created and stored in every element</strong>; <code>None</code> will not earn the mark (Jun 2024). The design decides, not habit.</p>
   </div>
 
   <h3>4. Work through their methods, not their attributes</h3>
@@ -438,7 +438,7 @@ Fiction.<span class="fn">AddBook</span>(<span class="nm">Book</span>(<span class
   </table>
   <div class="callout ex">
     <p class="bt">Pass the object, not its data</p>
-    <p style="margin:0">The design says <code>AddBook(NewBook)</code> — one parameter, and it is a <code>Book</code>. So the caller creates the object and hands it over: <code>Fiction.AddBook(Book("Dune", 412))</code>. Writing <code>AddBook(self, Title, Pages)</code> and building the book inside does not follow the design. Examiners have reported exactly this — passing the integer and string values <em>instead of the object</em> — in Nov 2022 and again in Jun 2024.</p>
+    <p style="margin:0">Here <code>AddBook(NewBook)</code> takes one parameter, and it is a <code>Book</code> — in the exam, the class design tells you this. So the caller creates the object and hands it over: <code>Fiction.AddBook(Book("Dune", 412))</code>. Writing <code>AddBook(self, Title, Pages)</code> and building the book inside does not follow the design. Examiners have reported exactly this — passing the integer and string values <em>instead of the object</em> — in Nov 2022 and again in Jun 2024.</p>
   </div>
 
   <div class="cp" data-cp="2">
@@ -763,7 +763,7 @@ Added = TheClub.<span class="fn">AddMember</span>(NewMember)
     <p class="bt">Before you screenshot</p>
     <ul style="margin:0">
       <li>The first line of output should be <code>Tom Reilly could not be added: club full</code>. If the program crashes with <code>IndexError</code> instead, <code>AddMember</code> is not checking for space.</li>
-      <li>The total should be <strong>150</strong> — Tom's 10 credits are not counted, because he was never added. A total of <strong>160</strong>, with Tom's details appearing at the end, means your <code>AddMember</code> stored a sixth member without checking for space. A <code>'NoneType'</code> error means a loop is running past the members you have.</li>
+      <li>The total should be <strong>150</strong> — Tom's 10 credits are not counted, because he was never added. A total of <strong>160</strong>, with Tom's details appearing at the end, means your array grew to fit a sixth member — usually because <code>AddMember</code> uses <code>append</code> instead of storing into the fixed array of five. A <code>'NoneType'</code> error means a loop is running past the members you have.</li>
       <li>You should see Lina's details <strong>once</strong>, and <code>Tom Reilly not found</code> <strong>once</strong>. If "not found" appears several times, it is inside the loop.</li>
       <li>The screenshot must show <strong>the test data as well as the output</strong> — the lines of code that create the six members, alongside the console.</li>
       <li>Your <em>code</em> goes into the document as <strong>text</strong>, never as a screenshot.</li>

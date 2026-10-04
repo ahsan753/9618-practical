@@ -15,6 +15,8 @@ oop-lesson-1.html       20.1 OOP — Classes, Attributes and the Constructor
 oop-lesson-2.html       20.1 OOP — Get and Set Methods
 oop-lesson-3.html       20.1 OOP — Using Objects
 oop-lesson-4.html       20.1 OOP — Containment or Inheritance?
+oop-lesson-5.html       20.1 OOP — Inheritance
+oop-lesson-6.html       20.1 OOP — A Full Paper 4 Question
 robots.txt          disallow all crawlers
 ```
 

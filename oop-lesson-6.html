@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>20.1 OOP — Home Lesson 6: A Full Paper 4 Question</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
+  --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
+  --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
+  --warn:#B45309; --warn-bg:#FFFBEB;
+  --mono:"Cascadia Mono","Consolas","SF Mono",Menlo,monospace;
+  --sans:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{margin:0;background:#E2E8F0;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;background:var(--white);padding:0 0 64px;box-shadow:0 0 40px rgba(15,23,42,.10)}
+.pad{padding:0 40px}
+@media(max-width:640px){.pad{padding:0 18px} body{font-size:16px}}
+
+/* ---------- masthead ---------- */
+header.mast{background:var(--blue-dk);color:#fff;padding:30px 40px 26px}
+@media(max-width:640px){header.mast{padding:24px 18px}}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#BFDBFE;font-weight:700;margin:0 0 8px}
+.kicker a.home{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
+.kicker a.home:hover{border-bottom-color:#fff}
+header.mast h1{margin:0;font-size:31px;line-height:1.2;font-weight:700}
+header.mast .sub{margin:10px 0 0;color:#DBEAFE;font-size:15px}
+.pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;color:#EFF6FF}
+
+/* ---------- sticky nav ---------- */
+nav.sticky{position:sticky;top:0;z-index:40;background:#fff;border-bottom:2px solid var(--line);padding:0 40px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+@media(max-width:640px){nav.sticky{padding:0 10px}}
+nav.sticky a{flex:0 0 auto;padding:11px 12px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+nav.sticky a:hover{color:var(--blue);border-bottom-color:#BFDBFE}
+
+/* ---------- sections ---------- */
+section{padding-top:34px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:800;margin:0 0 4px}
+h2 + .h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25}
+h3{font-size:19px;color:var(--blue-dk);margin:26px 0 8px}
+p{margin:0 0 13px}
+.lead{font-size:18px;color:var(--muted)}
+hr.rule{border:0;border-top:2px solid var(--panel);margin:38px 0 0}
+
+/* ---------- boxes ---------- */
+.box{border:1.5px solid var(--blue);background:var(--panel);border-radius:8px;padding:16px 20px;margin:16px 0}
+.box.pinkb{border-color:var(--pink);background:#fff}
+.box .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--blue);margin:0 0 8px}
+.box.pinkb .bt{color:var(--pink)}
+.callout{border-left:5px solid var(--warn);background:var(--warn-bg);padding:13px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+.callout .bt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--warn);margin:0 0 6px}
+.callout.ex{border-left-color:var(--bad);background:var(--bad-bg)}
+.callout.ex .bt{color:var(--bad)}
+ul,ol{margin:0 0 13px;padding-left:22px}
+li{margin:0 0 7px}
+code{font-family:var(--mono);background:#E2E8F0;padding:1px 5px;border-radius:4px;font-size:.92em}
+.tick{color:var(--good);font-weight:800}
+.cross{color:var(--bad);font-weight:800}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+tbody tr:nth-child(even){background:#F8FAFC}
+td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+@media(max-width:640px){td.dt{white-space:normal;overflow-wrap:anywhere;font-size:13px} th,td{padding:7px 7px}}
+
+/* ---------- code ---------- */
+pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
+pre.code .cm{color:#94A3B8;font-style:italic}
+pre.code .kw{color:#F0ABFC}
+pre.code .st{color:#86EFAC}
+pre.code .fn{color:#93C5FD}
+pre.code .nm{color:#FDE68A}
+.codelabel{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:5px 5px 0 0;margin-bottom:-4px}
+
+/* ---------- runner ---------- */
+.runner{border:2px solid var(--blue);border-radius:10px;overflow:hidden;margin:16px 0;background:#0F172A}
+.runbar{background:#1E293B;padding:8px 12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid #334155}
+.runbar .ttl{color:#93C5FD;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-right:auto}
+button{font-family:var(--sans);font-size:14px;font-weight:700;border:0;border-radius:6px;padding:7px 15px;cursor:pointer;background:var(--blue);color:#fff}
+button:hover{background:#1E40AF}
+button.ghost{background:#334155;color:#CBD5E1}
+button.ghost:hover{background:#475569}
+button:disabled{opacity:.5;cursor:not-allowed}
+textarea.editor{width:100%;min-height:250px;background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;border:0;padding:14px 18px;resize:vertical;display:block;outline:none;tab-size:4}
+.outwrap{border-top:1px solid #334155;background:#020617}
+.outlabel{color:#64748B;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:7px 18px 0}
+pre.out{margin:0;padding:6px 18px 14px;color:#E2E8F0;font-family:var(--mono);font-size:14px;line-height:1.55;white-space:pre-wrap;min-height:34px}
+pre.out .err{color:#FCA5A5}
+pre.out .ok{color:#86EFAC}
+.status{font-size:12.5px;color:#94A3B8;font-family:var(--mono)}
+
+/* ---------- interactive ---------- */
+.predict{border:2px dashed var(--pink);border-radius:9px;padding:16px 20px;margin:16px 0;background:#FDF2F8}
+.predict .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--pink);margin:0 0 8px}
+.predict textarea{width:100%;min-height:70px;font-family:var(--mono);font-size:14px;padding:9px 11px;border:1.5px solid var(--line);border-radius:6px;resize:vertical}
+
+.cp{border:2px solid var(--blue);border-radius:10px;margin:20px 0;overflow:hidden}
+.cp .cph{background:var(--blue);color:#fff;padding:9px 18px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.cp .cpb{padding:16px 20px}
+.cp .q{font-weight:700;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:11px 14px;margin:0 0 9px;cursor:pointer;font-family:var(--sans);font-size:15.5px;color:var(--ink);font-weight:400;line-height:1.45}
+.opt:hover{border-color:var(--blue);background:#EFF6FF}
+.opt code{background:#E2E8F0}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.fb{display:none;margin-top:10px;padding:12px 15px;border-radius:7px;font-size:15px;line-height:1.5}
+.fb.show{display:block}
+.fb.good{background:var(--good-bg);border-left:5px solid var(--good)}
+.fb.bad{background:var(--bad-bg);border-left:5px solid var(--bad)}
+
+details.rev{border:1.5px solid var(--line);border-radius:8px;margin:14px 0;background:#fff;overflow:hidden}
+details.rev>summary{cursor:pointer;padding:12px 18px;font-weight:700;color:var(--blue);background:var(--panel);list-style:none;font-size:15.5px}
+details.rev>summary::-webkit-details-marker{display:none}
+details.rev>summary::before{content:"▸ ";color:var(--pink);font-weight:800}
+details.rev[open]>summary::before{content:"▾ "}
+details.rev .body{padding:4px 18px 14px}
+
+.tier{border:1.5px solid var(--line);border-radius:9px;margin:14px 0;overflow:hidden}
+.tier .th{padding:9px 18px;font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#fff}
+.tier.s .th{background:#0891B2} .tier.i .th{background:var(--blue)} .tier.e .th{background:#7C3AED}
+.tier .tb{padding:14px 18px}
+
+.ms{border:1.5px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0}
+.ms table{margin:0;font-size:15px}
+.ms th{background:var(--blue-dk)}
+.mp{font-family:var(--mono);font-weight:700;color:var(--blue);white-space:nowrap}
+
+.steps{counter-reset:st;list-style:none;padding:0}
+.steps li{counter-increment:st;position:relative;padding-left:44px;margin-bottom:14px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
+.tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
+.tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
+
+/* ---------- Lesson 6 additions ---------- */
+td code,li code{overflow-wrap:anywhere}
+#diagnose td.mp{white-space:normal}
+.opt .oc{display:block;margin:7px 0 0;font-family:var(--mono);font-size:13.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;background:#F1F5F9;padding:7px 10px;border-radius:5px;color:var(--ink)}
+.opt.right .oc{background:#D1FAE5} .opt.wrong .oc{background:#FEE2E2}
+textarea.editor.tall{min-height:420px}
+.twocol{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px;align-items:start}
+@media(max-width:640px){.twocol{grid-template-columns:1fr}}
+.timer{position:sticky;top:46px;z-index:30;display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--blue-dk);color:#fff;border-radius:10px;padding:12px 18px;margin:12px 0 18px;box-shadow:0 4px 14px rgba(15,23,42,.18)}
+.timer .tleft{flex:1;min-width:0}
+.timer .tlabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#BFDBFE}
+.timer .tclock{font-family:var(--mono);font-size:34px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.timer .tnote{font-size:13.5px;color:#DBEAFE}
+.timer .tbtns{display:flex;gap:8px}
+.timer.warn{background:#B45309} .timer.over{background:#B91C1C}
+@media(max-width:640px){.timer{top:42px;padding:10px 14px} .timer .tclock{font-size:28px}}
+</style>
+</head>
+<body data-lesson="L6">
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker"><a class="home" href="index.html">← All lessons</a> &nbsp;·&nbsp; Cambridge 9618 A Level · Unit 20.1 · Paper 4 Practical</p>
+  <h1>Object-Oriented Programming<br>Home Lesson 6 — A Full Paper 4 Question</h1>
+  <p class="sub">Five lessons in one question: a class, a child class, a container and a main program — against the clock, then marked and evidenced exactly as in June.</p>
+  <div class="pills">
+    <span class="pill">Home lesson 6 of 6</span>
+    <span class="pill">Language: Python (console)</span>
+    <span class="pill">Timed attempt: 65 minutes</span>
+    <span class="pill">Allow 90 minutes in total</span>
+    <span class="pill">Submit: Evidence Document (.docx)</span>
+  </div>
+</header>
+
+<nav class="sticky">
+  <a href="#how">How this works</a>
+  <a href="#donow">Do Now</a>
+  <a href="#obj">Objectives</a>
+  <a href="#plan">Read the design</a>
+  <a href="#warmup">Warm-up</a>
+  <a href="#question">The question</a>
+  <a href="#markscheme">Mark scheme</a>
+  <a href="#diagnose">Diagnose</a>
+  <a href="#submit">Submit</a>
+</nav>
+
+<div class="pad">
+
+<!-- ========== HOW THIS WORKS ========== -->
+<section id="how">
+  <p class="eyebrow">Start here</p>
+  <h2 class="h">How this lesson works</h2>
+  <p class="lead">No new content today. This is the dress rehearsal: one Paper 4 question of 32 marks, at exam pace, followed by honest marking and a diagnosis of exactly which lesson to go back to.</p>
+  <ol class="steps">
+    <li><strong>Warm up (15 minutes).</strong> Do Now, then practise decoding a class design on a small example. Nothing here is timed.</li>
+    <li><strong>The timed attempt (65 minutes).</strong> Start the clock, then write the whole program in your own IDE — IDLE, Thonny or VS Code — as you will in the exam. Paste each part into the Evidence Document as you finish it. No notes, no earlier lessons, no searching.</li>
+    <li><strong>Mark, diagnose, submit (10 minutes).</strong> Self-mark against the mark scheme, find your weakest lesson in the diagnosis table, and submit the Evidence Document on Teams.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">Why 65 minutes</p>
+    <p style="margin:0 0 8px">Paper 4 is 75 marks in 2 hours 30 minutes — about <strong>two minutes per mark</strong>. This question is worth 32, so 65 minutes is exam pace. If you cannot do it in one sitting, split it across two home periods: the timed attempt in one, the marking and evidence in the next. Do not split the timed attempt itself.</p>
+    <p style="margin:0">If the clock runs out, stop writing, note which part you reached in the Evidence Document, and then finish the program untimed. Both numbers are useful — the first tells you about pace, the second about knowledge.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== DO NOW ========== -->
+<section id="donow">
+  <p class="eyebrow">Retrieval · real past-paper question</p>
+  <h2 class="h">Do Now — four minutes, no notes</h2>
+  <p>Question 1 is a real Cambridge Paper 3 question. Write your answers in your book, then reveal the mark scheme and mark them.</p>
+  <div class="box">
+    <p class="bt">Questions</p>
+    <ol style="margin-bottom:0">
+      <li>Match <strong>one</strong> description to each Object-Oriented Programming (OOP) term. Write the term and its letter. <em>[4]</em><br><span style="font-size:14px;color:var(--muted)">9618 Paper 3, June 2023 (variant 2), Q4 — on paper you draw lines</span>
+        <table style="margin:10px 0 4px">
+          <tr><th style="width:30%">OOP term</th><th>Description</th></tr>
+          <tr><td>Encapsulation</td><td><strong>A</strong> &nbsp;methods used to return the value of a property</td></tr>
+          <tr><td>Getters</td><td><strong>B</strong> &nbsp;the process of putting data and methods together as a single unit</td></tr>
+          <tr><td>Polymorphism</td><td><strong>C</strong> &nbsp;methods used to update the value of a property</td></tr>
+          <tr><td>Setters</td><td><strong>D</strong> &nbsp;allows methods to be redefined for derived classes</td></tr>
+          <tr><td></td><td><strong>E</strong> &nbsp;enables the defining of a new class that inherits from a parent class</td></tr>
+        </table>
+      </li>
+      <li><code>Car</code>'s constructor takes <code>Make</code> and <code>Model</code>. The class <code>Hatchback(Car)</code> has the constructor header <code>def __init__(self, Make, Model, Doors):</code>. <strong>Write</strong> the first line of its body. <em>[1]</em></li>
+      <li>A candidate writes this get method: <code>def GetAge(self, Age): return Age</code>. <strong>State</strong> two things that are wrong with it. <em>[2]</em></li>
+    </ol>
+  </div>
+  <details class="rev"><summary>Mark scheme — mark your own answers</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:60px">Q</th><th>Accepted</th><th style="width:70px">Marks</th></tr>
+      <tr><td class="mp">1</td><td>One mark for each correct match (Cambridge mark scheme):<br>Encapsulation — <strong>B</strong> &nbsp;·&nbsp; Getters — <strong>A</strong> &nbsp;·&nbsp; Polymorphism — <strong>D</strong> &nbsp;·&nbsp; Setters — <strong>C</strong>.<br><strong>E</strong> is not used: it describes <em>inheritance</em>, which is not one of the four terms. A description left over is normal in a matching question — do not force it onto a term.</td><td>4</td></tr>
+      <tr><td class="mp">2</td><td><code>super().__init__(Make, Model)</code> &nbsp;//&nbsp; <code>Car.__init__(self, Make, Model)</code><br><span class="cross">Reject:</span> passing <code>Doors</code> to the parent; omitting the parameters.</td><td>1</td></tr>
+      <tr><td class="mp">3</td><td>Any two: it takes a <strong>parameter</strong> — a get method takes none (beyond <code>self</code>) // it returns the <strong>parameter</strong>, not the attribute — it should return <code>self.__Age</code> // it does not access the object's attribute at all.</td><td>2</td></tr>
+    </table></div>
+    <p style="margin:10px 0 0">Q3 is the single most repeated OOP error in Paper 4 — a get method with a parameter appears in the examiner reports of <strong>all ten</strong> series since 2021. If you lost a mark on it, read Lesson 2 again before you start the clock.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== OBJECTIVES ========== -->
+<section id="obj">
+  <p class="eyebrow">Where this is going</p>
+  <h2 class="h">Learning objectives</h2>
+  <table>
+    <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
+    <tr><td>Complete a full Paper 4 OOP question — class, child class, container and main program — at exam pace.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Read a class design accurately: <strong>is a</strong> or <strong>has a</strong>; parameter or fixed value; <strong>returns</strong> or outputs.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Store and use the value a method returns, including one returned through a container.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Evidence a program to Paper 4 rules, and diagnose my lost marks against the lesson that teaches each one.</td><td>20.1</td><td>4</td></tr>
+  </table>
+</section>
+
+<hr class="rule">
+
+<!-- ========== READ THE DESIGN ========== -->
+<section id="plan">
+  <p class="eyebrow">Exam technique</p>
+  <h2 class="h">The first five minutes — read the design, not the code you remember</h2>
+  <p>Examiners keep saying the same thing: the strongest candidates are not the ones who know the most syntax. They are the ones who <strong>follow the design they are given</strong>. "Data structures differ each year to test if candidates can manipulate them when they are working in a slightly different way" (June 2023). So before you type a single line, spend five minutes with a pen.</p>
+  <ol class="steps">
+    <li><strong>Read every part first.</strong> Later parts tell you what earlier methods are for. Part (i) of today's question explains why part (g) has to <em>return</em> a value rather than output it.</li>
+    <li><strong>Label each class.</strong> Does another class's name appear in its <em>data type</em> column? Then it <strong>has</strong> those objects — containment, no brackets. Does the description say "subclass of" or "inherits from"? Then it <strong>is a</strong> — inheritance, brackets and <code>super().__init__</code>.</li>
+    <li><strong>Label each attribute</strong> <em>P</em> (from a parameter) or <em>F</em> (fixed value). Only the P attributes appear in the constructor header. A child constructor takes the parent's P attributes first, then its own.</li>
+    <li><strong>Label each method</strong> <em>R</em> (returns) or <em>O</em> (outputs). For every R, ask: does it return on <strong>every</strong> path, and where in the program is the value <strong>stored</strong> and used?</li>
+    <li><strong>Work out the expected output</strong> from the test data before you write any code. Then you will know immediately when the program is wrong.</li>
+  </ol>
+</section>
+
+<hr class="rule">
+
+<!-- ========== WARM-UP ========== -->
+<section id="warmup">
+  <p class="eyebrow">Warm-up · untimed</p>
+  <h2 class="h">Decode a design — a parcel company</h2>
+  <p>Practise those five steps on a small design that is <em>not</em> today's question. Do not write the code; just answer the checkpoints.</p>
+  <div class="box">
+    <p class="bt">Class design</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:34%">Parcel</th><th style="width:20%">Data type</th><th>Description</th></tr>
+      <tr><td class="dt">ParcelID</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Weight</td><td class="dt">INTEGER</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Delivered</td><td class="dt">BOOLEAN</td><td>Always <code>FALSE</code> when created</td></tr>
+      <tr><td class="dt">GetParcelID()</td><td class="dt"></td><td>Returns <code>ParcelID</code></td></tr>
+    </table>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:34%">ExpressParcel — a subclass of Parcel</th><th style="width:20%">Data type</th><th>Description</th></tr>
+      <tr><td class="dt">Deadline</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Priority</td><td class="dt">INTEGER</td><td>Always <code>1</code> when created</td></tr>
+    </table>
+    <table style="margin:0">
+      <tr><th style="width:34%">Van</th><th style="width:20%">Data type</th><th>Description</th></tr>
+      <tr><td class="dt">Registration</td><td class="dt">STRING</td><td>From a parameter</td></tr>
+      <tr><td class="dt">Load</td><td class="dt">ARRAY[0:19] OF Parcel</td><td>Twenty empty elements</td></tr>
+      <tr><td class="dt">ParcelCount</td><td class="dt">INTEGER</td><td>Always <code>0</code> when created</td></tr>
+      <tr><td class="dt">LoadParcel(NewParcel)</td><td class="dt"></td><td>Stores <code>NewParcel</code> in the next free element if there is space, and returns <code>TRUE</code>; otherwise returns <code>FALSE</code></td></tr>
+      <tr><td class="dt">FindParcel(SearchID)</td><td class="dt"></td><td>Returns the index of the stored parcel whose ID is <code>SearchID</code>, or <code>-1</code> if there is none</td></tr>
+    </table>
+  </div>
+
+  <div class="cp" data-cp="1">
+    <div class="cph">Checkpoint 1</div>
+    <div class="cpb">
+      <p class="q">How many parameters, after <code>self</code>, does the constructor of <code>ExpressParcel</code> take?</p>
+      <button class="opt" data-ok="0">A &nbsp;1 — <code>Deadline</code></button>
+      <button class="opt" data-ok="0">B &nbsp;2 — <code>Deadline</code> and <code>Priority</code></button>
+      <button class="opt" data-ok="1">C &nbsp;3 — <code>ParcelID</code>, <code>Weight</code> and <code>Deadline</code></button>
+      <button class="opt" data-ok="0">D &nbsp;4 — <code>ParcelID</code>, <code>Weight</code>, <code>Deadline</code> and <code>Priority</code></button>
+      <div class="fbs" hidden>
+        <div>The child has to receive the parent's parameters too, so that it can pass them to <code>super().__init__</code>. An express parcel still needs an ID and a weight — it <em>is a</em> parcel.</div>
+        <div>Two problems. The parent's parameters are missing, and <code>Priority</code> is <em>always 1</em> — a fixed value, assigned inside the constructor. Taking a fixed value as a parameter is a mark lost in Lesson 1 and again here.</div>
+        <div>The parent's two P attributes, then the child's one P attribute. <code>Delivered</code> and <code>Priority</code> are fixed values, so neither appears in the header — the parent's constructor sets <code>Delivered</code>, and the child sets <code>Priority</code> to 1 itself.</div>
+        <div>Right idea for the parent's parameters — but <code>Priority</code> is <em>always 1</em> when the object is created. It is assigned inside the constructor, not passed in.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="cp" data-cp="2">
+    <div class="cph">Checkpoint 2</div>
+    <div class="cpb">
+      <p class="q"><code>Load</code> is declared as <code>ARRAY[0:19] OF Parcel</code>. Which of these can be passed to <code>LoadParcel()</code>?</p>
+      <button class="opt" data-ok="0">A &nbsp;Only <code>Parcel</code> objects — an <code>ExpressParcel</code> is a different class, so it does not match the array's type</button>
+      <button class="opt" data-ok="1">B &nbsp;<code>Parcel</code> objects and <code>ExpressParcel</code> objects</button>
+      <button class="opt" data-ok="0">C &nbsp;A parcel ID and a weight, so that <code>LoadParcel</code> can create the parcel</button>
+      <button class="opt" data-ok="0">D &nbsp;Only <code>ExpressParcel</code> objects, because they have the most attributes</button>
+      <div class="fbs" hidden>
+        <div>An <code>ExpressParcel</code> <em>is a</em> <code>Parcel</code> — it has everything a parcel has. Anywhere a <code>Parcel</code> is expected, a child object can go. That is exactly how Lesson 5's extension put a junior member into a club built for members.</div>
+        <div>An express parcel <em>is a</em> parcel, so it can go anywhere a parcel can. The van can then call <code>GetParcelID()</code> on every element without caring which class each one is — and an overridden method would run in the right version for each. That is polymorphism doing real work.</div>
+        <div>The design says <code>LoadParcel(NewParcel)</code> — one parameter, and it is a parcel object. The caller creates the object and passes it. Passing the separate values instead was reported by examiners in November 2022 and June 2024.</div>
+        <div>The array is declared <code>OF Parcel</code>, so ordinary parcels certainly belong in it. Having more attributes does not make a class "more" acceptable — what matters is the <em>is a</em> relationship.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="cp" data-cp="3">
+    <div class="cph">Checkpoint 3</div>
+    <div class="cpb">
+      <p class="q">Which version of <code>FindParcel</code> follows the design?</p>
+      <button class="opt" data-ok="0">A<span class="oc">for Index in range(0, self.__ParcelCount):
+    if self.__Load[Index].GetParcelID() == SearchID:
+        return Index
+    else:
+        return -1</span></button>
+      <button class="opt" data-ok="0">B<span class="oc">for Index in range(0, 20):
+    if self.__Load[Index].GetParcelID() == SearchID:
+        return Index
+return -1</span></button>
+      <button class="opt" data-ok="1">C<span class="oc">for Index in range(0, self.__ParcelCount):
+    if self.__Load[Index].GetParcelID() == SearchID:
+        return Index
+return -1</span></button>
+      <button class="opt" data-ok="0">D<span class="oc">for Index in range(0, self.__ParcelCount):
+    if self.__Load[Index].GetParcelID() == SearchID:
+        print(Index)
+return -1</span></button>
+      <div class="fbs" hidden>
+        <div>The <code>else</code> returns <code>-1</code> as soon as the <em>first</em> parcel does not match, so the loop never reaches the second. Not found can only be decided <strong>after</strong> every stored parcel has been checked.</div>
+        <div>The <code>return -1</code> is in the right place, but the loop runs over all twenty elements. Unfilled elements hold <code>None</code>, and <code>None.GetParcelID()</code> crashes whenever the ID is not found and the van is not full. Loop to the counter.</div>
+        <div>Only the stored parcels are checked, the index is returned the moment the match is found, and <code>-1</code> is returned only once the loop has finished without one. A return on every path, in the right place.</div>
+        <div>The design says <em>returns</em> the index. Printing it gives the caller nothing to store — and then the method still returns <code>-1</code> every time, even when the parcel was found. Outputting where a return is required is reported in nine of the last ten exam series.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== THE QUESTION ========== -->
+<section id="question">
+  <p class="eyebrow">Assessed work · timed</p>
+  <h2 class="h">The question — bike hire &nbsp;[32 marks]</h2>
+
+  <div class="timer" id="timer">
+    <div class="tleft">
+      <div class="tlabel">Exam clock</div>
+      <div class="tclock" id="tclock" aria-live="off">65:00</div>
+      <div class="tnote" id="tnote">Read the whole question first — that is part of the 65 minutes.</div>
+    </div>
+    <div class="tbtns">
+      <button id="tstart">▶ Start</button>
+      <button class="ghost" id="treset">Reset</button>
+    </div>
+  </div>
+
+  <div class="box pinkb">
+    <p class="bt">Question 1</p>
+    <p style="margin:0 0 10px">A city runs a bike hire scheme from several hire stations. A program is to be written using Object-Oriented Programming. There are two kinds of bike: ordinary bikes, and electric bikes, which also have a battery. Each hire station stores up to 10 bikes.</p>
+    <p style="margin:0 0 6px">The class <code>Bike</code> stores data about one bike.</p>
+    <table style="margin:0 0 12px">
+      <tr><th colspan="3">Bike</th></tr>
+      <tr><td class="dt" style="width:30%">BikeID : STRING</td><td colspan="2">the bike's unique ID, for example <code>"B101"</code></td></tr>
+      <tr><td class="dt">Model : STRING</td><td colspan="2">the model of the bike</td></tr>
+      <tr><td class="dt">HireRate : INTEGER</td><td colspan="2">the cost of hiring the bike for one hour</td></tr>
+      <tr><td class="dt">HoursHired : INTEGER</td><td colspan="2">the total number of hours the bike has been hired for, initialised to <code>0</code></td></tr>
+      <tr><td class="dt">Available : BOOLEAN</td><td colspan="2"><code>TRUE</code> if the bike can be hired, initialised to <code>TRUE</code></td></tr>
+      <tr><td class="dt">Constructor()</td><td colspan="2">takes the bike ID, model and hire rate as parameters, and initialises all the attributes</td></tr>
+      <tr><td class="dt">GetBikeID()</td><td colspan="2">returns the bike ID</td></tr>
+      <tr><td class="dt">GetAvailable()</td><td colspan="2">returns the value of <code>Available</code></td></tr>
+      <tr><td class="dt">Hire(Hours)</td><td colspan="2">if the bike is available: adds <code>Hours</code> to <code>HoursHired</code>, sets <code>Available</code> to <code>FALSE</code> and returns the cost, <code>Hours</code> multiplied by <code>HireRate</code>.<br>If the bike is not available, returns <code>-1</code></td></tr>
+    </table>
+    <p style="margin:0 0 6px">The class <code>EBike</code> inherits from <code>Bike</code>.</p>
+    <table style="margin:0 0 12px">
+      <tr><th colspan="2">EBike</th></tr>
+      <tr><td class="dt" style="width:30%">BatteryLevel : INTEGER</td><td>the percentage of charge in the battery</td></tr>
+      <tr><td class="dt">Constructor()</td><td>takes the bike ID, model, hire rate and battery level as parameters. Calls the parent constructor and initialises <code>BatteryLevel</code></td></tr>
+      <tr><td class="dt">Hire(Hours)</td><td>overrides the parent method.<br>If <code>BatteryLevel</code> is less than 20, returns <code>-1</code>.<br>Otherwise calls the parent's <code>Hire()</code> method. If the value it returns is not <code>-1</code>, reduces <code>BatteryLevel</code> by 10 for every hour hired. Returns the value returned by the parent's method.</td></tr>
+    </table>
+    <p style="margin:0 0 6px">The class <code>HireStation</code> stores the bikes at one station.</p>
+    <table style="margin:0 0 12px">
+      <tr><th colspan="2">HireStation</th></tr>
+      <tr><td class="dt" style="width:30%">StationName : STRING</td><td>the name of the station</td></tr>
+      <tr><td class="dt">Bikes : ARRAY[0:9] OF Bike</td><td>the bikes at the station, initially empty</td></tr>
+      <tr><td class="dt">NumberOfBikes : INTEGER</td><td>the number of bikes stored, initialised to <code>0</code></td></tr>
+      <tr><td class="dt">Constructor()</td><td>takes the station name as a parameter and initialises all the attributes</td></tr>
+      <tr><td class="dt">AddBike(NewBike)</td><td>if there is space, stores <code>NewBike</code> in the next free element of <code>Bikes</code>, adds 1 to <code>NumberOfBikes</code> and returns <code>TRUE</code>. Otherwise returns <code>FALSE</code></td></tr>
+      <tr><td class="dt">HireBike(BikeID, Hours)</td><td>searches the stored bikes for the bike with the ID <code>BikeID</code>. If it is found, hires it for <code>Hours</code> hours using its <code>Hire()</code> method and returns the value that <code>Hire()</code> returns. If no stored bike has that ID, returns <code>-1</code></td></tr>
+      <tr><td class="dt">CountAvailable()</td><td>returns the number of stored bikes that are available</td></tr>
+    </table>
+
+    <p style="margin:0 0 4px"><strong>(a)</strong> Write program code to declare the class <code>Bike</code> and its constructor. Use your programming language's appropriate constructor. All attributes must be private. If you are writing in Python, include attribute declarations using comments. <em>[4]</em></p>
+    <p style="margin:0 0 4px"><strong>(b)</strong> Write program code for the methods <code>GetBikeID()</code> and <code>GetAvailable()</code>. <em>[2]</em></p>
+    <p style="margin:0 0 4px"><strong>(c)</strong> Write program code for the method <code>Hire()</code> in the class <code>Bike</code>. <em>[4]</em></p>
+    <p style="margin:0 0 4px"><strong>(d)</strong> Write program code to declare the class <code>EBike</code> and its constructor. <em>[3]</em></p>
+    <p style="margin:0 0 4px"><strong>(e)</strong> Write program code for the method <code>Hire()</code> in the class <code>EBike</code>. <em>[4]</em></p>
+    <p style="margin:0 0 4px"><strong>(f)</strong> Write program code to declare the class <code>HireStation</code>, its constructor and the method <code>AddBike()</code>. <em>[4]</em></p>
+    <p style="margin:0 0 4px"><strong>(g)</strong> Write program code for the method <code>HireBike()</code>. <em>[4]</em></p>
+    <p style="margin:0 0 10px"><strong>(h)</strong> Write program code for the method <code>CountAvailable()</code>. <em>[2]</em></p>
+
+    <p style="margin:0 0 6px"><strong>(i)</strong> Write the main program. It must:</p>
+    <ul style="margin:0 0 8px">
+      <li>create a <code>HireStation</code> object with the name <code>"Harbour Road"</code></li>
+      <li>create the five bikes below, each as the class shown, and add each one to the station using <code>AddBike()</code></li>
+      <li>for each hire request below, in order: call <code>HireBike()</code>, <strong>store</strong> the value it returns, and output either<br><code>&lt;BikeID&gt; hired for &lt;Hours&gt; hours, cost &lt;value&gt;</code> &nbsp;or&nbsp; <code>&lt;BikeID&gt; cannot be hired</code> if the value is <code>-1</code></li>
+      <li>output <code>Bikes available: </code> followed by the value returned by <code>CountAvailable()</code>. <em>[3]</em></li>
+    </ul>
+    <div class="twocol">
+      <table style="margin:0">
+        <tr><th>Class</th><th>BikeID</th><th>Model</th><th>Rate</th><th>Battery</th></tr>
+        <tr><td>Bike</td><td class="dt">"B101"</td><td class="dt">"City Cruiser"</td><td class="dt">4</td><td>—</td></tr>
+        <tr><td>Bike</td><td class="dt">"B102"</td><td class="dt">"Trail Runner"</td><td class="dt">5</td><td>—</td></tr>
+        <tr><td>EBike</td><td class="dt">"E201"</td><td class="dt">"Volt 500"</td><td class="dt">9</td><td class="dt">85</td></tr>
+        <tr><td>EBike</td><td class="dt">"E202"</td><td class="dt">"Volt 500"</td><td class="dt">9</td><td class="dt">15</td></tr>
+        <tr><td>Bike</td><td class="dt">"B103"</td><td class="dt">"City Cruiser"</td><td class="dt">4</td><td>—</td></tr>
+      </table>
+      <table style="margin:0">
+        <tr><th>Request</th><th>BikeID</th><th>Hours</th></tr>
+        <tr><td>1</td><td class="dt">"B102"</td><td class="dt">3</td></tr>
+        <tr><td>2</td><td class="dt">"E201"</td><td class="dt">2</td></tr>
+        <tr><td>3</td><td class="dt">"E202"</td><td class="dt">1</td></tr>
+        <tr><td>4</td><td class="dt">"B102"</td><td class="dt">2</td></tr>
+        <tr><td>5</td><td class="dt">"B777"</td><td class="dt">1</td></tr>
+      </table>
+    </div>
+    <p style="margin:10px 0 0"><strong>(j)</strong> Test your program. Take a screenshot showing the output. <em>[2]</em></p>
+  </div>
+
+  <details class="rev"><summary>Stuck on one part for more than five minutes? One hint per part</summary>
+  <div class="body">
+    <p style="margin:0 0 8px">In the exam you would move on, and parts are marked independently — so move on here too. If you open a hint, write <em>"hint used"</em> beside that part in the Evidence Document. Honesty is what makes the diagnosis work.</p>
+    <ul style="margin:0">
+      <li><strong>(a)</strong> Three P attributes, two F attributes. Only the P ones are in the constructor header.</li>
+      <li><strong>(b)</strong> Neither method takes a parameter beyond <code>self</code>.</li>
+      <li><strong>(c)</strong> Two paths, two returns. Change the attributes <em>before</em> the <code>return</code> — nothing after a <code>return</code> runs.</li>
+      <li><strong>(d)</strong> Four parameters. The next line passes three of them to <code>super().__init__</code>.</li>
+      <li><strong>(e)</strong> <code>Cost = super().Hire(Hours)</code> on a line of its own — then test <code>Cost</code>.</li>
+      <li><strong>(f)</strong> Lesson 4's <code>Club</code>, with different names and ten elements.</li>
+      <li><strong>(g)</strong> Lesson 3's linear search, inside the class. Return what the bike's <code>Hire()</code> returns; return <code>-1</code> only after the loop.</li>
+      <li><strong>(h)</strong> Loop to <code>NumberOfBikes</code>, not to 10. Ask each bike with <code>GetAvailable()</code>.</li>
+      <li><strong>(i)</strong> <code>Station.AddBike(EBike("E201", "Volt 500", 9, 85))</code> creates the object and passes it in one line.</li>
+    </ul>
+  </div>
+  </details>
+
+  <div class="runner">
+    <div class="runbar">
+      <span class="ttl">Python 3 — scratch pad</span>
+      <span class="status" id="pystatus">Python is loading…</span>
+      <button id="runbtn" disabled>▶ Run</button>
+      <button class="stop" id="stopbtn" disabled>■ Stop</button>
+      <button class="ghost" id="resetbtn">Reset code</button>
+    </div>
+    <textarea class="editor tall" id="editor" spellcheck="false" aria-label="Python code editor"></textarea>
+    <div class="inwrap">
+      <label class="outlabel" for="stdin" style="display:block">Program input — only if your code uses input(): one value per line, in order</label>
+      <textarea class="stdin" id="stdin" spellcheck="false" rows="2"></textarea>
+    </div>
+    <div class="outwrap">
+      <div class="outlabel">Output</div>
+      <pre class="out" id="output">Press Run to execute.</pre>
+    </div>
+  </div>
+  <p class="savenote">Use your own IDE if you can — the exam does. This runner is here if you have nothing else, and it saves your code in this browser as you type. Paste into the Evidence Document from whichever you used.</p>
+
+  <div class="tier e">
+    <div class="th">Extension — only if you finish inside the 65 minutes</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Add a get method <code>GetBatteryLevel()</code> to <code>EBike</code>. In the main program, keep the <code>E201</code> object in a variable before you add it to the station, and after the other output, use it to output <code>E201 battery: </code> followed by its battery level.</p>
+      <p style="margin:0">Then explain in one sentence, in the Evidence Document, why the station's copy of E201 and your variable show the same battery level.</p>
+    </div>
+  </div>
+
+  <details class="rev"><summary>Check your output — open only after the clock has stopped</summary>
+  <div class="body">
+<pre class="code">B102 hired for 3 hours, cost 15
+E201 hired for 2 hours, cost 18
+E202 cannot be hired
+B102 cannot be hired
+B777 cannot be hired
+Bikes available: 3</pre>
+    <p style="margin:10px 0 6px">With the extension, a seventh line: <code>E201 battery: 65</code>. If yours differs, the difference tells you where to look:</p>
+    <table>
+      <tr><th style="width:44%">You see</th><th>Look at</th></tr>
+      <tr><td><code>E202 hired for 1 hours, cost 9</code> and <code>Bikes available: 2</code></td><td>(e) — the battery check is missing. E202 has only 15%.</td></tr>
+      <tr><td><code>B102 hired for 2 hours, cost 10</code></td><td>(c) — <code>Hire()</code> is not setting <code>Available</code> to <code>False</code>, so B102 is hired twice.</td></tr>
+      <tr><td>Every request <code>cannot be hired</code></td><td>(g) — <code>return -1</code> is inside the loop, so only the first bike, B101, is ever checked. None of the requests is for B101.</td></tr>
+      <tr><td><code>'NoneType' object has no attribute …</code></td><td>(g) or (h) — a loop runs to 10 instead of to <code>NumberOfBikes</code>. Only five bikes are stored.</td></tr>
+      <tr><td><code>AttributeError: … '_Bike__…'</code></td><td>(d) — the parent's constructor is not being called.</td></tr>
+      <tr><td><code>AttributeError: … '_EBike__Available'</code> or similar</td><td>(e) — the child is reaching into the parent's private attributes. Let <code>super().Hire(Hours)</code> do that work.</td></tr>
+      <tr><td><code>cost None</code> on a line</td><td>(c), (e) or (g) — a path through one of them has no <code>return</code>, or a value returned is not passed on.</td></tr>
+    </table>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MARK SCHEME ========== -->
+<section id="markscheme">
+  <p class="eyebrow">Self-marking</p>
+  <h2 class="h">Mark scheme — open it only after the clock has stopped</h2>
+  <p>Mark strictly. A mark point is a behaviour: if your code does not do it, you do not get it, however close it looks. Record each point in the Evidence Document.</p>
+
+  <details class="rev"><summary>Reveal the mark scheme [32 marks]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Description</th><th style="width:60px">Marks</th></tr>
+      <tr><td class="mp">(a) MP1</td><td><code>BikeID</code>, <code>Model</code> and <code>HireRate</code> declared private, with their data types evidenced.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP2</td><td>Constructor takes <strong>exactly three</strong> parameters and assigns them to those attributes — attribute on the left.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP3</td><td><code>HoursHired</code> private, typed, assigned <code>0</code> in the constructor.</td><td>1</td></tr>
+      <tr><td class="mp">(a) MP4</td><td><code>Available</code> private, typed, assigned <code>True</code> in the constructor.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP5</td><td><code>GetBikeID()</code> — no parameter, returns <code>BikeID</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(b) MP6</td><td><code>GetAvailable()</code> — no parameter, returns <code>Available</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP7</td><td><code>Hire()</code> takes one parameter and tests whether the bike is available.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP8</td><td>…when available, adds <code>Hours</code> to <code>HoursHired</code> <strong>and</strong> sets <code>Available</code> to <code>False</code>…</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP9</td><td>…and returns <code>Hours * HireRate</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(c) MP10</td><td>Returns <code>-1</code> when not available.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP11</td><td>Class header shows inheritance from <code>Bike</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP12</td><td>Constructor takes four parameters and <strong>calls the parent constructor</strong> with the first three.</td><td>1</td></tr>
+      <tr><td class="mp">(d) MP13</td><td><code>BatteryLevel</code> private, typed, assigned from the parameter.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP14</td><td><code>Hire()</code> defined in <code>EBike</code> with one parameter, returning <code>-1</code> when <code>BatteryLevel &lt; 20</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP15</td><td>Otherwise calls the <strong>parent's</strong> <code>Hire(Hours)</code> and <strong>stores</strong> the value it returns.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP16</td><td>Reduces <code>BatteryLevel</code> by <code>10 * Hours</code> <strong>only</strong> when that value is not <code>-1</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(e) MP17</td><td>Returns the stored value.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP18</td><td><code>class HireStation:</code> — no parent — with <code>StationName</code> private, from the one parameter.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP19</td><td><code>Bikes</code> a private array of 10 elements typed as <code>Bike</code>, and <code>NumberOfBikes</code> private and set to <code>0</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP20</td><td><code>AddBike()</code> checks for space, stores at index <code>NumberOfBikes</code>, <strong>then</strong> adds 1.</td><td>1</td></tr>
+      <tr><td class="mp">(f) MP21</td><td>Returns <code>True</code> / <code>False</code> on every path.</td><td>1</td></tr>
+      <tr><td class="mp">(g) MP22</td><td>Loops over the <strong>stored</strong> bikes only.</td><td>1</td></tr>
+      <tr><td class="mp">(g) MP23</td><td>Compares each bike's <code>GetBikeID()</code> with the parameter.</td><td>1</td></tr>
+      <tr><td class="mp">(g) MP24</td><td>Calls <code>Hire(Hours)</code> on the matching bike and returns the value it returns.</td><td>1</td></tr>
+      <tr><td class="mp">(g) MP25</td><td>Returns <code>-1</code> only <strong>after</strong> the loop.</td><td>1</td></tr>
+      <tr><td class="mp">(h) MP26</td><td>Count set to 0, loop over stored bikes, <code>GetAvailable()</code> tested and count incremented.</td><td>1</td></tr>
+      <tr><td class="mp">(h) MP27</td><td>Count returned after the loop.</td><td>1</td></tr>
+      <tr><td class="mp">(i) MP28</td><td>Station created; the five bikes created as the right classes with the test data, each added with <code>AddBike()</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(i) MP29</td><td>Each request made with <code>HireBike()</code>; value returned <strong>stored</strong>, tested against <code>-1</code>, and the right message output in each case.</td><td>1</td></tr>
+      <tr><td class="mp">(i) MP30</td><td><code>Bikes available: </code> output with the value returned by <code>CountAvailable()</code>.</td><td>1</td></tr>
+      <tr><td class="mp">(j) MP31</td><td>Screenshot shows the program running with the test data.</td><td>1</td></tr>
+      <tr><td class="mp">(j) MP32</td><td>Output matches the six expected lines.</td><td>1</td></tr>
+    </table></div>
+    <p style="margin:14px 0 6px"><strong>Accepted alternatives</strong></p>
+    <ul>
+      <li>MP12 and MP15: <code>Bike.__init__(self, BikeID, Model, HireRate)</code> and <code>Bike.Hire(self, Hours)</code>.</li>
+      <li>MP14: testing for the battery being 20 or more first, with the <code>-1</code> in the <code>else</code>.</li>
+      <li>MP24–MP25: a <code>while</code> loop with a found flag, provided the value returned by <code>Hire()</code> is the value returned by <code>HireBike()</code>.</li>
+      <li>MP28: creating each bike in a variable first, or a loop over a list of the test data.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Not credited, however good the code looks</strong></p>
+    <ul>
+      <li><code>HoursHired</code>, <code>Available</code> or a fixed value taken as a constructor parameter — <span class="cross">MP2 lost</span>, as well as the point for that attribute.</li>
+      <li><code>print(Hours * self.__HireRate)</code> in place of <code>return</code> — <span class="cross">MP9 lost</span>, and everything that relies on the value fails with it.</li>
+      <li>Changing <code>Available</code> after the <code>return</code> line — <span class="cross">MP8 lost</span>. That line never runs.</li>
+      <li><code>super().Hire(Hours)</code> called inside an <code>if</code> condition and again on the next line — <span class="cross">MP15 lost</span>. The bike is hired twice: the second call finds it unavailable and returns <code>-1</code>.</li>
+      <li><code>self.__Available</code> or <code>self.__HireRate</code> anywhere in <code>EBike</code> — <span class="cross">MP15 lost</span>. They are private to <code>Bike</code>.</li>
+      <li><code>class HireStation(Bike):</code> — <span class="cross">MP18 lost</span>. <code>Bike</code> is in the data type column: a station <em>has</em> bikes.</li>
+      <li><code>HireBike()</code> that outputs a message instead of returning — <span class="cross">MP24 lost</span>. The design says <em>returns</em>, and part (i) depends on it.</li>
+      <li>Calling <code>HireBike()</code> without storing what it returns, then calling it again to print the cost — <span class="cross">MP29 lost</span>, and the second call reports the bike as unavailable.</li>
+      <li>Code pasted as an image — <span class="cross">no code marks at all</span>.</li>
+    </ul>
+  </div>
+  </details>
+
+  <details class="rev"><summary>A full-mark answer (WAGOLL) — read it after marking, line by line</summary>
+  <div class="body">
+    <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="cm"># 1(a)</span>
+<span class="kw">class</span> <span class="nm">Bike</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, BikeID, Model, HireRate):
+        self.__BikeID = BikeID       <span class="cm"># STRING</span>
+        self.__Model = Model         <span class="cm"># STRING</span>
+        self.__HireRate = HireRate   <span class="cm"># INTEGER</span>
+        self.__HoursHired = <span class="nm">0</span>        <span class="cm"># INTEGER</span>
+        self.__Available = <span class="kw">True</span>      <span class="cm"># BOOLEAN</span>
+
+    <span class="cm"># 1(b)</span>
+    <span class="kw">def</span> <span class="fn">GetBikeID</span>(self):
+        <span class="kw">return</span> self.__BikeID
+
+    <span class="kw">def</span> <span class="fn">GetAvailable</span>(self):
+        <span class="kw">return</span> self.__Available
+
+    <span class="cm"># 1(c)</span>
+    <span class="kw">def</span> <span class="fn">Hire</span>(self, Hours):
+        <span class="kw">if</span> self.__Available == <span class="kw">True</span>:
+            self.__HoursHired = self.__HoursHired + Hours
+            self.__Available = <span class="kw">False</span>
+            <span class="kw">return</span> Hours * self.__HireRate
+        <span class="kw">else</span>:
+            <span class="kw">return</span> -<span class="nm">1</span>
+
+
+<span class="cm"># 1(d) an EBike IS A Bike</span>
+<span class="kw">class</span> <span class="nm">EBike</span>(<span class="nm">Bike</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, BikeID, Model, HireRate, BatteryLevel):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(BikeID, Model, HireRate)
+        self.__BatteryLevel = BatteryLevel     <span class="cm"># INTEGER</span>
+
+    <span class="cm"># 1(e) overrides Bike.Hire</span>
+    <span class="kw">def</span> <span class="fn">Hire</span>(self, Hours):
+        <span class="kw">if</span> self.__BatteryLevel &lt; <span class="nm">20</span>:
+            <span class="kw">return</span> -<span class="nm">1</span>
+        Cost = <span class="fn">super</span>().<span class="fn">Hire</span>(Hours)             <span class="cm"># store what the parent's method returns</span>
+        <span class="kw">if</span> Cost != -<span class="nm">1</span>:
+            self.__BatteryLevel = self.__BatteryLevel - <span class="nm">10</span> * Hours
+        <span class="kw">return</span> Cost
+
+
+<span class="cm"># 1(f) a HireStation HAS bikes — no brackets</span>
+<span class="kw">class</span> <span class="nm">HireStation</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, StationName):
+        self.__StationName = StationName       <span class="cm"># STRING</span>
+        self.__Bikes = [<span class="kw">None</span>] * <span class="nm">10</span>             <span class="cm"># ARRAY[0:9] OF Bike</span>
+        self.__NumberOfBikes = <span class="nm">0</span>               <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">AddBike</span>(self, NewBike):
+        <span class="kw">if</span> self.__NumberOfBikes &lt; <span class="nm">10</span>:
+            self.__Bikes[self.__NumberOfBikes] = NewBike
+            self.__NumberOfBikes = self.__NumberOfBikes + <span class="nm">1</span>
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">else</span>:
+            <span class="kw">return</span> <span class="kw">False</span>
+
+    <span class="cm"># 1(g)</span>
+    <span class="kw">def</span> <span class="fn">HireBike</span>(self, BikeID, Hours):
+        <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, self.__NumberOfBikes):
+            <span class="kw">if</span> self.__Bikes[Index].<span class="fn">GetBikeID</span>() == BikeID:
+                <span class="kw">return</span> self.__Bikes[Index].<span class="fn">Hire</span>(Hours)
+        <span class="kw">return</span> -<span class="nm">1</span>
+
+    <span class="cm"># 1(h)</span>
+    <span class="kw">def</span> <span class="fn">CountAvailable</span>(self):
+        Count = <span class="nm">0</span>
+        <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, self.__NumberOfBikes):
+            <span class="kw">if</span> self.__Bikes[Index].<span class="fn">GetAvailable</span>() == <span class="kw">True</span>:
+                Count = Count + <span class="nm">1</span>
+        <span class="kw">return</span> Count
+
+
+<span class="cm"># 1(i) main program</span>
+Station = <span class="nm">HireStation</span>(<span class="st">"Harbour Road"</span>)
+Added = Station.<span class="fn">AddBike</span>(<span class="nm">Bike</span>(<span class="st">"B101"</span>, <span class="st">"City Cruiser"</span>, <span class="nm">4</span>))
+Added = Station.<span class="fn">AddBike</span>(<span class="nm">Bike</span>(<span class="st">"B102"</span>, <span class="st">"Trail Runner"</span>, <span class="nm">5</span>))
+Added = Station.<span class="fn">AddBike</span>(<span class="nm">EBike</span>(<span class="st">"E201"</span>, <span class="st">"Volt 500"</span>, <span class="nm">9</span>, <span class="nm">85</span>))
+Added = Station.<span class="fn">AddBike</span>(<span class="nm">EBike</span>(<span class="st">"E202"</span>, <span class="st">"Volt 500"</span>, <span class="nm">9</span>, <span class="nm">15</span>))
+Added = Station.<span class="fn">AddBike</span>(<span class="nm">Bike</span>(<span class="st">"B103"</span>, <span class="st">"City Cruiser"</span>, <span class="nm">4</span>))
+
+Requests = [[<span class="st">"B102"</span>, <span class="nm">3</span>], [<span class="st">"E201"</span>, <span class="nm">2</span>], [<span class="st">"E202"</span>, <span class="nm">1</span>], [<span class="st">"B102"</span>, <span class="nm">2</span>], [<span class="st">"B777"</span>, <span class="nm">1</span>]]
+<span class="kw">for</span> Request <span class="kw">in</span> Requests:
+    Cost = Station.<span class="fn">HireBike</span>(Request[<span class="nm">0</span>], Request[<span class="nm">1</span>])
+    <span class="kw">if</span> Cost == -<span class="nm">1</span>:
+        <span class="fn">print</span>(Request[<span class="nm">0</span>] + <span class="st">" cannot be hired"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(Request[<span class="nm">0</span>] + <span class="st">" hired for "</span> + <span class="fn">str</span>(Request[<span class="nm">1</span>]) + <span class="st">" hours, cost "</span> + <span class="fn">str</span>(Cost))
+
+<span class="fn">print</span>(<span class="st">"Bikes available: "</span> + <span class="fn">str</span>(Station.<span class="fn">CountAvailable</span>()))</pre>
+    <ul style="margin-bottom:0">
+      <li><strong>Polymorphism is doing the work in (g).</strong> <code>HireBike</code> calls <code>Hire()</code> on whatever is in the array. For E201 and E202 that is <code>EBike</code>'s version, with the battery check; for the others it is <code>Bike</code>'s. The station never asks which class a bike is.</li>
+      <li><strong>The value returned travels three levels.</strong> <code>Bike.Hire</code> returns the cost to <code>EBike.Hire</code>, which stores it and returns it to <code>HireStation.HireBike</code>, which returns it to the main program, which stores it and tests it. Break any link and the output fails — that chain is exactly what examiners mean by "using what a call returns".</li>
+      <li><strong>(i) uses <code>Added = …</code></strong> even though nothing is tested here. Keeping what a method returns is a habit; in a question that asked for a club-full message, it would be the mark.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== DIAGNOSE ========== -->
+<section id="diagnose">
+  <p class="eyebrow">After the marking</p>
+  <h2 class="h">Diagnose — which lesson do your lost marks point to?</h2>
+  <p>Find every mark point you lost in this table. The lesson that appears most often is the one to redo — the whole page, Exam Conditions tier included — before the mock.</p>
+  <table>
+    <tr><th style="width:22%">Mark points</th><th style="width:40%">What they test</th><th>Go back to</th></tr>
+    <tr><td class="mp">MP1–MP4, MP13</td><td>Private attributes, data types, fixed values vs parameters</td><td><a href="oop-lesson-1.html">Lesson 1 — Classes, Attributes and the Constructor</a></td></tr>
+    <tr><td class="mp">MP5–MP10</td><td>Get methods without parameters; returning, not outputting</td><td><a href="oop-lesson-2.html">Lesson 2 — Get and Set Methods</a></td></tr>
+    <tr><td class="mp">MP22–MP30</td><td>Looping over objects, searching, storing what a call returns</td><td><a href="oop-lesson-3.html">Lesson 3 — Using Objects</a></td></tr>
+    <tr><td class="mp">MP18–MP21</td><td>Has a: an array of objects inside a class, with a counter</td><td><a href="oop-lesson-4.html">Lesson 4 — Containment or Inheritance?</a></td></tr>
+    <tr><td class="mp">MP11–MP12, MP14–MP17</td><td>Is a: the parent constructor call, overriding, the parent's method</td><td><a href="oop-lesson-5.html">Lesson 5 — Inheritance</a></td></tr>
+    <tr><td class="mp">MP31–MP32</td><td>Evidence: test data and output in the screenshot</td><td>The marking rules on page 1 of every Evidence Document</td></tr>
+  </table>
+  <div class="callout">
+    <p class="bt">Pace or knowledge?</p>
+    <p style="margin:0">Compare the part you reached when the clock stopped with your final mark. Lots of marks but an unfinished question means <strong>pace</strong>: practise the Exam Conditions tiers with a timer. An unfinished question with marks lost in the parts you did write means <strong>knowledge</strong>: redo the lesson the table points to. Many people have a bit of both — write down which matters more for you.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== SUBMIT ========== -->
+<section id="submit">
+  <p class="eyebrow">Hand-in</p>
+  <h2 class="h">What to submit on Teams</h2>
+  <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 6.docx</code>.</p>
+  <div class="box">
+    <p class="bt">Checklist before you upload</p>
+    <ul style="margin:0">
+      <li>Your name and class are at the top of the document, with your start and finish times and the part you reached at 65 minutes.</li>
+      <li>Parts (a) to (i) are each pasted <strong>as text</strong> into their own box, with the indentation intact. Any part where you opened a hint is marked <em>hint used</em>.</li>
+      <li>The screenshot for (j) shows the program running with the test data, and the output is not cut off.</li>
+      <li>Your self-marked total out of 32 is filled in, and the diagnosis names the lesson you will go back to.</li>
+      <li>You are submitting <strong>the document only</strong> — not a zip, not the <code>.py</code> file.</li>
+    </ul>
+  </div>
+  <p>Your next taught lesson opens by going through the most common lost marks across the class. If you ran out of time, submit what you have — the unfinished parts are useful evidence too.</p>
+
+  <h3>What comes next</h3>
+  <p>That completes the OOP arc. In the exam, an OOP question usually sits alongside one on <strong>file handling</strong> and one on an <strong>abstract data type</strong> — and the OOP question itself often loads its objects from a text file. Those topics are next on the practical strand, and everything from these six lessons carries straight into them.</p>
+</section>
+
+
+<footer class="foot">
+  Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 6 of 6 &nbsp;·&nbsp; Paper 4 Practical &nbsp;·&nbsp; United School International
+</footer>
+
+</div><!-- /pad -->
+</div><!-- /wrap -->
+
+
+<script>
+/* ---------------- starter code ---------------- */
+const STARTER = `# Home Lesson 6 — bike hire  (Question 1, 32 marks)
+# Write your whole answer here, or in your own IDE (IDLE, Thonny, VS Code).
+# This runner saves your code in this browser as you type.
+
+`;
+
+const PAGE_KEY = '9618-oop-' + (document.body.dataset.lesson || location.pathname);
+const PY_URL   = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+const OFFLINE_MSG = 'The in-page Python runner could not load (this usually means no internet connection, or the network is blocking it).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.';
+const OUTPUT_LIMIT = 100000;   // characters — a runaway print loop is stopped here
+
+const editor  = document.getElementById('editor');
+const stdinEl = document.getElementById('stdin');
+const output  = document.getElementById('output');
+const runbtn  = document.getElementById('runbtn');
+const stopbtn = document.getElementById('stopbtn');
+const resetbt = document.getElementById('resetbtn');
+const statusEl= document.getElementById('pystatus');
+
+/* ---------------- saving work in this browser ---------------- */
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(PAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+let saved = loadSaved();
+let saveTimer = null;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { editor: editor.value, stdin: stdinEl.value, notes: {} };
+    document.querySelectorAll('textarea[data-save]').forEach(t => { data.notes[t.id] = t.value; });
+    try { localStorage.setItem(PAGE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — work is not saved */ }
+  }, 400);
+}
+editor.value  = (typeof saved.editor === 'string' && saved.editor.trim()) ? saved.editor : STARTER;
+stdinEl.value = typeof saved.stdin === 'string' ? saved.stdin : '';
+document.querySelectorAll('textarea[data-save]').forEach(t => {
+  if (saved.notes && typeof saved.notes[t.id] === 'string') t.value = saved.notes[t.id];
+  t.addEventListener('input', saveSoon);
+});
+editor.addEventListener('input', saveSoon);
+stdinEl.addEventListener('input', saveSoon);
+
+/* Tab inserts four spaces rather than moving focus */
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab' && !e.shiftKey) {
+    e.preventDefault();
+    const s = editor.selectionStart, t = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
+    editor.selectionStart = editor.selectionEnd = s + 4;
+    saveSoon();
+  }
+});
+
+resetbt.addEventListener('click', () => {
+  editor.value = STARTER;
+  output.textContent = 'Press Run to execute.';
+  saveSoon();
+});
+
+/* ---------------- Python, in a background worker ----------------
+   Running Python off the main thread means a loop that never ends
+   cannot freeze the page: Stop simply throws the worker away. */
+const WORKER_SRC = `
+let py = null, inputLines = [];
+const HARNESS = \`
+import sys, traceback
+
+def __run__(src):
+    g = {"__name__": "__main__"}
+    try:
+        code = compile(src, "your program", "exec")
+    except SyntaxError:
+        etype, evalue, tb = sys.exc_info()
+        print("".join(traceback.format_exception_only(etype, evalue)), end="", file=sys.stderr)
+        return
+    try:
+        exec(code, g)
+    except SystemExit:
+        pass
+    except EOFError:
+        print("EOFError: input() ran out of values.\\\\nType every value your program asks for in the Program input box, one per line, in order.", file=sys.stderr)
+    except BaseException:
+        etype, evalue, tb = sys.exc_info()
+        if tb is not None and tb.tb_next is not None:
+            tb = tb.tb_next
+        print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+\`;
+const dec = new TextDecoder();
+self.addEventListener('unhandledrejection', () => { if (!py) postMessage({ type: 'fail' }); });
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.url);
+      py = await loadPyodide({ indexURL: m.base });
+      py.setStdout({ write: b => { postMessage({ type: 'out', text: dec.decode(b) }); return b.length; } });
+      py.setStderr({ write: b => { postMessage({ type: 'err', text: dec.decode(b) }); return b.length; } });
+      py.setStdin({ stdin: () => {
+        if (!inputLines.length) return null;
+        const v = inputLines.shift();
+        postMessage({ type: 'echo', text: v });
+        return v;
+      } });
+      py.runPython(HARNESS);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'fail', text: String(err) });
+    }
+  } else if (m.type === 'run') {
+    inputLines = m.input.length ? m.input.replace(/\\n$/, '').split('\\n') : [];
+    try {
+      py.globals.set('__student_src__', m.src);
+      await py.runPythonAsync('__run__(__student_src__)');
+    } catch (ex) {
+      postMessage({ type: 'err', text: String(ex).trim().split('\\n').slice(-3).join('\\n') });
+    }
+    postMessage({ type: 'done' });
+  }
+};
+`;
+
+let worker = null, ready = false, running = false, outChars = 0, hadErr = false, slowTimer = null;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+function appendOut(text, cls) {
+  if (cls === 'err' && output.textContent.length && !output.textContent.endsWith('\n')) text = '\n' + text;
+  if (cls === 'err' && !output.textContent.length) text = text.replace(/^\n+/, '');
+  outChars += text.length;
+  const last = output.lastChild;
+  if (!cls && last && last.nodeType === 3) { last.appendData(text); }
+  else if (cls && last && last.nodeType === 1 && last.className === cls) { last.textContent += text; }
+  else {
+    const node = cls ? document.createElement('span') : document.createTextNode(text);
+    if (cls) { node.className = cls; node.textContent = text; }
+    output.appendChild(node);
+  }
+}
+function unavailable() {
+  ready = false;
+  statusEl.textContent = 'Python unavailable';
+  runbtn.disabled = true; stopbtn.disabled = true;
+  setOut(OFFLINE_MSG, 'err');
+}
+function finishRun(message) {
+  running = false;
+  clearTimeout(slowTimer);
+  runbtn.disabled = !ready; stopbtn.disabled = true;
+  if (message) statusEl.textContent = message;
+}
+
+function startWorker() {
+  ready = false;
+  runbtn.disabled = true;
+  let w;
+  try {
+    const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    w = new Worker(URL.createObjectURL(blob));
+  } catch (e) { unavailable(); return; }
+  worker = w;
+  w.onerror = () => { if (worker === w) unavailable(); };
+  w.onmessage = e => {
+    if (worker !== w) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ready = true; statusEl.textContent = 'Python ready'; runbtn.disabled = false;
+    } else if (m.type === 'fail') {
+      unavailable();
+    } else if (m.type === 'out' || m.type === 'err' || m.type === 'echo') {
+      if (!running) return;
+      if (m.type === 'err') hadErr = true;
+      appendOut(m.type === 'echo' ? m.text + '\n' : m.text, m.type === 'err' ? 'err' : (m.type === 'echo' ? 'in' : null));
+      if (outChars > OUTPUT_LIMIT) {
+        stopRun('\n\nStopped: the program printed far too much output. Is there a loop that never ends?');
+      }
+    } else if (m.type === 'done') {
+      if (!running) return;
+      if (!output.textContent.length) setOut('(the program produced no output)');
+      else if (output.lastChild) output.lastChild.textContent = output.lastChild.textContent.replace(/\n+$/, '');
+      finishRun(hadErr ? 'Error — read it carefully' : 'Finished');
+    }
+  };
+  statusEl.textContent = 'Python is loading…';
+  setTimeout(() => { if (worker === w && !ready) { w.terminate(); worker = null; unavailable(); } }, 90000);
+  w.postMessage({ type: 'init', url: PY_URL, base: PY_URL.replace(/[^/]*$/, '') });
+}
+
+function stopRun(note) {
+  if (!running) return;
+  if (worker) worker.terminate();
+  worker = null;
+  appendOut(note || '\n\nStopped.', 'err');
+  finishRun('Stopped — restarting Python…');
+  startWorker();
+}
+
+runbtn.addEventListener('click', () => {
+  if (!ready || running) return;
+  running = true; hadErr = false; outChars = 0;
+  output.textContent = '';
+  runbtn.disabled = true; stopbtn.disabled = false;
+  statusEl.textContent = 'Running…';
+  slowTimer = setTimeout(() => {
+    if (running) statusEl.textContent = 'Still running — press Stop if it is stuck in a loop';
+  }, 5000);
+  worker.postMessage({ type: 'run', src: editor.value, input: stdinEl.value });
+});
+stopbtn.addEventListener('click', () => stopRun());
+
+startWorker();
+
+/* ---------------- checkpoints ----------------
+   A wrong choice explains itself and is crossed out, but the right answer
+   is never shown — the student has to find it. Their first attempt is
+   recorded on the card so they can be honest about it. */
+document.querySelectorAll('.cp').forEach(cp => {
+  const fb    = cp.querySelector('.fb');
+  const texts = cp.querySelectorAll('.fbs > div');
+  const opts  = Array.from(cp.querySelectorAll('.opt'));
+  const first = cp.querySelector('.first');
+  let attempts = 0, solved = false;
+  opts.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      if (solved || btn.classList.contains('wrong')) return;
+      attempts++;
+      const ok = btn.dataset.ok === '1';
+      btn.classList.add(ok ? 'right' : 'wrong');
+      btn.setAttribute('aria-disabled', 'true');
+      fb.className = 'fb show ' + (ok ? 'good' : 'bad');
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite — try again. </strong>')
+                   + (texts[i] ? texts[i].innerHTML : '');
+      if (attempts === 1 && first) {
+        first.textContent = ok ? 'First attempt: correct' : 'First attempt: not correct';
+        first.className = 'first ' + (ok ? 'good' : 'bad');
+      }
+      if (ok) {
+        solved = true;
+        opts.forEach(b => { if (b !== btn) b.setAttribute('aria-disabled', 'true'); b.classList.add('done'); });
+      }
+    });
+  });
+});
+
+/* ---------------- exam clock ----------------
+   Advisory only: it locks nothing. Its state is kept in this browser so a
+   refreshed tab carries on from where it was. */
+(function () {
+  const LIMIT = 65 * 60 * 1000;
+  const KEY = PAGE_KEY + '-clock';
+  const box = document.getElementById('timer'), clock = document.getElementById('tclock');
+  const note = document.getElementById('tnote'), bStart = document.getElementById('tstart'), bReset = document.getElementById('treset');
+  if (!box) return;
+  let st = { running: false, endAt: 0, left: LIMIT };
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && typeof s.left === 'number') st = s; } catch (e) {}
+  let tick = null;
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  function remaining() { return st.running ? st.endAt - Date.now() : st.left; }
+  function fmt(ms) {
+    const neg = ms < 0, s = Math.floor(Math.abs(ms) / 1000);
+    const m = Math.floor(s / 60), r = s % 60;
+    return (neg ? '+' : '') + String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0');
+  }
+  function draw() {
+    const ms = remaining();
+    clock.textContent = fmt(ms > 0 ? Math.ceil(ms / 1000) * 1000 : ms);
+    box.classList.toggle('warn', ms > 0 && ms <= 10 * 60 * 1000);
+    box.classList.toggle('over', ms <= 0);
+    if (ms <= 0) note.textContent = 'Time. Note the part you reached in the Evidence Document, then finish untimed.';
+    else if (!st.running && ms === LIMIT) note.textContent = 'Read the whole question first — that is part of the 65 minutes.';
+    else if (!st.running) note.textContent = 'Paused.';
+    else if (ms <= 10 * 60 * 1000) note.textContent = 'Ten minutes or less. Make sure every part has something in it.';
+    else note.textContent = 'About two minutes per mark.';
+    bStart.textContent = st.running ? '❚❚ Pause' : (ms === LIMIT ? '▶ Start' : '▶ Resume');
+  }
+  function loop() { clearInterval(tick); if (st.running) tick = setInterval(draw, 250); draw(); }
+  bStart.addEventListener('click', () => {
+    if (st.running) { st.left = st.endAt - Date.now(); st.running = false; }
+    else { st.endAt = Date.now() + st.left; st.running = true; }
+    save(); loop();
+  });
+  bReset.addEventListener('click', () => { st = { running: false, endAt: 0, left: LIMIT }; save(); loop(); });
+  loop();
+})();
+</script>
+</body>
+</html>
