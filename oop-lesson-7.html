@@ -226,8 +226,8 @@ td[colspan]{font-family:var(--sans)}
   <div class="callout">
     <p class="bt">The three gaps this lesson closes</p>
     <p style="margin:0 0 8px"><strong>1. A class in pseudocode.</strong> <code>CLASS … ENDCLASS</code>, <code>PRIVATE</code> declarations, a constructor called <code>NEW</code>. Recent Paper 3s ask for it directly — June 2026 paper 32 gave five marks for nothing else.</p>
-    <p style="margin:0 0 8px"><strong>2. A class diagram with getters and setters.</strong> Paper 3 asked for one in November 2024 and again in two variants of June 2025. The November 2024 examiners reported that marks higher than three out of five were <strong>rare</strong>, because setters were written without a parameter and its data type.</p>
-    <p style="margin:0"><strong>3. Sorting objects, and output that depends on the class.</strong> Sorting is in almost every Paper 4. When the data is held in objects, you compare one field and move the whole object. And when a design says "if it is a helicopter, also output…", the June 2023 examiners found that most candidates simply output everything for every object.</p>
+    <p style="margin:0 0 8px"><strong>2. A class diagram with getters and setters.</strong> Paper 3 asked for one in November 2024 and again in two variants of June 2025. The November 2024 examiners reported that marks higher than three out of five were <strong>rare</strong>: the setters mark, which needs parameters with appropriate data types, was "rarely seen".</p>
+    <p style="margin:0"><strong>3. Sorting objects, and output that depends on the class.</strong> Sorting or searching appears in most Paper 4s. When the data is held in objects, you compare one field and move the whole object. And when a design says "if it is a helicopter, also output…", the June 2023 examiners reported that a common error was simply outputting all three values for every object, whatever its type.</p>
   </div>
 </section>
 
@@ -276,7 +276,7 @@ td[colspan]{font-family:var(--sans)}
     <tr><td>Write a class, a constructor, getters, setters and a child class in <strong>Cambridge pseudocode</strong>.</td><td>20.1</td><td>3</td></tr>
     <tr><td>Complete a <strong>class diagram</strong> with attributes, data types, setters and getters that match the names already given.</td><td>20.1</td><td>3</td></tr>
     <tr><td><strong>Sort an array of objects</strong> by one attribute: compare through a getter, swap the whole object, and use only the slots in use.</td><td>20.1, 19.1</td><td>4</td></tr>
-    <tr><td>Write output that <strong>depends on the class</strong> of the object, testing the child class before the parent.</td><td>20.1</td><td>4</td></tr>
+    <tr><td>Write output that <strong>depends on the class</strong> of the object.</td><td>20.1</td><td>4</td></tr>
   </table>
 </section>
 
@@ -373,6 +373,10 @@ td[colspan]{font-family:var(--sans)}
       GuardianName ← GivenGuardian
       ConsentGiven ← <span class="kw">FALSE</span>
    <span class="kw">ENDPROCEDURE</span>
+
+   <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> <span class="fn">SetConsentGiven</span>(NewConsent : <span class="nm">BOOLEAN</span>)
+      ConsentGiven ← NewConsent
+   <span class="kw">ENDPROCEDURE</span>
 <span class="kw">ENDCLASS</span>
 
 Ava ← <span class="kw">NEW</span> <span class="fn">JuniorMember</span>(<span class="st">"J5101"</span>, <span class="st">"Ava Brooks"</span>, <span class="nm">13</span>, <span class="st">"Helen Brooks"</span>)
@@ -437,7 +441,7 @@ ENDFUNCTION</span></button>
   </div>
 
   <h3>We do — a real Paper 3 question</h3>
-  <p>Complete the pseudocode in the box below before you open the mark scheme. It is worth five marks, and they are the five rules above.</p>
+  <p>Complete the pseudocode in the box below before you open the mark scheme. It is worth five marks, and almost all of them are about matching the names already printed in the question.</p>
   <div class="box pinkb">
     <p class="bt">9618 Paper 3, November 2022 (variant 1), Q11(b) &nbsp;[5]</p>
     <p style="margin:0 0 8px">In OOP, a class contains attributes and methods. Complete the pseudocode for the class <code>Car</code> to enable objects to be created. The class needs to include:</p>
@@ -513,19 +517,15 @@ ENDFUNCTION</span></button>
   <p>A class diagram is the class without the code inside the methods. Paper 3 gives you a partly completed one and a list of what it must include. The marks go to <strong>consistency</strong> with what is already printed. The June 2025 examiners put it plainly:</p>
   <div class="box">
     <p class="bt">June 2025 Paper 3 examiner report — Question 11(a)</p>
-    <p style="margin:0">"Common errors included inconsistency of naming across the various parts of the question. For example, the attribute for identification of the patient had to be <code>PatientID</code>, because the setter is given as <code>SetPatientID</code>. Similarly, its getter would need to be <code>GetPatientID()</code>. Also, any parameters given in the setters are expected to have different names to their respective attributes."</p>
+    <p style="margin:0">"Common errors included inconsistency of naming across the various parts of the question. For example, the attribute for identification of the patient had to be <code>PatientID</code>, because the setter is given as <code>SetPatientID</code>. Similarly, its getter would need to be <code>GetPatientID()</code>. Also, any parameters given in the setters are expected to have different names to their respective attributes …"</p>
   </div>
   <table>
     <tr><th style="width:26%">Part of the diagram</th><th style="width:38%">Write it like this</th><th>Why</th></tr>
     <tr><td><strong>Attribute</strong></td><td class="dt">Telephone : STRING</td><td>Name, colon, data type. The name comes from the setters and getters already printed.</td></tr>
     <tr><td><strong>Setter</strong></td><td class="dt">SetTelephone(Tel : STRING)</td><td>One parameter, with a different name from the attribute, <strong>and its data type</strong>. This is the mark November 2024 candidates "rarely" earned.</td></tr>
     <tr><td><strong>Getter</strong></td><td class="dt">GetTelephone()</td><td>Empty brackets. Its name is <code>Get</code> plus the attribute's exact name.</td></tr>
-    <tr><td><strong>Constructor</strong></td><td class="dt">Constructor()</td><td>When the question asks for "a method to create an object". <code>NEW(…)</code> is equally acceptable.</td></tr>
+    <tr><td><strong>Constructor</strong></td><td class="dt">Constructor()</td><td>When the question asks for "a method to create an object" — the form Cambridge's November 2024 mark scheme prints.</td></tr>
   </table>
-  <div class="callout">
-    <p class="bt">Choosing the data type</p>
-    <p style="margin:0">Decide from what the value <em>is</em>, and check it against anything already printed. A telephone number such as 01223658721 is a <code>STRING</code>: it starts with a zero and you never do arithmetic with it. But if a printed setter already says <code>SetPatientID(PatientNumber : INTEGER)</code>, then the attribute <em>is</em> an <code>INTEGER</code> — the question has told you, so your diagram must agree.</p>
-  </div>
 
   <div class="cp" data-cp="3">
     <div class="cph">Checkpoint 3</div>
@@ -536,7 +536,7 @@ ENDFUNCTION</span></button>
       <button class="opt" data-ok="0">C &nbsp;<code>RoomNumber : INTEGER</code></button>
       <button class="opt" data-ok="1">D &nbsp;<code>RoomNo : INTEGER</code></button>
       <div class="fbs" hidden>
-        <div>A sound rule of thumb on its own — but the diagram has already decided: the setter takes an <code>INTEGER</code> and stores it in this attribute, so the attribute must be an <code>INTEGER</code> too. In the June 2025 question on this page, Cambridge's mark scheme printed <code>PatientID : INTEGER</code> for exactly this reason.</div>
+        <div>A sound rule of thumb on its own — but the diagram has already decided: the setter takes an <code>INTEGER</code> and stores it in this attribute, so the attribute must be an <code>INTEGER</code> too. In the June 2025 question quoted above, Cambridge's mark scheme printed <code>PatientID : INTEGER</code>, matching the printed setter.</div>
         <div>The parameter is not the attribute. The attribute's name comes from the <em>method's</em> name — <code>SetRoomNo</code> sets <code>RoomNo</code> — and the parameter deliberately has a different name, which is what the examiners said they expect.</div>
         <div>Clearer, perhaps, but inconsistent: <code>SetRoomNo</code> and <code>GetRoomNo</code> are already printed, so the attribute they set and return is <code>RoomNo</code>. "Inconsistency of naming across the various parts of the question" is the first error the June 2025 examiners named.</div>
         <div>The name comes from <code>SetRoomNo</code> and <code>GetRoomNo</code>, and the type comes from the setter's parameter. Both agree with what is already printed, which is what the marks reward.</div>
@@ -544,6 +544,11 @@ ENDFUNCTION</span></button>
       <div class="fb" aria-live="polite"></div>
       <p class="first" aria-live="polite"></p>
     </div>
+  </div>
+
+  <div class="callout">
+    <p class="bt">Choosing the data type</p>
+    <p style="margin:0">Decide from what the value <em>is</em>, and check it against anything already printed. A telephone number such as 01223658721 is a <code>STRING</code>: it starts with a zero and you never do arithmetic with it. But if a printed setter already says <code>SetPatientID(PatientNumber : INTEGER)</code>, then the attribute <em>is</em> an <code>INTEGER</code> — the question has told you, so your diagram must agree.</p>
   </div>
 
   <h3>We do — a real Paper 3 question</h3>
@@ -571,9 +576,9 @@ ENDFUNCTION</span></button>
       <div class="cd parent" style="max-width:360px"><div class="cdh">SubstituteTeacher</div><div class="cdb">SubName : STRING<br><strong>Telephone : STRING</strong><br>InSchool : BOOLEAN</div><div class="cdb"><strong>SetSubName(StaffName : STRING)</strong><br>SetTelephone(Tel : STRING)<br><strong>SetInSchool(Present : BOOLEAN)</strong><br>GetSubName()<br><strong>GetTelephone()</strong><br><strong>GetInSchool()</strong></div></div>
     </div>
     <ul style="margin:12px 0 0">
-      <li><strong>Each mark is all-or-nothing for its group.</strong> Two setters with parameters and types, both correct, for one mark; two getters for another. One slip in a group loses that group.</li>
+      <li><strong>Each mark covers a whole group.</strong> Two setters with parameters and types, both correct, for one mark; two getters for another. One slip in a group loses that group.</li>
       <li><code>Telephone</code> is a <code>STRING</code> — the example starts with a zero. The printed <code>SetTelephone(Tel : STRING)</code> confirms it.</li>
-      <li>The parameter names (<code>StaffName</code>, <code>Present</code>) are Cambridge's choice; any sensible name that differs from the attribute is fine. The data types are not a choice.</li>
+      <li>The parameter names (<code>StaffName</code>, <code>Present</code>) are the examples Cambridge printed; its later mark schemes ask for "appropriate parameters and data types" (November 2024). The data types are not a choice.</li>
     </ul>
   </div>
   </details>
@@ -700,25 +705,25 @@ Mia 58</pre>
   <div class="cp" data-cp="4">
     <div class="cph">Checkpoint 4</div>
     <div class="cpb">
-      <p class="q">Players have the methods <code>GetName()</code>, <code>GetScore()</code> and <code>SetScore()</code>. Inside the sort, the comparison has decided that two players must change places:</p>
-<pre class="code" style="margin:0 0 12px"><span class="kw">if</span> Players[Index].<span class="fn">GetScore</span>() &gt; Players[Index + <span class="nm">1</span>].<span class="fn">GetScore</span>():
+      <p class="q">A different program stores <code>Player</code> objects in the array <code>Team</code>. Players have the methods <code>GetName()</code>, <code>GetScore()</code> and <code>SetScore()</code>. Inside its sort, the comparison has decided that the players in <code>Team[J]</code> and <code>Team[J + 1]</code> must change places. Which code does that correctly?</p>
+<pre class="code" style="margin:0 0 12px"><span class="kw">if</span> Team[J].<span class="fn">GetScore</span>() &gt; Team[J + <span class="nm">1</span>].<span class="fn">GetScore</span>():
     <span class="cm"># swap — which code goes here?</span></pre>
-      <button class="opt" data-ok="0">A<span class="oc">Temp = Players[Index].GetScore()
-Players[Index].SetScore(Players[Index + 1].GetScore())
-Players[Index + 1].SetScore(Temp)</span></button>
-      <button class="opt" data-ok="0">B<span class="oc">Players[Index] = Players[Index + 1]
-Players[Index + 1] = Players[Index]</span></button>
-      <button class="opt" data-ok="1">C<span class="oc">Temp = Players[Index]
-Players[Index] = Players[Index + 1]
-Players[Index + 1] = Temp</span></button>
-      <button class="opt" data-ok="0">D<span class="oc">Temp = Players[Index + 1]
-Players[Index] = Players[Index + 1]
-Players[Index + 1] = Temp</span></button>
+      <button class="opt" data-ok="0">A<span class="oc">Spare = Team[J].GetScore()
+Team[J].SetScore(Team[J + 1].GetScore())
+Team[J + 1].SetScore(Spare)</span></button>
+      <button class="opt" data-ok="0">B<span class="oc">Team[J] = Team[J + 1]
+Team[J + 1] = Team[J]</span></button>
+      <button class="opt" data-ok="1">C<span class="oc">Spare = Team[J]
+Team[J] = Team[J + 1]
+Team[J + 1] = Spare</span></button>
+      <button class="opt" data-ok="0">D<span class="oc">Spare = Team[J + 1]
+Team[J] = Team[J + 1]
+Team[J + 1] = Spare</span></button>
       <div class="fbs" hidden>
-        <div>It runs, and the scores come out in order — which is why it is dangerous. The scores have moved but the <em>names</em> have not, so Mia ends up holding Zane's score. This is the partial swap from the examiner reports, done with setters: one field moved, the rest left behind.</div>
-        <div>No temporary variable. The first line overwrites slot <code>Index</code>, so by the second line the original object is gone and both slots hold the same player. One player is duplicated, the other is lost.</div>
-        <div>The object in slot <code>Index</code> is kept safe in <code>Temp</code>, the other object moves down, and <code>Temp</code> fills the gap. Whole objects move, so every attribute stays with its owner.</div>
-        <div>Nearly the right shape, but <code>Temp</code> saves the wrong slot. <code>Temp</code> holds the object from <code>Index + 1</code>, and the last line puts that same object back where it came from — both slots end up with the same player. Save the slot you are about to overwrite.</div>
+        <div>It runs, and the scores come out in order — which is why it is dangerous. The scores have moved but the <em>names</em> have not. Put this swap into the Predict program and the players finish in their original order — Kai, Mia, Zane, Lola — holding 12, 31, 44, 58: Kai now has Zane's score and Mia has Kai's. This is the partial swap from the examiner reports, done with setters: one field moved, the rest left behind.</div>
+        <div>No temporary variable. The first line overwrites <code>Team[J]</code>, so by the second line the original object is gone and both slots hold the same player. One player is duplicated, the other is lost.</div>
+        <div>The object in <code>Team[J]</code> is kept safe in <code>Spare</code>, the other object moves down, and <code>Spare</code> fills the gap. Whole objects move, so every attribute stays with its owner.</div>
+        <div>Nearly the right shape, but <code>Spare</code> saves the wrong slot. <code>Spare</code> holds the object from <code>Team[J + 1]</code>, and the last line puts that same object back where it came from — both slots end up with the same player. Save the slot you are about to overwrite.</div>
       </div>
       <div class="fb" aria-live="polite"></div>
       <p class="first" aria-live="polite"></p>
@@ -835,7 +840,7 @@ Zane scored 12</pre>
     <ul style="margin-bottom:0">
       <li><strong>Ravi sorted into place with everyone else.</strong> The sort calls <code>GetScore()</code>, which <code>ProPlayer</code> inherits, so a pro and an ordinary player can share one array and one sort.</li>
       <li><code>Count = 5</code>, not 6. Slot 5 is still empty.</li>
-      <li>If every player printed a sponsor line, or the program crashed with <code>'Player' object has no attribute 'GetSponsor'</code>, the <code>isinstance</code> test is missing or testing the wrong class.</li>
+      <li>If the program crashed at Mia with <code>'Player' object has no attribute 'GetSponsor'</code>, the <code>isinstance</code> test is missing, or it tests <code>Player</code> instead of <code>ProPlayer</code> — an ordinary player has no sponsor to get.</li>
     </ul>
   </div>
   </details>
@@ -1018,7 +1023,7 @@ Zane scored 12</pre>
     <div class="tb">
       <p style="margin:0 0 8px"><strong>(B1)</strong> Write program code for the method <code>SortByCredits()</code>. <em>[4]</em></p>
       <p style="margin:0 0 8px"><strong>(B2)</strong> Write program code for the method <code>DisplayAll()</code>. <em>[3]</em></p>
-      <p style="margin:0 0 8px"><strong>(B3)</strong> Write a main program that carries out the seven steps of the test data, in order. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(B3)</strong> Write a main program that carries out the seven steps of the test data, in order. Name each object after what it is — <code>Sara</code>, not <code>member</code>. <em>[3]</em></p>
       <p style="margin:0"><strong>(B4)</strong> Take a screenshot showing the program running. It must show <strong>the test data and the complete output</strong>. <em>[2]</em></p>
     </div>
   </div>
@@ -1135,7 +1140,7 @@ ENDCLASS</pre>
       <tr><td class="mp">B1 MP2</td><td>Compares adjacent members' credits using <code>GetCredits()</code> on both objects.</td><td>1</td></tr>
       <tr><td class="mp">B1 MP3</td><td>…the comparison gives <strong>descending</strong> order (swaps when the first has fewer credits).</td><td>1</td></tr>
       <tr><td class="mp">B1 MP4</td><td>Swaps the whole <code>Member</code> objects, using a temporary variable.</td><td>1</td></tr>
-      <tr><td class="mp">B2 MP5</td><td><code>DisplayAll()</code> loops over the members in use and outputs each name, <code>" : "</code> and credits, using the getters and <code>str()</code>.</td><td>1</td></tr>
+      <tr><td class="mp">B2 MP5</td><td><code>DisplayAll()</code> loops over the members in use and outputs each name, <code>" : "</code> and credits, using the getters.</td><td>1</td></tr>
       <tr><td class="mp">B2 MP6</td><td>Checks whether each object is a <code>JuniorMember</code> — <code>isinstance(Item, JuniorMember)</code> // an overriding method in each class.</td><td>1</td></tr>
       <tr><td class="mp">B2 MP7</td><td>…<code>" (junior)"</code> appears for junior members only.</td><td>1</td></tr>
       <tr><td class="mp">B3 MP8</td><td>Club and four members created with the test data — Ava and Leo as <code>JuniorMember</code> objects — in variables not named after their class.</td><td>1</td></tr>
@@ -1152,9 +1157,9 @@ ENDCLASS</pre>
     <p style="margin:14px 0 6px"><strong>Not credited, however good the code looks</strong></p>
     <ul style="margin-bottom:0">
       <li><code>sort()</code>, <code>sorted()</code> or any in-built sort — <span class="cross">MP1 to MP4 lost</span>. The design asks for a bubble sort.</li>
-      <li>Comparing the objects themselves, <code>self.__Members[Index] &lt; …</code> — <span class="cross">MP2 lost</span>, and it is a <code>TypeError</code>.</li>
+      <li>Comparing the objects themselves, <code>self.__Members[Index] &lt; …</code> — <span class="cross">MP2 and MP3 lost</span>, and it is a <code>TypeError</code>.</li>
       <li>Swapping only the credits — <span class="cross">MP4 lost</span>. It is a partial swap; the names stay where they were.</li>
-      <li>Testing <code>isinstance(Item, Member)</code> — <span class="cross">MP7 lost</span>. Every member, junior or not, would be marked junior.</li>
+      <li>Testing <code>isinstance(Item, Member)</code> — <span class="cross">MP6 and MP7 lost</span>. Every member, junior or not, would be marked junior.</li>
       <li>Code pasted as an image — <span class="cross">no code marks at all</span>.</li>
     </ul>
   </div>
