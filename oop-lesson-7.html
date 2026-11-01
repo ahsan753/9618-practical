@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>20.1 OOP — Home Lesson 7: Classes on Paper, and Sorting Objects</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231D4ED8'/%3E%3Ctext x='16' y='23' font-family='Consolas,monospace' font-size='19' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --blue:#1D4ED8; --blue-dk:#1E3A8A; --pink:#EC4899; --pink-text:#BE185D; --ink:#0F172A;
+  --muted:#475569; --panel:#F1F5F9; --line:#CBD5E1; --white:#FFFFFF;
+  --good:#047857; --good-bg:#ECFDF5; --bad:#B91C1C; --bad-bg:#FEF2F2;
+  --warn:#B45309; --warn-bg:#FFFBEB;
+  --mono:"Cascadia Mono","Consolas","SF Mono",Menlo,monospace;
+  --sans:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{margin:0;background:#E2E8F0;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;background:var(--white);padding:0 0 64px;box-shadow:0 0 40px rgba(15,23,42,.10)}
+.pad{padding:0 40px}
+@media(max-width:640px){.pad{padding:0 18px} body{font-size:16px}}
+
+/* ---------- masthead ---------- */
+header.mast{background:var(--blue-dk);color:#fff;padding:30px 40px 26px}
+@media(max-width:640px){header.mast{padding:24px 18px}}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#BFDBFE;font-weight:700;margin:0 0 8px}
+.kicker a.home{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45)}
+.kicker a.home:hover{border-bottom-color:#fff}
+header.mast h1{margin:0;font-size:31px;line-height:1.2;font-weight:700}
+header.mast .sub{margin:10px 0 0;color:#DBEAFE;font-size:15px}
+.pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;color:#EFF6FF}
+
+/* ---------- sticky nav ---------- */
+nav.sticky{position:sticky;top:0;z-index:40;background:#fff;border-bottom:2px solid var(--line);padding:0 40px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+@media(max-width:640px){nav.sticky{padding:0 10px}}
+nav.sticky a{flex:0 0 auto;padding:11px 12px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+nav.sticky a:hover{color:var(--blue);border-bottom-color:#BFDBFE}
+
+/* ---------- sections ---------- */
+section{padding-top:34px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:800;margin:0 0 4px}
+h2 + .h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25}
+h3{font-size:19px;color:var(--blue-dk);margin:26px 0 8px}
+p{margin:0 0 13px}
+.lead{font-size:18px;color:var(--muted)}
+hr.rule{border:0;border-top:2px solid var(--panel);margin:38px 0 0}
+
+/* ---------- boxes ---------- */
+.box{border:1.5px solid var(--blue);background:var(--panel);border-radius:8px;padding:16px 20px;margin:16px 0}
+.box.pinkb{border-color:var(--pink);background:#fff}
+.box .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--blue);margin:0 0 8px}
+.box.pinkb .bt{color:var(--pink)}
+.callout{border-left:5px solid var(--warn);background:var(--warn-bg);padding:13px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+.callout .bt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--warn);margin:0 0 6px}
+.callout.ex{border-left-color:var(--bad);background:var(--bad-bg)}
+.callout.ex .bt{color:var(--bad)}
+ul,ol{margin:0 0 13px;padding-left:22px}
+li{margin:0 0 7px}
+code{font-family:var(--mono);background:#E2E8F0;padding:1px 5px;border-radius:4px;font-size:.92em}
+.tick{color:var(--good);font-weight:800}
+.cross{color:var(--bad);font-weight:800}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--blue);color:#fff;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+tbody tr:nth-child(even){background:#F8FAFC}
+td.dt{font-family:var(--mono);font-size:14px;white-space:nowrap}
+@media(max-width:640px){td.dt{white-space:normal;overflow-wrap:anywhere;font-size:13px} th,td{padding:7px 7px}}
+
+/* ---------- code ---------- */
+pre.code{background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:15px 18px;border-radius:8px;overflow-x:auto;margin:12px 0}
+pre.code .cm{color:#94A3B8;font-style:italic}
+pre.code .kw{color:#F0ABFC}
+pre.code .st{color:#86EFAC}
+pre.code .fn{color:#93C5FD}
+pre.code .nm{color:#FDE68A}
+.codelabel{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:5px 5px 0 0;margin-bottom:-4px}
+
+/* ---------- runner ---------- */
+.runner{border:2px solid var(--blue);border-radius:10px;overflow:hidden;margin:16px 0;background:#0F172A}
+.runbar{background:#1E293B;padding:8px 12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid #334155}
+.runbar .ttl{color:#93C5FD;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-right:auto}
+button{font-family:var(--sans);font-size:14px;font-weight:700;border:0;border-radius:6px;padding:7px 15px;cursor:pointer;background:var(--blue);color:#fff}
+button:hover{background:#1E40AF}
+button.ghost{background:#334155;color:#CBD5E1}
+button.ghost:hover{background:#475569}
+button:disabled{opacity:.5;cursor:not-allowed}
+textarea.editor{width:100%;min-height:250px;background:#0F172A;color:#E2E8F0;font-family:var(--mono);font-size:14.5px;line-height:1.6;border:0;padding:14px 18px;resize:vertical;display:block;outline:none;tab-size:4}
+.outwrap{border-top:1px solid #334155;background:#020617}
+.outlabel{color:#64748B;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:7px 18px 0}
+pre.out{margin:0;padding:6px 18px 14px;color:#E2E8F0;font-family:var(--mono);font-size:14px;line-height:1.55;white-space:pre-wrap;min-height:34px}
+pre.out .err{color:#FCA5A5}
+pre.out .ok{color:#86EFAC}
+.status{font-size:12.5px;color:#94A3B8;font-family:var(--mono)}
+
+/* ---------- interactive ---------- */
+.predict{border:2px dashed var(--pink);border-radius:9px;padding:16px 20px;margin:16px 0;background:#FDF2F8}
+.predict .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--pink);margin:0 0 8px}
+.predict textarea{width:100%;min-height:70px;font-family:var(--mono);font-size:14px;padding:9px 11px;border:1.5px solid var(--line);border-radius:6px;resize:vertical}
+
+.cp{border:2px solid var(--blue);border-radius:10px;margin:20px 0;overflow:hidden}
+.cp .cph{background:var(--blue);color:#fff;padding:9px 18px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.cp .cpb{padding:16px 20px}
+.cp .q{font-weight:700;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:11px 14px;margin:0 0 9px;cursor:pointer;font-family:var(--sans);font-size:15.5px;color:var(--ink);font-weight:400;line-height:1.45}
+.opt:hover{border-color:var(--blue);background:#EFF6FF}
+.opt code{background:#E2E8F0}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.fb{display:none;margin-top:10px;padding:12px 15px;border-radius:7px;font-size:15px;line-height:1.5}
+.fb.show{display:block}
+.fb.good{background:var(--good-bg);border-left:5px solid var(--good)}
+.fb.bad{background:var(--bad-bg);border-left:5px solid var(--bad)}
+
+details.rev{border:1.5px solid var(--line);border-radius:8px;margin:14px 0;background:#fff;overflow:hidden}
+details.rev>summary{cursor:pointer;padding:12px 18px;font-weight:700;color:var(--blue);background:var(--panel);list-style:none;font-size:15.5px}
+details.rev>summary::-webkit-details-marker{display:none}
+details.rev>summary::before{content:"▸ ";color:var(--pink);font-weight:800}
+details.rev[open]>summary::before{content:"▾ "}
+details.rev .body{padding:4px 18px 14px}
+
+.tier{border:1.5px solid var(--line);border-radius:9px;margin:14px 0;overflow:hidden}
+.tier .th{padding:9px 18px;font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#fff}
+.tier.s .th{background:#0891B2} .tier.i .th{background:var(--blue)} .tier.e .th{background:#7C3AED}
+.tier .tb{padding:14px 18px}
+
+.ms{border:1.5px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0}
+.ms table{margin:0;font-size:15px}
+.ms th{background:var(--blue-dk)}
+.mp{font-family:var(--mono);font-weight:700;color:var(--blue);white-space:nowrap}
+
+.steps{counter-reset:st;list-style:none;padding:0}
+.steps li{counter-increment:st;position:relative;padding-left:44px;margin-bottom:14px}
+.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+footer.foot{margin-top:40px;border-top:2px solid var(--panel);padding-top:18px;color:var(--muted);font-size:13px}
+.tn{border:1.5px dashed var(--muted);border-radius:8px;padding:14px 18px;margin:18px 0;background:#F8FAFC;font-size:14.5px}
+.tn .bt{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 0 7px}
+
+/* ---------- review fixes, Sept 2026 ---------- */
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-text);font-weight:800;margin:0 0 4px}
+h2.h{font-size:26px;font-weight:700;color:var(--blue);margin:0 0 14px;line-height:1.25;letter-spacing:normal;text-transform:none}
+.predict .bt,.box.pinkb .bt{color:var(--pink-text)}
+.tier.s .th{background:#0E7490}
+.outlabel{color:#94A3B8}
+.opt.wrong{text-decoration:line-through;text-decoration-color:rgba(185,28,28,.55);cursor:default}
+.opt.done{cursor:default}
+.opt.done:not(.right):not(.wrong){opacity:.6}
+.first{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--muted)}
+.first.good{color:var(--good)} .first.bad{color:var(--bad)}
+button.stop{background:#B91C1C} button.stop:hover{background:#991B1B}
+.inwrap{border-top:1px solid #334155;background:#0B1222}
+textarea.stdin{width:100%;min-height:44px;background:#0B1222;color:#FDE68A;font-family:var(--mono);font-size:14px;line-height:1.5;border:0;padding:4px 18px 10px;resize:vertical;display:block;outline:none}
+pre.out .in{color:#FDE68A}
+.savenote{font-size:13px;color:var(--muted);margin:-8px 0 12px}
+nav.sticky a{padding:11px 8px}
+
+/* ---------- Lesson 5 additions ---------- */
+td code,li code{overflow-wrap:anywhere}
+.opt .oc{display:block;margin:7px 0 0;font-family:var(--mono);font-size:13.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;background:#F1F5F9;padding:7px 10px;border-radius:5px;color:var(--ink)}
+.opt.right .oc{background:#D1FAE5} .opt.wrong .oc{background:#FEE2E2}
+.cd-wrap{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px}
+.cd{border:1.5px solid var(--ink);background:#fff;font-family:var(--mono);font-size:13.5px;line-height:1.55;min-width:0}
+.cd.parent{max-width:270px;margin:0 auto 18px}
+.cdh{font-weight:700;text-align:center;border-bottom:1.5px solid var(--ink);padding:5px 8px}
+.cdb{padding:6px 10px;border-bottom:1.5px solid var(--ink)} .cdb:last-child{border-bottom:0}
+.cd-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:640px){.cd-row{grid-template-columns:1fr} .cd.parent{max-width:none}}
+.blank{color:var(--muted)}
+
+/* ---------- Lesson 7 additions ---------- */
+.cmp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin:12px 0}
+.cmp pre.code{margin:0;height:calc(100% - 18px);font-size:13.5px}
+@media(max-width:760px){.cmp{grid-template-columns:minmax(0,1fr)}}
+pre.code.ps{border-left:5px solid var(--pink)}
+td[colspan]{font-family:var(--sans)}
+</style>
+<body data-lesson="L7">
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker"><a class="home" href="index.html">← All lessons</a> &nbsp;·&nbsp; Cambridge 9618 A Level · Unit 20.1 · Papers 3 and 4</p>
+  <h1>Object-Oriented Programming<br>Home Lesson 7 — Classes on Paper, and Sorting Objects</h1>
+  <p class="sub">Write a class the way Paper 3 wants it — in Cambridge pseudocode and as a class diagram — then sort the club's members and output each one according to its class. Submit the Evidence Document on Teams.</p>
+  <div class="pills">
+    <span class="pill">Home lesson 7 of 7</span>
+    <span class="pill">Part A: pseudocode · Part B: Python</span>
+    <span class="pill">Suggested time: 75 minutes</span>
+    <span class="pill">Submit: Evidence Document (.docx)</span>
+  </div>
+</header>
+
+<nav class="sticky">
+  <a href="#how">How this works</a>
+  <a href="#donow">Do Now</a>
+  <a href="#obj">Objectives</a>
+  <a href="#terms">Key terms</a>
+  <a href="#partA">A: Pseudocode</a>
+  <a href="#diagrams">A: Diagrams</a>
+  <a href="#predict">B: Predict</a>
+  <a href="#run">Run</a>
+  <a href="#investigate">Investigate</a>
+  <a href="#modify">Modify</a>
+  <a href="#technique">Exam technique</a>
+  <a href="#task">Your task</a>
+  <a href="#markscheme">Mark scheme</a>
+  <a href="#submit">Submit</a>
+</nav>
+
+<div class="pad">
+
+<!-- ========== HOW THIS WORKS ========== -->
+<section id="how">
+  <p class="eyebrow">Start here</p>
+  <h2 class="h">How this lesson works</h2>
+  <p class="lead">Six lessons taught you to build classes in Python. This one closes the three gaps that are left — two that Paper 3 tests on paper, and one that Paper 4 keeps setting.</p>
+  <ol class="steps">
+    <li><strong>Part A — on paper.</strong> Paper 3 asks for classes in <em>Cambridge pseudocode</em> and as <em>class diagrams</em>, never in Python. You will translate the <code>Member</code> class you already know, then do two real Paper 3 questions with their mark schemes.</li>
+    <li><strong>Part B — in Python.</strong> Predict, run, investigate, modify: sorting an array of <em>objects</em>, and writing output that depends on which class an object belongs to.</li>
+    <li><strong>Evidence it.</strong> Section A of the Evidence Document is typed pseudocode. Section B is your code pasted <em>as text</em> plus a screenshot. Submit the one document on Teams.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">The three gaps this lesson closes</p>
+    <p style="margin:0 0 8px"><strong>1. A class in pseudocode.</strong> <code>CLASS … ENDCLASS</code>, <code>PRIVATE</code> declarations, a constructor called <code>NEW</code>. Recent Paper 3s ask for it directly — June 2026 paper 32 gave five marks for nothing else.</p>
+    <p style="margin:0 0 8px"><strong>2. A class diagram with getters and setters.</strong> Paper 3 asked for one in November 2024 and again in two variants of June 2025. The November 2024 examiners reported that marks higher than three out of five were <strong>rare</strong>, because setters were written without a parameter and its data type.</p>
+    <p style="margin:0"><strong>3. Sorting objects, and output that depends on the class.</strong> Sorting is in almost every Paper 4. When the data is held in objects, you compare one field and move the whole object. And when a design says "if it is a helicopter, also output…", the June 2023 examiners found that most candidates simply output everything for every object.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== DO NOW ========== -->
+<section id="donow">
+  <p class="eyebrow">Retrieval · real past-paper questions</p>
+  <h2 class="h">Do Now — four minutes, no notes</h2>
+  <p>Both questions are real Cambridge Paper 3 questions on vocabulary from Lessons 1 to 5. Write your answers in your book, then reveal the mark scheme and mark them — strictly.</p>
+  <div class="box">
+    <p class="bt">Questions</p>
+    <ol style="margin-bottom:0">
+      <li>Complete the table by filling in the missing OOP terms and descriptions. <em>[4]</em><br><span style="font-size:14px;color:var(--muted)">9618 Paper 3, June 2026 (variant 2), Q11(b)</span>
+        <table style="margin:8px 0 4px">
+          <tr><th style="width:34%">OOP term</th><th>Description</th></tr>
+          <tr><td class="blank">……………………</td><td>A method used to change values in private attributes in a class.</td></tr>
+          <tr><td class="blank">……………………</td><td>An occurrence of a class during the execution of a program.</td></tr>
+          <tr><td>aggregation</td><td class="blank">……………………………………………</td></tr>
+          <tr><td>inheritance</td><td class="blank">……………………………………………</td></tr>
+        </table>
+      </li>
+      <li>Identify the object-oriented programming (OOP) feature whose function includes restricting external access to the data. <em>[1]</em><br><span style="font-size:14px;color:var(--muted)">9618 Paper 3, June 2025 (variant 1), Q11(b)(i)</span></li>
+    </ol>
+  </div>
+  <details class="rev"><summary>Mark scheme — mark your own answers</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:60px">Q</th><th>Accepted (Cambridge mark scheme wording)</th><th style="width:70px">Marks</th></tr>
+      <tr><td class="mp">1</td><td><strong>setter</strong><br><strong>instance(s) // object(s)</strong><br><strong>aggregation</strong> — one class/object contains another // hierarchy of nested classes/objects // process by which one class can contain other classes // represents a "has a" relationship between classes.<br><strong>inheritance</strong> — deriving new classes/objects on existing classes/objects // process in which the methods and data from one class, a superclass or base class, are copied to another class, a derived class // represents a hierarchy of derived classes // represents an "is a" relationship between classes.</td><td>4</td></tr>
+      <tr><td class="mp">2</td><td><strong>Encapsulation</strong></td><td>1</td></tr>
+    </table></div>
+    <p style="margin:10px 0 0"><strong>Aggregation is Lesson 4's containment.</strong> Cambridge uses both words: a <code>Club</code> <em>has</em> members, so it aggregates (contains) <code>Member</code> objects. "Has a" and "is a" are now accepted wordings in their own right — worth learning as the short form.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== OBJECTIVES ========== -->
+<section id="obj">
+  <p class="eyebrow">Where this is going</p>
+  <h2 class="h">Learning objectives</h2>
+  <table>
+    <tr><th style="width:56%">By the end of this lesson I can…</th><th>Syllabus</th><th>Paper</th></tr>
+    <tr><td>Write a class, a constructor, getters, setters and a child class in <strong>Cambridge pseudocode</strong>.</td><td>20.1</td><td>3</td></tr>
+    <tr><td>Complete a <strong>class diagram</strong> with attributes, data types, setters and getters that match the names already given.</td><td>20.1</td><td>3</td></tr>
+    <tr><td><strong>Sort an array of objects</strong> by one attribute: compare through a getter, swap the whole object, and use only the slots in use.</td><td>20.1, 19.1</td><td>4</td></tr>
+    <tr><td>Write output that <strong>depends on the class</strong> of the object, testing the child class before the parent.</td><td>20.1</td><td>4</td></tr>
+  </table>
+</section>
+
+<hr class="rule">
+
+<!-- ========== KEY TERMS ========== -->
+<section id="terms">
+  <p class="eyebrow">Vocabulary</p>
+  <h2 class="h">Key terms — Python next to Cambridge pseudocode</h2>
+  <p>Paper 3 is written in the pseudocode from Cambridge's <em>Pseudocode Guide for Teachers</em>, section 10. Every line on the left has exactly one partner on the right.</p>
+  <table>
+    <tr><th style="width:24%">What it does</th><th style="width:36%">Python (Paper 4)</th><th>Cambridge pseudocode (Paper 3)</th></tr>
+    <tr><td><strong>Class</strong></td><td class="dt">class Member:</td><td class="dt">CLASS Member<br>…<br>ENDCLASS</td></tr>
+    <tr><td><strong>Private attribute</strong></td><td class="dt">self.__Name = Name  # STRING</td><td class="dt">PRIVATE Name : STRING</td></tr>
+    <tr><td><strong>Constructor</strong></td><td class="dt">def __init__(self, GivenName):</td><td class="dt">PUBLIC PROCEDURE NEW(GivenName : STRING)<br>…<br>ENDPROCEDURE</td></tr>
+    <tr><td><strong>Assignment</strong></td><td class="dt">self.__Name = GivenName</td><td class="dt">Name ← GivenName</td></tr>
+    <tr><td><strong>Getter</strong></td><td class="dt">def GetName(self):<br>&nbsp;&nbsp;&nbsp;&nbsp;return self.__Name</td><td class="dt">PUBLIC FUNCTION GetName() RETURNS STRING<br>&nbsp;&nbsp;&nbsp;RETURN Name<br>ENDFUNCTION</td></tr>
+    <tr><td><strong>Setter</strong></td><td class="dt">def SetAge(self, NewAge):<br>&nbsp;&nbsp;&nbsp;&nbsp;self.__Age = NewAge</td><td class="dt">PUBLIC PROCEDURE SetAge(NewAge : INTEGER)<br>&nbsp;&nbsp;&nbsp;Age ← NewAge<br>ENDPROCEDURE</td></tr>
+    <tr><td><strong>Child class</strong></td><td class="dt">class JuniorMember(Member):</td><td class="dt">CLASS JuniorMember INHERITS Member</td></tr>
+    <tr><td><strong>Parent constructor</strong></td><td class="dt">super().__init__(GivenID, …)</td><td class="dt">SUPER.NEW(GivenID, …)</td></tr>
+    <tr><td><strong>Create an object</strong></td><td class="dt">Ava = JuniorMember(…)</td><td class="dt">Ava ← NEW JuniorMember(…)</td></tr>
+    <tr><td><strong>Call a method</strong></td><td class="dt">Ava.SetConsentGiven(True)</td><td class="dt">Ava.SetConsentGiven(TRUE)</td></tr>
+    <tr><td><strong>Class diagram</strong></td><td colspan="2">A box in three parts: the class name; the attributes, each with <code>: DATA TYPE</code>; the methods — the constructor, each setter <strong>with its parameter and data type</strong>, and each getter with empty brackets.</td></tr>
+  </table>
+  <div class="callout ex">
+    <p class="bt">What pseudocode leaves out — and what it adds</p>
+    <p style="margin:0">There is no <code>self</code> and no <code>__</code>: inside the class, an attribute is just its name. In exchange, <strong>everything has a data type</strong> — every attribute, every parameter, and every function's <code>RETURNS</code>. A Python habit of leaving types in comments becomes, in pseudocode, a mark you lose if the type is missing.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PART A: PSEUDOCODE ========== -->
+<section id="partA">
+  <p class="eyebrow">Part A · Paper 3 · I do</p>
+  <h2 class="h">Your Member class, in pseudocode</h2>
+  <p>This is the <code>Member</code> class from Lessons 1 and 2, cut down to one getter and one setter. Read the two versions line by line — the pseudocode is what Paper 3 would want if it asked you to "write pseudocode statements to declare the class".</p>
+  <div class="cmp">
+    <div><span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Member</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, MemberID, Name, Age):
+        self.__MemberID = MemberID   <span class="cm"># STRING</span>
+        self.__Name = Name           <span class="cm"># STRING</span>
+        self.__Age = Age             <span class="cm"># INTEGER</span>
+        self.__Credits = <span class="nm">0</span>           <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">GetName</span>(self):
+        <span class="kw">return</span> self.__Name
+
+    <span class="kw">def</span> <span class="fn">SetAge</span>(self, NewAge):
+        self.__Age = NewAge</pre></div>
+    <div><span class="codelabel">Pseudocode — Paper 3</span>
+<pre class="code ps"><span class="kw">CLASS</span> Member
+   <span class="kw">PRIVATE</span> MemberID : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> Name : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> Age : <span class="nm">INTEGER</span>
+   <span class="kw">PRIVATE</span> Credits : <span class="nm">INTEGER</span>
+
+   <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> <span class="kw">NEW</span>(GivenID : <span class="nm">STRING</span>,
+                        GivenName : <span class="nm">STRING</span>,
+                        GivenAge : <span class="nm">INTEGER</span>)
+      MemberID ← GivenID
+      Name ← GivenName
+      Age ← GivenAge
+      Credits ← <span class="nm">0</span>
+   <span class="kw">ENDPROCEDURE</span>
+
+   <span class="kw">PUBLIC</span> <span class="kw">FUNCTION</span> <span class="fn">GetName</span>() <span class="kw">RETURNS</span> <span class="nm">STRING</span>
+      <span class="kw">RETURN</span> Name
+   <span class="kw">ENDFUNCTION</span>
+
+   <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> <span class="fn">SetAge</span>(NewAge : <span class="nm">INTEGER</span>)
+      Age ← NewAge
+   <span class="kw">ENDPROCEDURE</span>
+<span class="kw">ENDCLASS</span></pre></div>
+  </div>
+  <h3>The five rules the mark schemes check</h3>
+  <ol>
+    <li><strong><code>CLASS</code> name … <code>ENDCLASS</code>.</strong> A mark of its own in both questions you will see today. Forgetting <code>ENDCLASS</code> loses it.</li>
+    <li><strong>The attributes are declared first, before the constructor</strong>, each one <code>PRIVATE Name : TYPE</code>. The June 2026 mark scheme gives this a mark: "correct attribute declaration section before the constructor".</li>
+    <li><strong>The constructor is <code>PUBLIC PROCEDURE NEW(…)</code> … <code>ENDPROCEDURE</code></strong> — a procedure, because it returns nothing. Every parameter has a name <em>and</em> a type.</li>
+    <li><strong>A parameter must not have the same name as its attribute.</strong> In Python <code>self.__Name = Name</code> works, because <code>self.</code> tells them apart. In pseudocode <code>Name ← Name</code> means nothing. The June 2026 mark scheme says the parameters can have "any names … except" the attributes' names, and the June 2025 examiners repeated it for setters. Use <code>GivenName</code>, <code>NewName</code>, <code>CarMake</code> — anything else.</li>
+    <li><strong>Attribute on the left of the arrow.</strong> <code>Name ← GivenName</code> stores the parameter. <code>GivenName ← Name</code> throws it away. Fixed values such as <code>Credits ← 0</code> are assigned in <code>NEW</code>, not passed in.</li>
+  </ol>
+  <p>A child class adds <code>INHERITS</code> to the header and calls <code>SUPER.NEW(…)</code> as the first line of its constructor — exactly Lesson 5's <code>super().__init__(…)</code>:</p>
+  <span class="codelabel">Pseudocode — Paper 3</span>
+<pre class="code ps"><span class="kw">CLASS</span> JuniorMember <span class="kw">INHERITS</span> Member
+   <span class="kw">PRIVATE</span> GuardianName : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> ConsentGiven : <span class="nm">BOOLEAN</span>
+
+   <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> <span class="kw">NEW</span>(GivenID : <span class="nm">STRING</span>, GivenName : <span class="nm">STRING</span>, GivenAge : <span class="nm">INTEGER</span>,
+                        GivenGuardian : <span class="nm">STRING</span>)
+      <span class="kw">SUPER</span>.<span class="kw">NEW</span>(GivenID, GivenName, GivenAge)
+      GuardianName ← GivenGuardian
+      ConsentGiven ← <span class="kw">FALSE</span>
+   <span class="kw">ENDPROCEDURE</span>
+<span class="kw">ENDCLASS</span>
+
+Ava ← <span class="kw">NEW</span> <span class="fn">JuniorMember</span>(<span class="st">"J5101"</span>, <span class="st">"Ava Brooks"</span>, <span class="nm">13</span>, <span class="st">"Helen Brooks"</span>)
+Ava.<span class="fn">SetConsentGiven</span>(<span class="kw">TRUE</span>)</pre>
+
+  <div class="cp" data-cp="1">
+    <div class="cph">Checkpoint 1</div>
+    <div class="cpb">
+      <p class="q">A class <code>Book</code> has the private attributes <code>Title : STRING</code> and <code>Pages : INTEGER</code>. Its constructor takes both values as parameters. Which constructor would earn every mark?</p>
+      <button class="opt" data-ok="0">A<span class="oc">PUBLIC PROCEDURE NEW(Title : STRING, Pages : INTEGER)
+   Title ← Title
+   Pages ← Pages
+ENDPROCEDURE</span></button>
+      <button class="opt" data-ok="0">B<span class="oc">PUBLIC PROCEDURE NEW(NewTitle : STRING, NewPages : INTEGER)
+   NewTitle ← Title
+   NewPages ← Pages
+ENDPROCEDURE</span></button>
+      <button class="opt" data-ok="1">C<span class="oc">PUBLIC PROCEDURE NEW(NewTitle : STRING, NewPages : INTEGER)
+   Title ← NewTitle
+   Pages ← NewPages
+ENDPROCEDURE</span></button>
+      <button class="opt" data-ok="0">D<span class="oc">PUBLIC FUNCTION NEW(NewTitle : STRING, NewPages : INTEGER) RETURNS Book
+   Title ← NewTitle
+   Pages ← NewPages
+ENDFUNCTION</span></button>
+      <div class="fbs" hidden>
+        <div>This is the Python habit carried across. With no <code>self.</code> to tell them apart, <code>Title ← Title</code> assigns a name to itself and the attribute is never set. Cambridge's June 2026 mark scheme allows "any names … except" the attribute names for the parameters, so the parameter mark and the assignment mark both go.</div>
+        <div>The names are fine — but the arrows point the wrong way. <code>NewTitle ← Title</code> copies the (empty) attribute into the parameter and then throws it away. The attribute always goes on the left: it is the thing being given a value.</div>
+        <div>Parameters with their own names and types, and each attribute on the left of its arrow. Notice that no <code>RETURN</code> appears anywhere: a constructor sets up the object and hands nothing back.</div>
+        <div>A constructor is a <strong>procedure</strong>, <code>PUBLIC PROCEDURE NEW</code>. Creating the object is done by <code>NEW Book(…)</code> in the calling code, not by a return value — the mark scheme's "begin and end the constructor as <code>PUBLIC PROCEDURE NEW … ENDPROCEDURE</code>" is lost.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="cp" data-cp="2">
+    <div class="cph">Checkpoint 2</div>
+    <div class="cpb">
+      <p class="q">Still in <code>Book</code>. Which is the getter for <code>Pages</code>?</p>
+      <button class="opt" data-ok="0">A<span class="oc">PUBLIC PROCEDURE GetPages()
+   OUTPUT Pages
+ENDPROCEDURE</span></button>
+      <button class="opt" data-ok="0">B<span class="oc">PUBLIC FUNCTION GetPages(Pages : INTEGER) RETURNS INTEGER
+   RETURN Pages
+ENDFUNCTION</span></button>
+      <button class="opt" data-ok="0">C<span class="oc">PUBLIC FUNCTION GetPages() RETURNS STRING
+   RETURN Pages
+ENDFUNCTION</span></button>
+      <button class="opt" data-ok="1">D<span class="oc">PUBLIC FUNCTION GetPages() RETURNS INTEGER
+   RETURN Pages
+ENDFUNCTION</span></button>
+      <div class="fbs" hidden>
+        <div>Lesson 2's trap in a new language. A getter <strong>returns</strong> the value to whatever called it; <code>OUTPUT</code> only displays it, and the caller gets nothing back to store or compare. And something that returns a value is a <code>FUNCTION</code>, not a <code>PROCEDURE</code>.</div>
+        <div>The single most repeated OOP error in the Paper 4 reports — a parameter on a getter — and it is just as wrong on paper. A getter needs nothing from the caller. Worse, the parameter is called <code>Pages</code>, so <code>RETURN Pages</code> would return the caller's value, not the attribute.</div>
+        <div>Close — but <code>Pages</code> is an <code>INTEGER</code>, so the function must say <code>RETURNS INTEGER</code>. The data type in <code>RETURNS</code> has to match the attribute it hands back.</div>
+        <div>A function, no parameter, the right return type, and one <code>RETURN</code> of the attribute unchanged. This is the template for every getter on Paper 3.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>We do — a real Paper 3 question</h3>
+  <p>Complete the pseudocode in the box below before you open the mark scheme. It is worth five marks, and they are the five rules above.</p>
+  <div class="box pinkb">
+    <p class="bt">9618 Paper 3, November 2022 (variant 1), Q11(b) &nbsp;[5]</p>
+    <p style="margin:0 0 8px">In OOP, a class contains attributes and methods. Complete the pseudocode for the class <code>Car</code> to enable objects to be created. The class needs to include:</p>
+    <ul style="margin:0 0 8px">
+      <li>string attributes to store the make, model, body type and fuel type</li>
+      <li>an integer attribute to store the number of cars of that type built.</li>
+    </ul>
+    <p style="margin:0 0 10px">The attributes must be available only through the methods of the class.</p>
+<pre class="code ps"><span class="kw">CLASS</span> ………………………
+   <span class="kw">PRIVATE</span> Make : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> ……………………………………………
+   ……………………………………………………………
+   ……………………………………………………………
+   ……………………………………………………………
+   <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> <span class="kw">New</span>(CarMake : <span class="nm">STRING</span>, …………………………… ,
+                        ……………………………)
+      Make ← ………………………
+      Model ← ………………………
+      BodyType ← CarBodyType
+      Fuel ← <span class="st">""</span>
+      NumberBuilt ← <span class="nm">0</span>
+   <span class="kw">ENDPROCEDURE</span>
+   <span class="fn">GetFuel</span>()
+   <span class="fn">GetNumberBuilt</span>()
+………………………</pre>
+  </div>
+  <div class="predict">
+    <p class="bt">Your answer — commit it before you open the mark scheme</p>
+    <textarea id="pred1" data-save placeholder="Write the whole class, filling every gap…" style="min-height:150px"></textarea>
+  </div>
+  <details class="rev"><summary>Cambridge mark scheme [5]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>One mark for each point</th></tr>
+      <tr><td class="mp">1</td><td><code>Car</code> and <code>ENDCLASS</code></td></tr>
+      <tr><td class="mp">2</td><td>Four declarations — must use the identifiers used in the assignments</td></tr>
+      <tr><td class="mp">3</td><td>Constructor header — must use <code>CarBodyType</code></td></tr>
+      <tr><td class="mp">4</td><td>Two assignments — must use <code>CarMake</code></td></tr>
+      <tr><td class="mp">5</td><td>Constructor identifier for the car model and the identifier in the <code>Model</code> assignment statement match</td></tr>
+    </table></div>
+<pre class="code ps"><span class="kw">CLASS</span> Car
+   <span class="kw">PRIVATE</span> Make : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> Model : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> BodyType : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> Fuel : <span class="nm">STRING</span>
+   <span class="kw">PRIVATE</span> NumberBuilt : <span class="nm">INTEGER</span>
+   <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> <span class="kw">NEW</span>(CarMake : <span class="nm">STRING</span>,
+                        CarModel : <span class="nm">STRING</span>, CarBodyType : <span class="nm">STRING</span>)
+      Make ← CarMake
+      Model ← CarModel
+      BodyType ← CarBodyType
+      Fuel ← <span class="st">""</span>
+      NumberBuilt ← <span class="nm">0</span>
+   <span class="kw">ENDPROCEDURE</span>
+   <span class="fn">GetFuel</span>()
+   <span class="fn">GetNumberBuilt</span>()
+<span class="kw">ENDCLASS</span></pre>
+    <ul style="margin:12px 0 0">
+      <li><strong>Every mark is about matching names.</strong> The declarations must be <code>Model</code>, <code>BodyType</code>, <code>Fuel</code> and <code>NumberBuilt</code>, because those are the names the constructor already assigns to. The parameter you invent for the model — <code>CarModel</code> here — must be the same word in the header and in <code>Model ← CarModel</code>.</li>
+      <li><strong>The question gives you the pattern.</strong> <code>CarMake</code> and <code>CarBodyType</code> are printed, so the model's parameter is naturally <code>CarModel</code>. Read what is already on the page before you invent anything.</li>
+      <li><code>NumberBuilt</code> is the one <code>INTEGER</code>; the other four are <code>STRING</code>. And <code>Fuel</code> and <code>NumberBuilt</code> are <em>not</em> parameters — they are fixed starting values, set inside the constructor.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PART A: DIAGRAMS ========== -->
+<section id="diagrams">
+  <p class="eyebrow">Part A · Paper 3 · We do</p>
+  <h2 class="h">Class diagrams — the names are already on the page</h2>
+  <p>A class diagram is the class without the code inside the methods. Paper 3 gives you a partly completed one and a list of what it must include. The marks go to <strong>consistency</strong> with what is already printed. The June 2025 examiners put it plainly:</p>
+  <div class="box">
+    <p class="bt">June 2025 Paper 3 examiner report — Question 11(a)</p>
+    <p style="margin:0">"Common errors included inconsistency of naming across the various parts of the question. For example, the attribute for identification of the patient had to be <code>PatientID</code>, because the setter is given as <code>SetPatientID</code>. Similarly, its getter would need to be <code>GetPatientID()</code>. Also, any parameters given in the setters are expected to have different names to their respective attributes."</p>
+  </div>
+  <table>
+    <tr><th style="width:26%">Part of the diagram</th><th style="width:38%">Write it like this</th><th>Why</th></tr>
+    <tr><td><strong>Attribute</strong></td><td class="dt">Telephone : STRING</td><td>Name, colon, data type. The name comes from the setters and getters already printed.</td></tr>
+    <tr><td><strong>Setter</strong></td><td class="dt">SetTelephone(Tel : STRING)</td><td>One parameter, with a different name from the attribute, <strong>and its data type</strong>. This is the mark November 2024 candidates "rarely" earned.</td></tr>
+    <tr><td><strong>Getter</strong></td><td class="dt">GetTelephone()</td><td>Empty brackets. Its name is <code>Get</code> plus the attribute's exact name.</td></tr>
+    <tr><td><strong>Constructor</strong></td><td class="dt">Constructor()</td><td>When the question asks for "a method to create an object". <code>NEW(…)</code> is equally acceptable.</td></tr>
+  </table>
+  <div class="callout">
+    <p class="bt">Choosing the data type</p>
+    <p style="margin:0">Decide from what the value <em>is</em>, and check it against anything already printed. A telephone number such as 01223658721 is a <code>STRING</code>: it starts with a zero and you never do arithmetic with it. But if a printed setter already says <code>SetPatientID(PatientNumber : INTEGER)</code>, then the attribute <em>is</em> an <code>INTEGER</code> — the question has told you, so your diagram must agree.</p>
+  </div>
+
+  <div class="cp" data-cp="3">
+    <div class="cph">Checkpoint 3</div>
+    <div class="cpb">
+      <p class="q">A hotel's class diagram for <code>Booking</code> already shows the setter <code>SetRoomNo(NewRoom : INTEGER)</code> and the getter <code>GetRoomNo()</code>. Rooms are identified by a 4-digit number, for example 2105. Which attribute line earns the mark?</p>
+      <button class="opt" data-ok="0">A &nbsp;<code>RoomNo : STRING</code></button>
+      <button class="opt" data-ok="0">B &nbsp;<code>NewRoom : INTEGER</code></button>
+      <button class="opt" data-ok="0">C &nbsp;<code>RoomNumber : INTEGER</code></button>
+      <button class="opt" data-ok="1">D &nbsp;<code>RoomNo : INTEGER</code></button>
+      <div class="fbs" hidden>
+        <div>A sound rule of thumb on its own — but the diagram has already decided: the setter takes an <code>INTEGER</code> and stores it in this attribute, so the attribute must be an <code>INTEGER</code> too. In the June 2025 question on this page, Cambridge's mark scheme printed <code>PatientID : INTEGER</code> for exactly this reason.</div>
+        <div>The parameter is not the attribute. The attribute's name comes from the <em>method's</em> name — <code>SetRoomNo</code> sets <code>RoomNo</code> — and the parameter deliberately has a different name, which is what the examiners said they expect.</div>
+        <div>Clearer, perhaps, but inconsistent: <code>SetRoomNo</code> and <code>GetRoomNo</code> are already printed, so the attribute they set and return is <code>RoomNo</code>. "Inconsistency of naming across the various parts of the question" is the first error the June 2025 examiners named.</div>
+        <div>The name comes from <code>SetRoomNo</code> and <code>GetRoomNo</code>, and the type comes from the setter's parameter. Both agree with what is already printed, which is what the marks reward.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>We do — a real Paper 3 question</h3>
+  <div class="box pinkb">
+    <p class="bt">9618 Paper 3, November 2022 (variant 2), Q10(b) &nbsp;[3]</p>
+    <p style="margin:0 0 8px">A school has a program written using OOP to maintain its staff and student records. The object <code>SubstituteTeacher</code> allows the details of the school's substitute teachers to be stored. This includes their full name, telephone number and whether or not they are in school today. For example: <code>SubName</code> Sarah Jones · <code>Telephone</code> 01223658721 · <code>InSchool</code> TRUE.</p>
+    <p style="margin:0 0 10px"><strong>Complete the diagram for the object <code>SubstituteTeacher</code>, including appropriate properties and their getters and setters.</strong></p>
+    <div class="cd-wrap">
+      <div class="cd parent" style="max-width:330px"><div class="cdh">SubstituteTeacher</div><div class="cdb">SubName : STRING<br><span class="blank">…………………………</span><br>InSchool : BOOLEAN</div><div class="cdb"><span class="blank">…………………………</span><br>SetTelephone(Tel : STRING)<br><span class="blank">…………………………</span><br>GetSubName()<br><span class="blank">…………………………</span><br><span class="blank">…………………………</span></div></div>
+    </div>
+  </div>
+  <div class="predict">
+    <p class="bt">Your answer — commit it before you open the mark scheme</p>
+    <textarea id="pred2" data-save placeholder="What goes on each dotted line?"></textarea>
+  </div>
+  <details class="rev"><summary>Cambridge mark scheme [3]</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>One mark for each point</th></tr>
+      <tr><td class="mp">1</td><td>properties correct</td></tr>
+      <tr><td class="mp">2</td><td>setters correct</td></tr>
+      <tr><td class="mp">3</td><td>getters correct</td></tr>
+    </table></div>
+    <div class="cd-wrap" style="margin-top:12px">
+      <div class="cd parent" style="max-width:360px"><div class="cdh">SubstituteTeacher</div><div class="cdb">SubName : STRING<br><strong>Telephone : STRING</strong><br>InSchool : BOOLEAN</div><div class="cdb"><strong>SetSubName(StaffName : STRING)</strong><br>SetTelephone(Tel : STRING)<br><strong>SetInSchool(Present : BOOLEAN)</strong><br>GetSubName()<br><strong>GetTelephone()</strong><br><strong>GetInSchool()</strong></div></div>
+    </div>
+    <ul style="margin:12px 0 0">
+      <li><strong>Each mark is all-or-nothing for its group.</strong> Two setters with parameters and types, both correct, for one mark; two getters for another. One slip in a group loses that group.</li>
+      <li><code>Telephone</code> is a <code>STRING</code> — the example starts with a zero. The printed <code>SetTelephone(Tel : STRING)</code> confirms it.</li>
+      <li>The parameter names (<code>StaffName</code>, <code>Present</code>) are Cambridge's choice; any sensible name that differs from the attribute is fine. The data types are not a choice.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PART B: PREDICT ========== -->
+<section id="predict">
+  <p class="eyebrow">Part B · Paper 4 · PRIMM step 1</p>
+  <h2 class="h">Predict — sorting an array of objects</h2>
+  <p>Back to Python. Read this program carefully. <strong>Do not run it yet.</strong> Write down exactly what you think it will output — every line.</p>
+  <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Player</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Name, Score):
+        self.__Name = Name        <span class="cm"># STRING</span>
+        self.__Score = Score      <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">GetName</span>(self):
+        <span class="kw">return</span> self.__Name
+
+    <span class="kw">def</span> <span class="fn">GetScore</span>(self):
+        <span class="kw">return</span> self.__Score
+
+Players = [<span class="kw">None</span>] * <span class="nm">6</span>                  <span class="cm"># ARRAY[0:5] OF Player</span>
+Players[<span class="nm">0</span>] = <span class="nm">Player</span>(<span class="st">"Kai"</span>, <span class="nm">31</span>)
+Players[<span class="nm">1</span>] = <span class="nm">Player</span>(<span class="st">"Mia"</span>, <span class="nm">58</span>)
+Players[<span class="nm">2</span>] = <span class="nm">Player</span>(<span class="st">"Zane"</span>, <span class="nm">12</span>)
+Players[<span class="nm">3</span>] = <span class="nm">Player</span>(<span class="st">"Lola"</span>, <span class="nm">44</span>)
+Count = <span class="nm">4</span>                             <span class="cm"># how many slots are in use</span>
+
+<span class="kw">for</span> Pass <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count - <span class="nm">1</span>):
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count - <span class="nm">1</span> - Pass):
+        <span class="kw">if</span> Players[Index].<span class="fn">GetScore</span>() &gt; Players[Index + <span class="nm">1</span>].<span class="fn">GetScore</span>():
+            Temp = Players[Index]
+            Players[Index] = Players[Index + <span class="nm">1</span>]
+            Players[Index + <span class="nm">1</span>] = Temp
+
+<span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count):
+    <span class="fn">print</span>(Players[Index].<span class="fn">GetName</span>() + <span class="st">" "</span> + <span class="fn">str</span>(Players[Index].<span class="fn">GetScore</span>()))</pre>
+  <div class="predict">
+    <p class="bt">Commit your prediction before you scroll</p>
+    <textarea id="pred3" data-save placeholder="Type every line you expect…"></textarea>
+    <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Three harder questions. Is the result in ascending or descending order — and which single character decides that? The array has six slots: why do the loops use <code>Count</code> and not 6? And when two players swap places, does each player keep their own score?</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== RUN ========== -->
+<section id="run">
+  <p class="eyebrow">PRIMM · Step 2</p>
+  <h2 class="h">Run</h2>
+  <p>Now run it and compare the real output with your prediction.</p>
+
+  <div class="runner">
+    <div class="runbar">
+      <span class="ttl">Python 3 — try it</span>
+      <span class="status" id="pystatus">Python is loading…</span>
+      <button id="runbtn" disabled>▶ Run</button>
+      <button class="stop" id="stopbtn" disabled>■ Stop</button>
+      <button class="ghost" id="resetbtn">Reset code</button>
+    </div>
+    <textarea class="editor" id="editor" spellcheck="false" aria-label="Python code editor"></textarea>
+    <div class="inwrap">
+      <label class="outlabel" for="stdin" style="display:block">Program input — only if your code uses input(): one value per line, in order</label>
+      <textarea class="stdin" id="stdin" spellcheck="false" rows="2"></textarea>
+    </div>
+    <div class="outwrap">
+      <div class="outlabel">Output</div>
+      <pre class="out" id="output">Press Run to execute.</pre>
+    </div>
+  </div>
+  <p class="savenote">Your code and your answers are saved in this browser, so closing the tab does not lose them. If a program never finishes, press <strong>Stop</strong>.</p>
+
+  <details class="rev"><summary>Check your prediction</summary>
+  <div class="body">
+<pre class="code">Zane 12
+Kai 31
+Lola 44
+Mia 58</pre>
+    <ul style="margin-bottom:0">
+      <li><strong>Ascending</strong> — lowest score first. The <code>&gt;</code> in the comparison decides it: when the left player has the <em>higher</em> score, they swap, so high scores drift to the end. Change it to <code>&lt;</code> and the order reverses.</li>
+      <li><strong>Every player keeps their own score.</strong> The swap moves the whole <code>Player</code> object, so Mia and 58 travel together. Nothing about a player is ever split up.</li>
+      <li><strong><code>Count</code>, not 6,</strong> because slots 4 and 5 hold <code>None</code> — no player at all. The next box shows what happens if you forget.</li>
+    </ul>
+  </div>
+  </details>
+
+  <div class="callout ex">
+    <p class="bt">Try these two — then read why they matter</p>
+    <p style="margin:0 0 8px"><strong>1.</strong> Change <code>Count = 4</code> to <code>Count = 6</code> and run it. You get <code>AttributeError: 'NoneType' object has no attribute 'GetScore'</code> — the sort reached an empty slot and asked it for a score. Paper 4 examiners report candidates sorting the empty elements of an array (November 2022): with objects it does not even get that far — it crashes. Put it back to 4.</p>
+    <p style="margin:0"><strong>2.</strong> Change the comparison to <code>if Players[Index] &gt; Players[Index + 1]:</code> and run it. <code>TypeError: '&gt;' not supported between instances of 'Player' and 'Player'</code>. Python has no idea what makes one player "bigger" than another. <strong>You compare a field — through its getter — never the objects themselves.</strong> Put it back.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== INVESTIGATE ========== -->
+<section id="investigate">
+  <p class="eyebrow">PRIMM · Step 3</p>
+  <h2 class="h">Investigate — sorting objects, and output by class</h2>
+
+  <h3>1. The anatomy of a bubble sort on objects</h3>
+<pre class="code"><span class="cm"># 1. only the slots in use</span>
+<span class="kw">for</span> Pass <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count - <span class="nm">1</span>):
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count - <span class="nm">1</span> - Pass):
+        <span class="cm"># 2. compare a FIELD, through the getters</span>
+        <span class="kw">if</span> Players[Index].<span class="fn">GetScore</span>() &gt; Players[Index + <span class="nm">1</span>].<span class="fn">GetScore</span>():
+            <span class="cm"># 3. swap the WHOLE object, with a temporary variable</span>
+            Temp = Players[Index]
+            Players[Index] = Players[Index + <span class="nm">1</span>]
+            Players[Index + <span class="nm">1</span>] = Temp</pre>
+  <ol>
+    <li><strong>Only the slots in use.</strong> The loops run up to the number of objects actually stored — <code>Count</code> here, <code>NumberOfMembers</code> in the club. Each pass pushes the largest remaining value to the end, so the inner loop can stop one place earlier each time (<code>- Pass</code>).</li>
+    <li><strong>Compare a field, through its getter.</strong> <code>GetScore()</code> on both objects. The attribute is private, so <code>Players[Index].__Score</code> is not an option — and comparing the objects themselves is a <code>TypeError</code>.</li>
+    <li><strong>Swap the whole object, with a temporary variable.</strong> Three lines, every time. The object carries all its attributes with it, so nothing can be left behind.</li>
+  </ol>
+  <div class="callout">
+    <p class="bt">Why this matters on Paper 4 — partial swaps</p>
+    <p style="margin:0">When the same data is held in a 2D array or in parallel arrays, every field has to be swapped separately, and candidates forget some. November 2024, paper 42: "a common error was only swapping the index that was being used in the comparison, for example the game level was swapped for two of the players but not the score and player ID." Objects remove that risk — <em>as long as you swap the object</em>, not a field.</p>
+  </div>
+
+  <div class="cp" data-cp="4">
+    <div class="cph">Checkpoint 4</div>
+    <div class="cpb">
+      <p class="q">Players have the methods <code>GetName()</code>, <code>GetScore()</code> and <code>SetScore()</code>. Inside the sort, the comparison has decided that two players must change places:</p>
+<pre class="code" style="margin:0 0 12px"><span class="kw">if</span> Players[Index].<span class="fn">GetScore</span>() &gt; Players[Index + <span class="nm">1</span>].<span class="fn">GetScore</span>():
+    <span class="cm"># swap — which code goes here?</span></pre>
+      <button class="opt" data-ok="0">A<span class="oc">Temp = Players[Index].GetScore()
+Players[Index].SetScore(Players[Index + 1].GetScore())
+Players[Index + 1].SetScore(Temp)</span></button>
+      <button class="opt" data-ok="0">B<span class="oc">Players[Index] = Players[Index + 1]
+Players[Index + 1] = Players[Index]</span></button>
+      <button class="opt" data-ok="1">C<span class="oc">Temp = Players[Index]
+Players[Index] = Players[Index + 1]
+Players[Index + 1] = Temp</span></button>
+      <button class="opt" data-ok="0">D<span class="oc">Temp = Players[Index + 1]
+Players[Index] = Players[Index + 1]
+Players[Index + 1] = Temp</span></button>
+      <div class="fbs" hidden>
+        <div>It runs, and the scores come out in order — which is why it is dangerous. The scores have moved but the <em>names</em> have not, so Mia ends up holding Zane's score. This is the partial swap from the examiner reports, done with setters: one field moved, the rest left behind.</div>
+        <div>No temporary variable. The first line overwrites slot <code>Index</code>, so by the second line the original object is gone and both slots hold the same player. One player is duplicated, the other is lost.</div>
+        <div>The object in slot <code>Index</code> is kept safe in <code>Temp</code>, the other object moves down, and <code>Temp</code> fills the gap. Whole objects move, so every attribute stays with its owner.</div>
+        <div>Nearly the right shape, but <code>Temp</code> saves the wrong slot. <code>Temp</code> holds the object from <code>Index + 1</code>, and the last line puts that same object back where it came from — both slots end up with the same player. Save the slot you are about to overwrite.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h3>2. Output that depends on the class</h3>
+  <p>Sometimes a design says: "outputs the name and score; <em>if the player is a pro</em>, also outputs the sponsor". Cambridge accepted three designs for exactly this in June 2023 (paper 41, Q2(c)): a method in each class that overrides the parent's (Lesson 5), testing the object's type, or exception handling. Testing the type is the most direct, and in Python it is <code>isinstance(Object, ClassName)</code>.</p>
+<pre class="code"><span class="kw">class</span> <span class="nm">ProPlayer</span>(<span class="nm">Player</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Name, Score, Sponsor):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Name, Score)
+        self.__Sponsor = Sponsor      <span class="cm"># STRING</span>
+
+    <span class="kw">def</span> <span class="fn">GetSponsor</span>(self):
+        <span class="kw">return</span> self.__Sponsor
+
+<span class="kw">def</span> <span class="fn">ShowPlayer</span>(ThePlayer):
+    <span class="fn">print</span>(ThePlayer.<span class="fn">GetName</span>() + <span class="st">" scored "</span> + <span class="fn">str</span>(ThePlayer.<span class="fn">GetScore</span>()))
+    <span class="kw">if</span> <span class="fn">isinstance</span>(ThePlayer, <span class="nm">ProPlayer</span>):
+        <span class="fn">print</span>(<span class="st">"Sponsor: "</span> + ThePlayer.<span class="fn">GetSponsor</span>())</pre>
+  <p><code>isinstance(ThePlayer, ProPlayer)</code> is <code>True</code> only when the object belongs to <code>ProPlayer</code> (or a child of it). For an ordinary player it is <code>False</code>, and the sponsor line is skipped — which matters, because an ordinary player has no <code>GetSponsor()</code> and would crash.</p>
+
+  <div class="cp" data-cp="5">
+    <div class="cph">Checkpoint 5</div>
+    <div class="cpb">
+      <p class="q"><code>ProPlayer</code> is a child of <code>Player</code>. The array <code>Squad</code> holds one ordinary player, Kai, and one pro, Ravi. What does this loop output for <strong>Ravi</strong>?</p>
+<pre class="code" style="margin:0 0 12px"><span class="kw">for</span> Item <span class="kw">in</span> Squad:
+    <span class="kw">if</span> <span class="fn">isinstance</span>(Item, <span class="nm">Player</span>):
+        <span class="fn">print</span>(Item.<span class="fn">GetName</span>() + <span class="st">" (player)"</span>)
+    <span class="kw">elif</span> <span class="fn">isinstance</span>(Item, <span class="nm">ProPlayer</span>):
+        <span class="fn">print</span>(Item.<span class="fn">GetName</span>() + <span class="st">" (pro)"</span>)</pre>
+      <button class="opt" data-ok="0">A &nbsp;<code>Ravi (pro)</code></button>
+      <button class="opt" data-ok="1">B &nbsp;<code>Ravi (player)</code></button>
+      <button class="opt" data-ok="0">C &nbsp;Both lines — <code>Ravi (player)</code> then <code>Ravi (pro)</code></button>
+      <button class="opt" data-ok="0">D &nbsp;An error — <code>isinstance</code> needs the object's exact class</button>
+      <div class="fbs" hidden>
+        <div>This is what the programmer meant, and it is not what happens. A pro <strong>is a</strong> player — that is what inheritance means — so the very first test, <code>isinstance(Item, Player)</code>, is already <code>True</code> for Ravi. The <code>elif</code> is never reached, for anyone.</div>
+        <div>Inheritance cuts both ways: a <code>ProPlayer</code> object is also a <code>Player</code>, so the first test succeeds and the <code>elif</code> never runs. <strong>Test the child class first</strong> — or test only the child, and let <code>else</code> handle everything else.</div>
+        <div>An <code>if … elif</code> runs at most one branch. Once the first condition is <code>True</code>, the rest are skipped — so even though Ravi passes both tests, only one line is printed.</div>
+        <div><code>isinstance</code> accepts the object's own class <em>or any parent of it</em> — that is precisely why it is useful, and why the order of the tests matters. There is no error.</div>
+      </div>
+      <div class="fb" aria-live="polite"></div>
+      <p class="first" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MODIFY ========== -->
+<section id="modify">
+  <p class="eyebrow">PRIMM · Step 4</p>
+  <h2 class="h">Modify</h2>
+  <p>Go back to the Predict program in the runner. Make these changes one at a time, running after each.</p>
+  <div class="box">
+    <p class="bt">Changes to make</p>
+    <ol style="margin:0">
+      <li>Make the sort put the <strong>highest</strong> score first. One character.</li>
+      <li>Add the class <code>ProPlayer</code> and the procedure <code>ShowPlayer()</code> from Investigate section 2. Put <code>ProPlayer("Ravi", 50, "Apex")</code> into <code>Players[4]</code> and change <code>Count</code> so that Ravi is included.</li>
+      <li>Replace the final <code>print</code> with a call to <code>ShowPlayer()</code> for each player in use. Only Ravi should have a sponsor line.</li>
+    </ol>
+  </div>
+  <details class="rev"><summary>Model answer — check yours against this</summary>
+  <div class="body">
+    <span class="codelabel">Python — Paper 4</span>
+<pre class="code"><span class="kw">class</span> <span class="nm">Player</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Name, Score):
+        self.__Name = Name        <span class="cm"># STRING</span>
+        self.__Score = Score      <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">GetName</span>(self):
+        <span class="kw">return</span> self.__Name
+
+    <span class="kw">def</span> <span class="fn">GetScore</span>(self):
+        <span class="kw">return</span> self.__Score
+
+<span class="kw">class</span> <span class="nm">ProPlayer</span>(<span class="nm">Player</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, Name, Score, Sponsor):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(Name, Score)
+        self.__Sponsor = Sponsor      <span class="cm"># STRING</span>
+
+    <span class="kw">def</span> <span class="fn">GetSponsor</span>(self):
+        <span class="kw">return</span> self.__Sponsor
+
+<span class="kw">def</span> <span class="fn">ShowPlayer</span>(ThePlayer):
+    <span class="fn">print</span>(ThePlayer.<span class="fn">GetName</span>() + <span class="st">" scored "</span> + <span class="fn">str</span>(ThePlayer.<span class="fn">GetScore</span>()))
+    <span class="kw">if</span> <span class="fn">isinstance</span>(ThePlayer, <span class="nm">ProPlayer</span>):
+        <span class="fn">print</span>(<span class="st">"Sponsor: "</span> + ThePlayer.<span class="fn">GetSponsor</span>())
+
+Players = [<span class="kw">None</span>] * <span class="nm">6</span>                  <span class="cm"># ARRAY[0:5] OF Player</span>
+Players[<span class="nm">0</span>] = <span class="nm">Player</span>(<span class="st">"Kai"</span>, <span class="nm">31</span>)
+Players[<span class="nm">1</span>] = <span class="nm">Player</span>(<span class="st">"Mia"</span>, <span class="nm">58</span>)
+Players[<span class="nm">2</span>] = <span class="nm">Player</span>(<span class="st">"Zane"</span>, <span class="nm">12</span>)
+Players[<span class="nm">3</span>] = <span class="nm">Player</span>(<span class="st">"Lola"</span>, <span class="nm">44</span>)
+Players[<span class="nm">4</span>] = <span class="nm">ProPlayer</span>(<span class="st">"Ravi"</span>, <span class="nm">50</span>, <span class="st">"Apex"</span>)
+Count = <span class="nm">5</span>
+
+<span class="kw">for</span> Pass <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count - <span class="nm">1</span>):
+    <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count - <span class="nm">1</span> - Pass):
+        <span class="kw">if</span> Players[Index].<span class="fn">GetScore</span>() &lt; Players[Index + <span class="nm">1</span>].<span class="fn">GetScore</span>():    <span class="cm"># &lt; for highest first</span>
+            Temp = Players[Index]
+            Players[Index] = Players[Index + <span class="nm">1</span>]
+            Players[Index + <span class="nm">1</span>] = Temp
+
+<span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, Count):
+    <span class="fn">ShowPlayer</span>(Players[Index])</pre>
+    <p style="margin:10px 0 6px">Expected output:</p>
+<pre class="code">Mia scored 58
+Ravi scored 50
+Sponsor: Apex
+Lola scored 44
+Kai scored 31
+Zane scored 12</pre>
+    <ul style="margin-bottom:0">
+      <li><strong>Ravi sorted into place with everyone else.</strong> The sort calls <code>GetScore()</code>, which <code>ProPlayer</code> inherits, so a pro and an ordinary player can share one array and one sort.</li>
+      <li><code>Count = 5</code>, not 6. Slot 5 is still empty.</li>
+      <li>If every player printed a sponsor line, or the program crashed with <code>'Player' object has no attribute 'GetSponsor'</code>, the <code>isinstance</code> test is missing or testing the wrong class.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== EXAM TECHNIQUE ========== -->
+<section id="technique">
+  <p class="eyebrow">The marks · a real Paper 4 question</p>
+  <h2 class="h">Exam technique — "if it is a helicopter, also…"</h2>
+  <p>June 2023, paper 41, Question 2. The class <code>Vehicle</code> has getters including <code>GetHorizontalPosition()</code> and <code>GetCurrentSpeed()</code>. The child class <code>Helicopter</code> inherits from <code>Vehicle</code> and adds a vertical position, with its own getter <code>GetVerticalPosition()</code>.</p>
+  <div class="box pinkb">
+    <p class="bt">9618 Paper 4, June 2023 (variant 1), Q2(c) &nbsp;[3]</p>
+    <p style="margin:0">A procedure needs to output the horizontal position and speed of a vehicle. If the vehicle is a helicopter, it also outputs the vertical position. All outputs must include appropriate messages. Write program code for this procedure.</p>
+  </div>
+  <p><strong>Predict, then reveal.</strong> A candidate writes this. Decide what an examiner would credit before you open the answer.</p>
+  <span class="codelabel">Candidate response</span>
+<pre class="code"><span class="kw">def</span> <span class="fn">OutputPosition</span>(TheVehicle):
+    <span class="fn">print</span>(TheVehicle.<span class="fn">GetHorizontalPosition</span>())
+    <span class="fn">print</span>(<span class="st">"Speed: "</span> + <span class="fn">str</span>(TheVehicle.<span class="fn">GetCurrentSpeed</span>()))
+    <span class="fn">print</span>(<span class="st">"Height: "</span> + <span class="fn">str</span>(TheVehicle.<span class="fn">GetVerticalPosition</span>()))</pre>
+  <details class="rev"><summary>What the examiner says</summary>
+  <div class="body">
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Cambridge mark scheme — 1 mark each to max 3</th><th style="width:70px">This one</th></tr>
+      <tr><td class="mp">1</td><td>Suitable method/procedure heading (and end where appropriate) and outputting horizontal position and current speed in an appropriate message</td><td><span class="cross">✗</span></td></tr>
+      <tr><td class="mp">2</td><td>Checking if object is a <code>Vehicle</code> or <code>Helicopter</code> // overriding methods in each class for output // one method in each class // try except …</td><td><span class="cross">✗</span></td></tr>
+      <tr><td class="mp">3</td><td>…outputting vertical position only if helicopter with appropriate message</td><td><span class="cross">✗</span></td></tr>
+    </table></div>
+    <ul>
+      <li><strong>MP1 lost on one word.</strong> The horizontal position is printed bare — no message. "All outputs must include appropriate messages" is in the question for a reason.</li>
+      <li><strong>MP2 and MP3 lost:</strong> nothing checks what kind of vehicle it is, so every vehicle gets a height line — and for an ordinary car it crashes, because a <code>Vehicle</code> has no <code>GetVerticalPosition()</code>. This is the exact error the examiners reported: "a common error being just outputting all 3 values no matter what the type of object."</li>
+      <li>Notice the <code>…</code> at the start of MP3: it hangs on MP2. Without a check, the vertical-position mark cannot be earned at all.</li>
+    </ul>
+    <p style="margin:10px 0 6px"><strong>What would have scored 3</strong></p>
+<pre class="code"><span class="kw">def</span> <span class="fn">OutputPosition</span>(TheVehicle):
+    <span class="fn">print</span>(<span class="st">"Horizontal position: "</span> + <span class="fn">str</span>(TheVehicle.<span class="fn">GetHorizontalPosition</span>()))
+    <span class="fn">print</span>(<span class="st">"Current speed: "</span> + <span class="fn">str</span>(TheVehicle.<span class="fn">GetCurrentSpeed</span>()))
+    <span class="kw">if</span> <span class="fn">isinstance</span>(TheVehicle, <span class="nm">Helicopter</span>):
+        <span class="fn">print</span>(<span class="st">"Vertical position: "</span> + <span class="fn">str</span>(TheVehicle.<span class="fn">GetVerticalPosition</span>()))</pre>
+    <p style="margin-bottom:0"><strong>The habit to build:</strong> when a design says "if it is a <em>child</em>, also…", write <code>if isinstance(TheObject, Child):</code> around the extra lines — testing the <em>child</em> class — and give every output a message.</p>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== TASK ========== -->
+<section id="task">
+  <p class="eyebrow">Assessed work</p>
+  <h2 class="h">Over to you — two sections, one document</h2>
+  <p class="lead">Section A is two real Paper 3 questions, typed into the Evidence Document. Section B extends your club in Python. Everyone starts at <strong>Independent</strong>; drop to Scaffolded in Section B if you stall.</p>
+
+  <h3>Section A — Paper 3, written in pseudocode &nbsp;[11 marks]</h3>
+  <div class="box pinkb">
+    <p class="bt">A1 · 9618 Paper 3, June 2026 (variant 2), Q11(a) &nbsp;[5]</p>
+    <p style="margin:0">Object-Oriented Programming (OOP) is used to design a class called <code>Node</code>. A partial design of the <code>Node</code> class includes the <code>STRING</code> attribute <code>Content</code> and the <code>INTEGER</code> attribute <code>Pointer</code>, together with their getters and setters. The class also includes a constructor, with two parameters, to set the values of these attributes.</p>
+    <p style="margin:8px 0 0"><strong>Write pseudocode statements to declare the <code>Node</code> class, its attributes and the constructor.</strong></p>
+  </div>
+  <div class="box pinkb">
+    <p class="bt">A2 · 9618 Paper 3, November 2024 (variant 1), Q9 &nbsp;[6]</p>
+    <p style="margin:0 0 8px">A veterinary surgery wants to create a class for individual pets. Some of the attributes required in the class are listed in the table.</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:30%">Attribute</th><th style="width:20%">Data type</th><th>Description</th></tr>
+      <tr><td class="dt">PetID</td><td class="dt">STRING</td><td>unique ID assigned at registration</td></tr>
+      <tr><td class="dt">PetType</td><td class="dt">STRING</td><td>type of pet assigned at registration</td></tr>
+      <tr><td class="dt">OwnerTelephone</td><td class="dt">STRING</td><td>telephone number of owner assigned at registration</td></tr>
+      <tr><td class="dt">DateRegistered</td><td class="dt">DATE</td><td>date of registration</td></tr>
+    </table>
+    <p style="margin:0 0 8px"><strong>(a)</strong> State one reason why the attributes would be declared as <code>PRIVATE</code>. <em>[1]</em></p>
+    <p style="margin:0 0 6px"><strong>(b)</strong> Complete the class diagram for <code>Pet</code>, to include: <em>[5]</em></p>
+    <ul style="margin:0 0 10px">
+      <li>an attribute and data type for the name of the pet</li>
+      <li>an attribute and data type for the name of the owner</li>
+      <li>a method to create a <code>Pet</code> object and set attributes at the time of registration</li>
+      <li>a method to assign a pet ID</li>
+      <li>a method to assign the date of registration</li>
+      <li>a method to return the pet name</li>
+      <li>a method to return the owner's telephone number.</li>
+    </ul>
+    <div class="cd-wrap">
+      <div class="cd parent" style="max-width:340px"><div class="cdh">Pet</div><div class="cdb">PetID : STRING<br>PetType : STRING<br>OwnerTelephone : STRING<br>DateRegistered : DATE<br><span class="blank">……………… : ………………</span><br><span class="blank">……………… : ………………</span></div><div class="cdb"><span class="blank">…………………………………</span><br><span class="blank">…………………………………</span><br><span class="blank">…………………………………</span><br><span class="blank">…………………………………</span><br><span class="blank">…………………………………</span></div></div>
+    </div>
+  </div>
+
+  <h3>Section B — Paper 4, in Python &nbsp;[12 marks]</h3>
+  <div class="box pinkb">
+    <p class="bt">The scenario</p>
+    <p style="margin:0 0 10px">The club wants a league table of its members, highest credits first, with junior members marked. <code>Member</code> and <code>JuniorMember</code> are <strong>unchanged</strong> from Lesson 5. Add two methods to your Lesson 4 <code>Club</code> class.</p>
+    <table style="margin:0 0 10px">
+      <tr><th style="width:30%">Method</th><th>Description</th></tr>
+      <tr><td class="dt">SortByCredits()</td><td>Uses a bubble sort to put the members in use into <strong>descending</strong> order of credits. It compares credits using <code>GetCredits()</code> and swaps whole <code>Member</code> objects. Do not use an in-built sort.</td></tr>
+      <tr><td class="dt">DisplayAll()</td><td>Outputs one line for each member in use, in array order: the name, <code>" : "</code> and the credits. If the member is a <code>JuniorMember</code>, the line ends with <code>" (junior)"</code>.</td></tr>
+    </table>
+    <p style="margin:0 0 6px"><strong>Test data</strong> — use it in this order:</p>
+    <table style="margin:0">
+      <tr><th style="width:8%">#</th><th>Step</th></tr>
+      <tr><td>1</td><td>Create a club <code>"Riverside Juniors"</code></td></tr>
+      <tr><td>2</td><td><code>Member</code> <code>"M4021"</code>, <code>"Sara Ahmed"</code>, <code>16</code> — add <code>20</code> credits</td></tr>
+      <tr><td>3</td><td><code>JuniorMember</code> <code>"J5101"</code>, <code>"Ava Brooks"</code>, <code>13</code>, guardian <code>"Helen Brooks"</code> — set consent to <code>TRUE</code>, then add <code>35</code> credits</td></tr>
+      <tr><td>4</td><td><code>Member</code> <code>"M4022"</code>, <code>"Omar Khan"</code>, <code>17</code> — add <code>45</code> credits</td></tr>
+      <tr><td>5</td><td><code>JuniorMember</code> <code>"J5102"</code>, <code>"Leo Grant"</code>, <code>12</code>, guardian <code>"Ruth Grant"</code> — add <code>10</code> credits (no consent)</td></tr>
+      <tr><td>6</td><td>Add Sara, Ava, Omar and Leo to the club, in that order, with <code>AddMember()</code></td></tr>
+      <tr><td>7</td><td>Output <code>"Before"</code>, call <code>DisplayAll()</code>, call <code>SortByCredits()</code>, output <code>"After"</code>, call <code>DisplayAll()</code></td></tr>
+    </table>
+  </div>
+
+  <details class="rev"><summary>Classes not working? Start from this version</summary>
+  <div class="body">
+    <p style="margin:0 0 8px">Lessons 4 and 5, as their mark schemes describe them. Copy this into your editor and add the two new methods <strong>inside</strong> <code>Club</code>. <code>Club</code>'s other methods are not needed today.</p>
+<pre class="code"><span class="kw">class</span> <span class="nm">Member</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, MemberID, Name, Age):
+        self.__MemberID = MemberID   <span class="cm"># STRING</span>
+        self.__Name = Name           <span class="cm"># STRING</span>
+        self.__Age = Age             <span class="cm"># INTEGER</span>
+        self.__Credits = <span class="nm">0</span>           <span class="cm"># INTEGER</span>
+        self.__Active = <span class="kw">True</span>         <span class="cm"># BOOLEAN</span>
+
+    <span class="kw">def</span> <span class="fn">DisplayDetails</span>(self):
+        <span class="fn">print</span>(<span class="st">"Member ID : "</span> + self.__MemberID)
+        <span class="fn">print</span>(<span class="st">"Name      : "</span> + self.__Name)
+        <span class="fn">print</span>(<span class="st">"Age       : "</span> + <span class="fn">str</span>(self.__Age))
+        <span class="fn">print</span>(<span class="st">"Credits   : "</span> + <span class="fn">str</span>(self.__Credits))
+        <span class="fn">print</span>(<span class="st">"Active    : "</span> + <span class="fn">str</span>(self.__Active))
+
+    <span class="kw">def</span> <span class="fn">GetName</span>(self):
+        <span class="kw">return</span> self.__Name
+
+    <span class="kw">def</span> <span class="fn">GetCredits</span>(self):
+        <span class="kw">return</span> self.__Credits
+
+    <span class="kw">def</span> <span class="fn">SetAge</span>(self, NewAge):
+        self.__Age = NewAge
+
+    <span class="kw">def</span> <span class="fn">AddCredits</span>(self, Amount):
+        NewTotal = self.__Credits + Amount
+        <span class="kw">if</span> NewTotal &gt; <span class="nm">50</span>:
+            NewTotal = <span class="nm">50</span>
+        self.__Credits = NewTotal
+
+<span class="kw">class</span> <span class="nm">JuniorMember</span>(<span class="nm">Member</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, MemberID, Name, Age, GuardianName):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(MemberID, Name, Age)
+        self.__GuardianName = GuardianName       <span class="cm"># STRING</span>
+        self.__ConsentGiven = <span class="kw">False</span>              <span class="cm"># BOOLEAN</span>
+
+    <span class="kw">def</span> <span class="fn">SetConsentGiven</span>(self, NewConsent):
+        self.__ConsentGiven = NewConsent
+
+    <span class="kw">def</span> <span class="fn">DisplayDetails</span>(self):
+        <span class="fn">super</span>().<span class="fn">DisplayDetails</span>()
+        <span class="fn">print</span>(<span class="st">"Guardian  : "</span> + self.__GuardianName)
+        <span class="fn">print</span>(<span class="st">"Consent   : "</span> + <span class="fn">str</span>(self.__ConsentGiven))
+
+    <span class="kw">def</span> <span class="fn">AddCredits</span>(self, Amount):
+        <span class="kw">if</span> self.__ConsentGiven == <span class="kw">False</span>:
+            <span class="fn">print</span>(self.<span class="fn">GetName</span>() + <span class="st">" needs consent before earning credits"</span>)
+        <span class="kw">else</span>:
+            <span class="fn">super</span>().<span class="fn">AddCredits</span>(Amount)
+
+<span class="kw">class</span> <span class="nm">Club</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, ClubName):
+        self.__ClubName = ClubName          <span class="cm"># STRING</span>
+        self.__Members = [<span class="kw">None</span>] * <span class="nm">5</span>         <span class="cm"># ARRAY[0:4] OF Member</span>
+        self.__NumberOfMembers = <span class="nm">0</span>          <span class="cm"># INTEGER</span>
+
+    <span class="kw">def</span> <span class="fn">AddMember</span>(self, NewMember):
+        <span class="kw">if</span> self.__NumberOfMembers &lt; <span class="nm">5</span>:
+            self.__Members[self.__NumberOfMembers] = NewMember
+            self.__NumberOfMembers = self.__NumberOfMembers + <span class="nm">1</span>
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">else</span>:
+            <span class="kw">return</span> <span class="kw">False</span></pre>
+  </div>
+  </details>
+
+  <div class="tier i">
+    <div class="th">Independent — start here</div>
+    <div class="tb">
+      <p style="margin:0 0 8px"><strong>(B1)</strong> Write program code for the method <code>SortByCredits()</code>. <em>[4]</em></p>
+      <p style="margin:0 0 8px"><strong>(B2)</strong> Write program code for the method <code>DisplayAll()</code>. <em>[3]</em></p>
+      <p style="margin:0 0 8px"><strong>(B3)</strong> Write a main program that carries out the seven steps of the test data, in order. <em>[3]</em></p>
+      <p style="margin:0"><strong>(B4)</strong> Take a screenshot showing the program running. It must show <strong>the test data and the complete output</strong>. <em>[2]</em></p>
+    </div>
+  </div>
+
+  <div class="tier s">
+    <div class="th">Scaffolded — only if you stall</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Same questions, same marks. Complete every <code>______</code> and <code># ...</code>.</p>
+<pre class="code" style="margin:0">    <span class="cm"># ---- add these two methods INSIDE class Club ----</span>
+    <span class="kw">def</span> <span class="fn">SortByCredits</span>(self):
+        <span class="kw">for</span> Pass <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, self.__NumberOfMembers - <span class="nm">1</span>):
+            <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, ______):                     <span class="cm"># only the slots in use</span>
+                <span class="kw">if</span> self.__Members[Index].<span class="fn">______</span>() &lt; self.__Members[Index + <span class="nm">1</span>].<span class="fn">______</span>():
+                    Temp = ______                              <span class="cm"># swap the whole object</span>
+                    self.__Members[Index] = ______
+                    self.__Members[Index + <span class="nm">1</span>] = ______
+
+    <span class="kw">def</span> <span class="fn">DisplayAll</span>(self):
+        <span class="kw">for</span> Index <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, self.__NumberOfMembers):
+            Item = self.__Members[Index]
+            <span class="kw">if</span> <span class="fn">isinstance</span>(Item, ______):                       <span class="cm"># test the CHILD class</span>
+                <span class="fn">print</span>(Item.<span class="fn">GetName</span>() + <span class="st">" : "</span> + <span class="fn">str</span>(______) + <span class="st">" (junior)"</span>)
+            <span class="kw">else</span>:
+                <span class="cm"># ... the same line without " (junior)"</span>
+
+<span class="cm"># ---- main program ----</span>
+TheClub = <span class="nm">Club</span>(<span class="st">"Riverside Juniors"</span>)
+Sara = <span class="nm">Member</span>(<span class="st">"M4021"</span>, <span class="st">"Sara Ahmed"</span>, <span class="nm">16</span>)
+Sara.<span class="fn">AddCredits</span>(<span class="nm">20</span>)
+Ava = <span class="nm">JuniorMember</span>(<span class="st">"J5101"</span>, <span class="st">"Ava Brooks"</span>, <span class="nm">13</span>, <span class="st">"Helen Brooks"</span>)
+<span class="cm"># ... consent TRUE, then 35 credits</span>
+<span class="cm"># ... Omar: "M4022", "Omar Khan", 17, then 45 credits</span>
+<span class="cm"># ... Leo: "J5102", "Leo Grant", 12, guardian "Ruth Grant", then 10 credits (no consent)</span>
+<span class="cm"># ... add all four to the club, in the order Sara, Ava, Omar, Leo</span>
+<span class="fn">print</span>(<span class="st">"Before"</span>)
+<span class="cm"># ... DisplayAll, SortByCredits, "After", DisplayAll</span></pre>
+      <p style="margin:10px 0 0;font-size:14.5px;color:var(--muted)">Why test <code>JuniorMember</code> and not <code>Member</code>? Checkpoint 5.</p>
+    </div>
+  </div>
+
+  <div class="tier e">
+    <div class="th">Exam conditions — where you need to be by the mock</div>
+    <div class="tb">
+      <p style="margin:0 0 8px">Close this page. Set a timer: <strong>15 minutes</strong> for Section A from the question boxes alone, then <strong>20 minutes</strong> for Section B from the scenario box alone.</p>
+      <p style="margin:0">Extension, not counted: make <code>SortByCredits()</code> <strong>efficient</strong> — it must stop as soon as a pass makes no swaps. June 2026's paper 43 asked for exactly this ("The bubble sort needs to be efficient and stop iterating as soon as it identifies that DataArray is in the correct order"). Use a Boolean flag and a <code>while</code> loop.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p class="bt">Before you screenshot</p>
+    <ul style="margin:0">
+      <li>The first line is <code>Leo Grant needs consent before earning credits</code> — Lesson 5's consent check, still working.</li>
+      <li><strong>Before:</strong> Sara 20, Ava 35 (junior), Omar 45, Leo 0 (junior). <strong>After:</strong> Omar 45, Ava 35 (junior), Sara 20, Leo 0 (junior).</li>
+      <li><code>'NoneType' object has no attribute 'GetCredits'</code> means your sort runs into the empty fifth slot. Loop to <code>NumberOfMembers</code>, not 5.</li>
+      <li>After-order Leo, Sara, Ava, Omar means the comparison points the wrong way — that is ascending.</li>
+      <li><code>(junior)</code> on every line means you tested <code>isinstance(Item, Member)</code>. A junior member is a member; test the child.</li>
+      <li>The screenshot must show <strong>the test data as well as the output</strong>. Your <em>code</em> goes into the document as <strong>text</strong>, never as a screenshot.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== MARK SCHEME ========== -->
+<section id="markscheme">
+  <p class="eyebrow">Self-marking</p>
+  <h2 class="h">Mark scheme — open it only after you have attempted the task</h2>
+  <p>Section A is marked with Cambridge's published mark schemes, word for word. Mark your own work honestly, then record your total in the Evidence Document.</p>
+
+  <details class="rev"><summary>Reveal the mark scheme [23 marks]</summary>
+  <div class="body">
+    <p style="margin:6px 0 6px"><strong>Section A1 — June 2026 paper 32, Q11(a) [5]</strong> &nbsp;One mark per mark point</p>
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Published mark scheme</th><th>Guidance</th></tr>
+      <tr><td class="mp">A1 MP1</td><td>Correct <code>CLASS Node</code> and <code>ENDCLASS</code> statements</td><td><code>Node</code> is given in the question, so must be used.</td></tr>
+      <tr><td class="mp">A1 MP2</td><td>Correct attribute declaration section before the constructor</td><td>Must use <code>Content</code> and <code>Pointer</code> as <code>STRING</code> and <code>INTEGER</code>, respectively.</td></tr>
+      <tr><td class="mp">A1 MP3</td><td>Correct statement to begin and end the constructor as <code>PUBLIC PROCEDURE NEW … ENDPROCEDURE</code></td><td></td></tr>
+      <tr><td class="mp">A1 MP4</td><td>Two parameters identified in the constructor with appropriate names and data types</td><td>Any names can be used except <code>Content</code> and <code>Pointer</code>.</td></tr>
+      <tr><td class="mp">A1 MP5</td><td>Values passed using the constructor are assigned correctly — allow use of setters</td><td>The parameters from MP4 must be assigned to the attributes from MP2.</td></tr>
+    </table></div>
+<pre class="code">CLASS Node
+   PRIVATE Content : STRING
+   PRIVATE Pointer : INTEGER
+
+   PUBLIC PROCEDURE NEW(NewContent : STRING, NewPointer : INTEGER)
+      Content ← NewContent
+      Pointer ← NewPointer
+   ENDPROCEDURE
+ENDCLASS</pre>
+
+    <p style="margin:16px 0 6px"><strong>Section A2 — November 2024 paper 31, Q9 [6]</strong></p>
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Published mark scheme</th></tr>
+      <tr><td class="mp">A2 (a)</td><td>To ensure that the attributes are only accessible using the class's own methods / within the class.</td></tr>
+      <tr><td class="mp">A2 MP1</td><td>Two correct attributes with sensible names and correct data types.</td></tr>
+      <tr><td class="mp">A2 MP2</td><td>Constructor present.</td></tr>
+      <tr><td class="mp">A2 MP3</td><td>Two correct setters with exact names and appropriate parameters and data types.</td></tr>
+      <tr><td class="mp">A2 MP4</td><td>Two correct getters with appropriate names.</td></tr>
+      <tr><td class="mp">A2 MP5</td><td>Name assigned to pet name getter matches the attribute.</td></tr>
+    </table></div>
+    <div class="cd-wrap" style="margin-top:12px">
+      <div class="cd parent" style="max-width:360px"><div class="cdh">Pet</div><div class="cdb">PetID : STRING<br>PetType : STRING<br>OwnerTelephone : STRING<br>DateRegistered : DATE<br><strong>PetName : STRING</strong><br><strong>OwnerName : STRING</strong></div><div class="cdb"><strong>Constructor()</strong><br><strong>SetPetID(APetID : STRING)</strong><br><strong>SetDateRegistered(RegDate : DATE)</strong><br><strong>GetPetName()</strong><br><strong>GetOwnerTelephone()</strong></div></div>
+    </div>
+    <ul style="margin:12px 0 0">
+      <li><strong>(a) is not about security.</strong> The examiners reported that "many candidates incorrectly interpreted the use of the word PRIVATE to indicate that the data must not be shared with unauthorised users". It is about <em>code</em>: only the class's own methods can reach the attribute.</li>
+      <li><strong>MP3 is the one that was "rarely seen".</strong> <code>SetPetID()</code> with empty brackets scores nothing; it needs a parameter and its data type — and <code>DATE</code> for the date of registration.</li>
+      <li><strong>MP5:</strong> if your attribute is <code>PetName</code>, the getter must be <code>GetPetName()</code>. Name it <code>Name</code> and call the getter <code>GetPetName()</code>, and MP5 goes.</li>
+    </ul>
+
+    <p style="margin:16px 0 6px"><strong>Section B — Paper 4 [12]</strong></p>
+    <div class="ms"><table>
+      <tr><th style="width:74px">Point</th><th>Description</th><th style="width:60px">Marks</th></tr>
+      <tr><td class="mp">B1 MP1</td><td><code>SortByCredits()</code> defined inside <code>Club</code>, with nested loops that cover only the members in use — <code>NumberOfMembers</code>, not the array size.</td><td>1</td></tr>
+      <tr><td class="mp">B1 MP2</td><td>Compares adjacent members' credits using <code>GetCredits()</code> on both objects.</td><td>1</td></tr>
+      <tr><td class="mp">B1 MP3</td><td>…the comparison gives <strong>descending</strong> order (swaps when the first has fewer credits).</td><td>1</td></tr>
+      <tr><td class="mp">B1 MP4</td><td>Swaps the whole <code>Member</code> objects, using a temporary variable.</td><td>1</td></tr>
+      <tr><td class="mp">B2 MP5</td><td><code>DisplayAll()</code> loops over the members in use and outputs each name, <code>" : "</code> and credits, using the getters and <code>str()</code>.</td><td>1</td></tr>
+      <tr><td class="mp">B2 MP6</td><td>Checks whether each object is a <code>JuniorMember</code> — <code>isinstance(Item, JuniorMember)</code> // an overriding method in each class.</td><td>1</td></tr>
+      <tr><td class="mp">B2 MP7</td><td>…<code>" (junior)"</code> appears for junior members only.</td><td>1</td></tr>
+      <tr><td class="mp">B3 MP8</td><td>Club and four members created with the test data — Ava and Leo as <code>JuniorMember</code> objects — in variables not named after their class.</td><td>1</td></tr>
+      <tr><td class="mp">B3 MP9</td><td>Consent and credits applied through the methods, then all four added with <code>AddMember()</code> in the stated order.</td><td>1</td></tr>
+      <tr><td class="mp">B3 MP10</td><td><code>"Before"</code>, <code>DisplayAll()</code>, <code>SortByCredits()</code>, <code>"After"</code>, <code>DisplayAll()</code> — in that order.</td><td>1</td></tr>
+      <tr><td class="mp">B4 MP11</td><td>Screenshot shows the test data being used, as well as the output.</td><td>1</td></tr>
+      <tr><td class="mp">B4 MP12</td><td>Output: the consent message for Leo, then Before Sara 20 / Ava 35 (junior) / Omar 45 / Leo 0 (junior), then After Omar 45 / Ava 35 (junior) / Sara 20 / Leo 0 (junior).</td><td>1</td></tr>
+    </table></div>
+    <p style="margin:14px 0 6px"><strong>Accepted alternatives</strong></p>
+    <ul>
+      <li>MP1: an outer loop that repeats a fixed <code>NumberOfMembers - 1</code> times, or a <code>while</code> loop with a swapped flag; the inner loop may run to <code>NumberOfMembers - 1</code> without <code>- Pass</code>.</li>
+      <li>MP6: <code>type(Item) == JuniorMember</code>. Or Cambridge's other accepted design — a method in each class that returns or outputs the line, with <code>JuniorMember</code>'s version overriding <code>Member</code>'s — provided <code>DisplayAll()</code> calls it.</li>
+    </ul>
+    <p style="margin:14px 0 6px"><strong>Not credited, however good the code looks</strong></p>
+    <ul style="margin-bottom:0">
+      <li><code>sort()</code>, <code>sorted()</code> or any in-built sort — <span class="cross">MP1 to MP4 lost</span>. The design asks for a bubble sort.</li>
+      <li>Comparing the objects themselves, <code>self.__Members[Index] &lt; …</code> — <span class="cross">MP2 lost</span>, and it is a <code>TypeError</code>.</li>
+      <li>Swapping only the credits — <span class="cross">MP4 lost</span>. It is a partial swap; the names stay where they were.</li>
+      <li>Testing <code>isinstance(Item, Member)</code> — <span class="cross">MP7 lost</span>. Every member, junior or not, would be marked junior.</li>
+      <li>Code pasted as an image — <span class="cross">no code marks at all</span>.</li>
+    </ul>
+  </div>
+  </details>
+</section>
+
+<hr class="rule">
+
+<!-- ========== SUBMIT ========== -->
+<section id="submit">
+  <p class="eyebrow">Hand-in</p>
+  <h2 class="h">What to submit on Teams</h2>
+  <p><strong>One file:</strong> the Evidence Document for this lesson, saved as <code>.docx</code> and named <code>Surname Initial — OOP Home Lesson 7.docx</code>.</p>
+  <div class="box">
+    <p class="bt">Checklist before you upload</p>
+    <ul style="margin:0">
+      <li>Your name and class are at the top of the document.</li>
+      <li>Section A: <code>Node</code> in pseudocode, ending in <code>ENDCLASS</code>; the <code>Pet</code> diagram completed with every setter showing a parameter <strong>and</strong> a data type.</li>
+      <li>Section B: B1 to B3 each pasted <strong>as text</strong> into their own box, with the indentation intact.</li>
+      <li>The screenshot shows the test data <strong>and</strong> the output: Before, then After with Omar first.</li>
+      <li>Your self-marked total out of 23 is filled in, with the points you lost named.</li>
+      <li>You are submitting <strong>the document only</strong> — not a zip, not the <code>.py</code> file.</li>
+    </ul>
+  </div>
+  <p>Your next taught lesson opens by checking these submissions. If you got stuck, submit what you have with a note saying where.</p>
+
+  <h3>Coming next</h3>
+  <p><strong>File handling and exception handling (20.2).</strong> Reading a text file to the end, closing it in the right place, and catching the exception with a message — and then loading the club's members from a file instead of typing them in.</p>
+</section>
+
+
+<footer class="foot">
+  Cambridge 9618 A Level Computer Science &nbsp;·&nbsp; 20.1 Programming Paradigms (OOP) &nbsp;·&nbsp; Home Lesson 7 of 7 &nbsp;·&nbsp; Papers 3 and 4 &nbsp;·&nbsp; United School International
+</footer>
+
+</div><!-- /pad -->
+</div><!-- /wrap -->
+
+
+<script>
+/* ---------------- starter code ---------------- */
+const STARTER = `class Player:
+    def __init__(self, Name, Score):
+        self.__Name = Name        # STRING
+        self.__Score = Score      # INTEGER
+
+    def GetName(self):
+        return self.__Name
+
+    def GetScore(self):
+        return self.__Score
+
+Players = [None] * 6                  # ARRAY[0:5] OF Player
+Players[0] = Player("Kai", 31)
+Players[1] = Player("Mia", 58)
+Players[2] = Player("Zane", 12)
+Players[3] = Player("Lola", 44)
+Count = 4                             # how many slots are in use
+
+for Pass in range(0, Count - 1):
+    for Index in range(0, Count - 1 - Pass):
+        if Players[Index].GetScore() > Players[Index + 1].GetScore():
+            Temp = Players[Index]
+            Players[Index] = Players[Index + 1]
+            Players[Index + 1] = Temp
+
+for Index in range(0, Count):
+    print(Players[Index].GetName() + " " + str(Players[Index].GetScore()))
+`;
+
+const PAGE_KEY = '9618-oop-' + (document.body.dataset.lesson || location.pathname);
+const PY_URL   = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+const OFFLINE_MSG = 'The in-page Python runner could not load (this usually means no internet connection, or the network is blocking it).\n\nEverything else on this page still works — run the code in IDLE, Thonny or VS Code instead, which is what you have to do for the assessed task anyway.';
+const OUTPUT_LIMIT = 100000;   // characters — a runaway print loop is stopped here
+
+const editor  = document.getElementById('editor');
+const stdinEl = document.getElementById('stdin');
+const output  = document.getElementById('output');
+const runbtn  = document.getElementById('runbtn');
+const stopbtn = document.getElementById('stopbtn');
+const resetbt = document.getElementById('resetbtn');
+const statusEl= document.getElementById('pystatus');
+
+/* ---------------- saving work in this browser ---------------- */
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(PAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+let saved = loadSaved();
+let saveTimer = null;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { editor: editor.value, stdin: stdinEl.value, notes: {} };
+    document.querySelectorAll('textarea[data-save]').forEach(t => { data.notes[t.id] = t.value; });
+    try { localStorage.setItem(PAGE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — work is not saved */ }
+  }, 400);
+}
+editor.value  = (typeof saved.editor === 'string' && saved.editor.trim()) ? saved.editor : STARTER;
+stdinEl.value = typeof saved.stdin === 'string' ? saved.stdin : '';
+document.querySelectorAll('textarea[data-save]').forEach(t => {
+  if (saved.notes && typeof saved.notes[t.id] === 'string') t.value = saved.notes[t.id];
+  t.addEventListener('input', saveSoon);
+});
+editor.addEventListener('input', saveSoon);
+stdinEl.addEventListener('input', saveSoon);
+
+/* Tab inserts four spaces rather than moving focus */
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab' && !e.shiftKey) {
+    e.preventDefault();
+    const s = editor.selectionStart, t = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(t);
+    editor.selectionStart = editor.selectionEnd = s + 4;
+    saveSoon();
+  }
+});
+
+resetbt.addEventListener('click', () => {
+  editor.value = STARTER;
+  output.textContent = 'Press Run to execute.';
+  saveSoon();
+});
+
+/* ---------------- Python, in a background worker ----------------
+   Running Python off the main thread means a loop that never ends
+   cannot freeze the page: Stop simply throws the worker away. */
+const WORKER_SRC = `
+let py = null, inputLines = [];
+const HARNESS = \`
+import sys, traceback
+
+def __run__(src):
+    g = {"__name__": "__main__"}
+    try:
+        code = compile(src, "your program", "exec")
+    except SyntaxError:
+        etype, evalue, tb = sys.exc_info()
+        print("".join(traceback.format_exception_only(etype, evalue)), end="", file=sys.stderr)
+        return
+    try:
+        exec(code, g)
+    except SystemExit:
+        pass
+    except EOFError:
+        print("EOFError: input() ran out of values.\\\\nType every value your program asks for in the Program input box, one per line, in order.", file=sys.stderr)
+    except BaseException:
+        etype, evalue, tb = sys.exc_info()
+        if tb is not None and tb.tb_next is not None:
+            tb = tb.tb_next
+        print("".join(traceback.format_exception(etype, evalue, tb)), end="", file=sys.stderr)
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+\`;
+const dec = new TextDecoder();
+self.addEventListener('unhandledrejection', () => { if (!py) postMessage({ type: 'fail' }); });
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.url);
+      py = await loadPyodide({ indexURL: m.base });
+      py.setStdout({ write: b => { postMessage({ type: 'out', text: dec.decode(b) }); return b.length; } });
+      py.setStderr({ write: b => { postMessage({ type: 'err', text: dec.decode(b) }); return b.length; } });
+      py.setStdin({ stdin: () => {
+        if (!inputLines.length) return null;
+        const v = inputLines.shift();
+        postMessage({ type: 'echo', text: v });
+        return v;
+      } });
+      py.runPython(HARNESS);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'fail', text: String(err) });
+    }
+  } else if (m.type === 'run') {
+    inputLines = m.input.length ? m.input.replace(/\\n$/, '').split('\\n') : [];
+    try {
+      py.globals.set('__student_src__', m.src);
+      await py.runPythonAsync('__run__(__student_src__)');
+    } catch (ex) {
+      postMessage({ type: 'err', text: String(ex).trim().split('\\n').slice(-3).join('\\n') });
+    }
+    postMessage({ type: 'done' });
+  }
+};
+`;
+
+let worker = null, ready = false, running = false, outChars = 0, hadErr = false, slowTimer = null;
+
+function setOut(text, cls) {
+  output.textContent = '';
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = text;
+  output.appendChild(span);
+}
+function appendOut(text, cls) {
+  if (cls === 'err' && output.textContent.length && !output.textContent.endsWith('\n')) text = '\n' + text;
+  if (cls === 'err' && !output.textContent.length) text = text.replace(/^\n+/, '');
+  outChars += text.length;
+  const last = output.lastChild;
+  if (!cls && last && last.nodeType === 3) { last.appendData(text); }
+  else if (cls && last && last.nodeType === 1 && last.className === cls) { last.textContent += text; }
+  else {
+    const node = cls ? document.createElement('span') : document.createTextNode(text);
+    if (cls) { node.className = cls; node.textContent = text; }
+    output.appendChild(node);
+  }
+}
+function unavailable() {
+  ready = false;
+  statusEl.textContent = 'Python unavailable';
+  runbtn.disabled = true; stopbtn.disabled = true;
+  setOut(OFFLINE_MSG, 'err');
+}
+function finishRun(message) {
+  running = false;
+  clearTimeout(slowTimer);
+  runbtn.disabled = !ready; stopbtn.disabled = true;
+  if (message) statusEl.textContent = message;
+}
+
+function startWorker() {
+  ready = false;
+  runbtn.disabled = true;
+  let w;
+  try {
+    const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    w = new Worker(URL.createObjectURL(blob));
+  } catch (e) { unavailable(); return; }
+  worker = w;
+  w.onerror = () => { if (worker === w) unavailable(); };
+  w.onmessage = e => {
+    if (worker !== w) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ready = true; statusEl.textContent = 'Python ready'; runbtn.disabled = false;
+    } else if (m.type === 'fail') {
+      unavailable();
+    } else if (m.type === 'out' || m.type === 'err' || m.type === 'echo') {
+      if (!running) return;
+      if (m.type === 'err') hadErr = true;
+      appendOut(m.type === 'echo' ? m.text + '\n' : m.text, m.type === 'err' ? 'err' : (m.type === 'echo' ? 'in' : null));
+      if (outChars > OUTPUT_LIMIT) {
+        stopRun('\n\nStopped: the program printed far too much output. Is there a loop that never ends?');
+      }
+    } else if (m.type === 'done') {
+      if (!running) return;
+      if (!output.textContent.length) setOut('(the program produced no output)');
+      else if (output.lastChild) output.lastChild.textContent = output.lastChild.textContent.replace(/\n+$/, '');
+      finishRun(hadErr ? 'Error — read it carefully' : 'Finished');
+    }
+  };
+  statusEl.textContent = 'Python is loading…';
+  setTimeout(() => { if (worker === w && !ready) { w.terminate(); worker = null; unavailable(); } }, 90000);
+  w.postMessage({ type: 'init', url: PY_URL, base: PY_URL.replace(/[^/]*$/, '') });
+}
+
+function stopRun(note) {
+  if (!running) return;
+  if (worker) worker.terminate();
+  worker = null;
+  appendOut(note || '\n\nStopped.', 'err');
+  finishRun('Stopped — restarting Python…');
+  startWorker();
+}
+
+runbtn.addEventListener('click', () => {
+  if (!ready || running) return;
+  running = true; hadErr = false; outChars = 0;
+  output.textContent = '';
+  runbtn.disabled = true; stopbtn.disabled = false;
+  statusEl.textContent = 'Running…';
+  slowTimer = setTimeout(() => {
+    if (running) statusEl.textContent = 'Still running — press Stop if it is stuck in a loop';
+  }, 5000);
+  worker.postMessage({ type: 'run', src: editor.value, input: stdinEl.value });
+});
+stopbtn.addEventListener('click', () => stopRun());
+
+startWorker();
+
+/* ---------------- checkpoints ----------------
+   A wrong choice explains itself and is crossed out, but the right answer
+   is never shown — the student has to find it. Their first attempt is
+   recorded on the card so they can be honest about it. */
+document.querySelectorAll('.cp').forEach(cp => {
+  const fb    = cp.querySelector('.fb');
+  const texts = cp.querySelectorAll('.fbs > div');
+  const opts  = Array.from(cp.querySelectorAll('.opt'));
+  const first = cp.querySelector('.first');
+  let attempts = 0, solved = false;
+  opts.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      if (solved || btn.classList.contains('wrong')) return;
+      attempts++;
+      const ok = btn.dataset.ok === '1';
+      btn.classList.add(ok ? 'right' : 'wrong');
+      btn.setAttribute('aria-disabled', 'true');
+      fb.className = 'fb show ' + (ok ? 'good' : 'bad');
+      fb.innerHTML = (ok ? '<strong>Correct. </strong>' : '<strong>Not quite — try again. </strong>')
+                   + (texts[i] ? texts[i].innerHTML : '');
+      if (attempts === 1 && first) {
+        first.textContent = ok ? 'First attempt: correct' : 'First attempt: not correct';
+        first.className = 'first ' + (ok ? 'good' : 'bad');
+      }
+      if (ok) {
+        solved = true;
+        opts.forEach(b => { if (b !== btn) b.setAttribute('aria-disabled', 'true'); b.classList.add('done'); });
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

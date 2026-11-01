@@ -17,6 +17,7 @@ oop-lesson-3.html       20.1 OOP — Using Objects
 oop-lesson-4.html       20.1 OOP — Containment or Inheritance?
 oop-lesson-5.html       20.1 OOP — Inheritance
 oop-lesson-6.html       20.1 OOP — A Full Paper 4 Question
+oop-lesson-7.html       20.1 OOP — Classes on Paper, and Sorting Objects
 robots.txt          disallow all crawlers
 ```
 
