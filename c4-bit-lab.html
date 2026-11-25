@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C4 - Bit Lab</title>
+<!--
+ BIT LAB — C4 Unit 4 lab 3 of 3 (built 24 Nov 2026 with C4 L14 + L15; build script _kit/bit_lab/build_bit.py).
+ LSL/LSR and AND/OR/XOR explanations: the 2027-29 syllabus, word for word (sources14.py / sources15.py, verified).
+ Arithmetic and cyclic shifts have no opcode in the table: done by hand. Arithmetic LEFT shift: shown only where keeping
+ or shifting the sign bit gives the same answer (no 9618 scheme prints one). The device byte is the L15 teacher's example.
+ MARK IT LIKE AN EXAMINER: example student answers written for this lab; every explanation quotes:
+  J25-13a  9618/13/M/J/25 Q7(a)(ii) · report
+  J25-13b  9618/13/M/J/25 Q7(a)(ii) · mark scheme
+  J25-13c  9618/13/M/J/25 Q7(a)(i) · report
+  N22-11   9618/11/O/N/22 Q6(b)(iv) · report
+  J21-11a  9618/11/M/J/21 Q3(c)(ii) · report
+  J21-11b  9618/11/M/J/21 Q3(c)(ii) · mark scheme
+  N24-12a  9618/12/O/N/24 Q8(b)(ii) · report
+  N24-12b  9618/12/O/N/24 Q8(b)(ii) · mark scheme
+  J25-11a  9618/11/M/J/25 Q8(b)(i) · report
+  J25-11b  9618/11/M/J/25 Q8(b)(i) · mark scheme
+  N22-13   9618/13/O/N/22 Q6(b)(i) · mark scheme
+-->
+<style>
+:root{
+  --paper:#ffffff; --ink:#1f2933; --ink-2:#57616e; --ink-3:#8b95a3;
+  --rule:#dde1e7; --rule-2:#c3cad3; --wash:#f6f7f9;
+  --write:#1d4ed8; --write-wash:#e6efff; --write-deep:#15389e;
+  --run:#15803d; --run-wash:#e5f4ea; --run-deep:#0f5c2c;
+  --fix:#be185d; --fix-wash:#fbe9f1; --fix-deep:#8f1146;
+  --amb:#9a6700; --amb-wash:#fdf3e0;
+  --good:#2c7a4b; --good-wash:#e6f3ea; --bad:#b3352f; --bad-wash:#fbeae9;
+  --kw:#b45309; --bi:#6d28d9; --st:#15803d; --cm:#b91c1c;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+body.board{font-size:21px}
+.rail{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.rail-in{max-width:900px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pips{display:flex;gap:4px;flex:1;min-width:180px}
+.pip{height:5px;flex:1;background:var(--rule);border-radius:3px;cursor:pointer}
+.pip.done{background:var(--ink-2)} .pip.now{background:var(--write)}
+.railtxt,.score{font-size:13px;color:var(--ink-2);white-space:nowrap}
+.score{font-family:var(--mono)}
+main{max-width:900px;margin:0 auto;padding:28px 20px 80px}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:34px;line-height:1.2;margin:0 0 6px;letter-spacing:-0.01em}
+h2{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:27px;line-height:1.25;margin:0 0 4px}
+h3{font-size:16px;font-weight:600;margin:22px 0 8px}
+p{margin:0 0 14px;max-width:70ch}
+.stage-no{font-family:var(--mono);font-size:13px;color:var(--ink-3);margin:0 0 10px}
+.lead{color:var(--ink-2);max-width:68ch}
+.stage{display:none} .stage.on{display:block}
+.panel{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:18px 0}
+.note{border-left:3px solid var(--rule-2);padding:2px 0 2px 14px;margin:16px 0;color:var(--ink-2);font-size:16px}
+.note.warn{border-left-color:var(--fix);color:var(--ink)}
+button{font-family:inherit;font-size:15px;padding:8px 15px;border:1px solid var(--rule-2);background:var(--paper);color:var(--ink);border-radius:7px;cursor:pointer;line-height:1.3}
+button:hover{border-color:var(--ink-3);background:var(--wash)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--write);outline-offset:2px}
+button.go{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:500} button.go:hover{background:#000}
+button.on{background:var(--write-wash);border-color:var(--write);color:var(--write-deep);font-weight:600}
+input[type=text]{font-family:inherit;font-size:17px;padding:8px 11px;border:1px solid var(--rule-2);border-radius:7px;width:260px}
+select{font-family:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--rule-2);border-radius:7px;background:#fff;color:var(--ink);max-width:100%}
+.qbox{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:14px 0}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.qtag{font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+.qtext{font-size:18px;margin:0 0 10px}
+.fb{font-size:15px;margin:10px 0 0;line-height:1.6} .fb.ok{color:var(--good)} .fb.no{color:var(--bad)}
+.mcq{display:grid;gap:8px;margin:10px 0}
+.mcq button{text-align:left;padding:11px 14px;font-size:16px;line-height:1.5}
+.picked-ok{background:var(--good-wash)!important;border-color:var(--good)!important;color:var(--good)!important}
+.picked-no{background:var(--bad-wash)!important;border-color:var(--bad)!important;color:var(--bad)!important}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:32px;padding-top:18px;border-top:1px solid var(--rule);flex-wrap:wrap}
+.hide{display:none!important}
+.code-out{font-family:var(--mono);font-size:30px;letter-spacing:.12em;color:var(--write-deep);background:var(--write-wash);border:1px solid var(--write);border-radius:9px;padding:14px 18px;display:inline-block;margin:10px 0}
+.fam{display:inline-block;font-size:12px;font-weight:700;color:#fff;border-radius:10px;padding:1px 9px;margin-right:6px;vertical-align:2px}
+.fam.w{background:var(--write)} .fam.r{background:var(--run)} .fam.x{background:var(--fix)}
+.kw{color:var(--kw);font-weight:700} .bi{color:var(--bi)} .st{color:var(--st)} .cm{color:var(--cm)}
+
+
+.twins{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.place{border-radius:10px;padding:14px 16px;color:#fff;font-size:16px;line-height:1.5}
+.place.w{background:var(--write)} .place.s{background:#a85a07}
+.sortq{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;margin:10px 0}
+.sortq .s{font-size:16.5px;margin:0 0 8px}
+.sortq .b{display:flex;gap:6px;flex-wrap:wrap}
+.sortq .b button{font-size:14px;padding:6px 11px}
+.missions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.missions div{border:1px solid var(--rule);border-radius:8px;padding:7px 11px;font-size:14.5px;display:flex;gap:8px;align-items:flex-start}
+.missions div:before{content:"";flex:0 0 16px;height:16px;border:2px solid var(--rule-2);border-radius:3px;margin-top:3px}
+.missions div.done{border-color:var(--good);background:var(--good-wash)}
+.missions div.done:before{background:var(--good);border-color:var(--good)}
+.sim{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin:14px 0}
+.code{border:1px solid var(--rule-2);border-radius:10px;overflow:hidden;font-family:var(--mono);font-size:15px;background:#fff}
+.code .ln{padding:2px 10px;white-space:pre;border-left:4px solid transparent}
+.code .ln .n{display:inline-block;width:2em;color:var(--ink-3);text-align:right;margin-right:.8em}
+.code .ln.ran{background:var(--good-wash);border-left-color:var(--good)}
+.code .ln.bad{background:var(--bad-wash);border-left-color:var(--bad);color:var(--bad);font-weight:700}
+.side .btns{display:flex;flex-direction:column;gap:6px}
+.side .btns button{text-align:left}
+.counter{font-family:var(--mono);font-size:13px;color:var(--ink-2);margin:8px 0}
+.out{border:1px solid var(--rule);border-radius:8px;background:#fbfbfc;font-family:var(--mono);font-size:14.5px;padding:8px 10px;min-height:120px;white-space:pre-wrap}
+.out .e{color:var(--cm);font-weight:600} .out .ok{color:var(--good);font-weight:700} .out .s{color:var(--ink-3)}
+.flash{font-size:14.5px;margin:6px 0 0;min-height:1.4em;color:var(--write-deep);font-weight:600}
+.parcel{border-radius:10px;padding:12px 14px;margin:8px 0;font-size:15.5px}
+.parcel.good{background:var(--good-wash);border:1px solid var(--good)} .parcel.bad{background:var(--bad-wash);border:1px solid var(--bad)}
+label.chk2{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:15.5px;cursor:pointer}
+label.chk2 input{margin-top:5px;transform:scale(1.2)}
+@media (max-width:640px){.twins,.missions,.sim{grid-template-columns:1fr}}
+input[type=text]{font-family:var(--mono);font-size:17px;padding:8px 11px;border:1px solid var(--rule-2);border-radius:7px;width:190px;background:var(--paper);color:var(--ink)}
+.qrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 0}
+.err{font-size:14px;color:var(--bad);margin:8px 0 0;min-height:0}
+.dots{display:flex;gap:5px;margin-top:12px;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--rule-2)}
+.dot.hit{background:var(--good);border-color:var(--good)}
+.dotlbl{font-size:13px;color:var(--ink-3);margin-left:6px}
+.wk{display:block;white-space:pre-line;font-family:var(--mono);font-size:14px;line-height:1.65;color:var(--ink-2);margin-top:9px;padding-top:9px;border-top:1px solid var(--rule);word-break:break-word}
+
+/* =========================================================== CPU Explorer on the house engine */
+:root{
+  --ink:#1E293B; --ink-2:#475569; --ink-3:#64748B; --bg:#F8FAFC; --rule:#E2E8F0; --rule-2:#CBD5E1; --wash:#F1F5F9;
+  --blue:#1D4ED8; --blue-t:#EFF6FF; --blue-t2:#DBEAFE; --blue-d:#1E40AF;
+  --pink:#EC4899; --pink-t:#FDF2F8; --pink-t2:#FCE7F3; --pink-d:#BE185D;
+  --green:#16A34A; --green-t:#F0FDF4; --green-t2:#DCFCE7; --green-d:#15803D;
+  --amber:#D97706; --amber-t:#FFFBEB; --amber-t2:#FEF3C7; --amber-d:#B45309;
+  --red:#EF4444; --red-t:#FEF2F2; --red-d:#B91C1C;
+  --write:#1D4ED8; --write-wash:#EFF6FF; --write-deep:#1E40AF;
+  --good:#15803D; --good-wash:#F0FDF4; --bad:#B91C1C; --bad-wash:#FEF2F2;
+}
+body{background:var(--bg);color:var(--ink);font-size:20px;line-height:1.4}
+main p{max-width:none}
+.hidden{display:none !important}
+.mono{font-family:var(--mono)}
+button{font-size:18px}
+button:focus-visible,select:focus-visible,input:focus-visible,.box:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+
+/* ---------- rail (header) */
+header.rail{position:static;background:#fff;border-bottom:1px solid var(--rule)}
+.rail-in{max-width:1440px;margin:0 auto;padding:8px 28px 0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 16px}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 14px;min-width:0}
+.brand h1{font-size:30px;margin:0;line-height:1.15;color:var(--ink)}
+.brand p{margin:0;color:var(--ink-2);font-size:18px}
+.railr{margin-left:auto;display:flex;align-items:center;gap:12px}
+.score{font-family:var(--mono);font-size:18px;color:var(--ink-2);white-space:nowrap}
+#kitchenBtn{font-size:18px;font-weight:600;padding:4px 12px;border:1px solid var(--pink);color:var(--pink-d);background:#fff;border-radius:7px}
+#kitchenBtn.on{background:var(--pink-d);border-color:var(--pink-d);color:#fff}
+.tabs{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:2px 4px;margin:0 -8px}
+.tabs button{position:relative;font-size:18px;font-weight:600;padding:4px 9px 12px;border:0;background:transparent;color:var(--ink-2);border-radius:7px 7px 0 0;line-height:1.3}
+.tabs button:after{content:"";position:absolute;left:9px;right:9px;bottom:4px;height:5px;border-radius:3px;background:var(--rule)}
+.tabs button.done:after{background:var(--ink-2)}
+.tabs button.on{background:transparent;border:0;color:var(--blue-d)}
+.tabs button.on:after{background:var(--blue)}
+.tabs button:hover{background:var(--wash)}
+
+/* ---------- layout + cards */
+main{max-width:1440px;margin:0 auto;padding:14px 28px 28px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+@media (max-width:1100px){.split{grid-template-columns:minmax(0,1fr)}}
+.card{background:#fff;border:1px solid var(--rule-2);border-top:4px solid var(--blue);border-radius:10px;padding:14px 18px;min-width:0;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.card.pink{border-top-color:var(--pink)}
+h2{font-size:26px;margin:0 0 8px;color:var(--ink)}
+aside h2{font-size:22px}
+h3{font-size:20px;margin:0}
+.small{color:var(--ink-2);font-size:18px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button{font-size:18px;font-weight:600;padding:5px 12px;border-radius:7px;color:var(--ink)}
+.btn{font-size:18px;font-weight:600;padding:7px 16px;border-radius:7px;border:1px solid var(--pink-d);background:var(--pink-d);color:#fff;cursor:pointer}
+.btn:hover{background:#9D174D;border-color:#9D174D}
+.btn.ghost,.btn.blue.ghost{background:#fff;color:var(--ink);border-color:var(--rule-2)}
+.btn.ghost:hover,.btn.blue.ghost:hover{background:var(--wash);border-color:var(--ink-3)}
+.btn.blue{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.blue:hover{background:#000}
+.btn:disabled{opacity:.4;cursor:default}
+label.tog{display:inline-flex;gap:8px;align-items:center;font-weight:600;cursor:pointer;font-size:18px}
+label.tog input{width:22px;height:22px;margin:0;accent-color:var(--blue)}
+select{font-size:18px;padding:4px 8px;border:1px solid var(--rule-2);border-radius:7px;background:#fff;color:var(--ink)}
+
+/* ---------- components */
+.box{border:2px solid var(--ink-3);border-radius:10px;background:#fff;padding:8px 10px;cursor:pointer;text-align:center;font-weight:600;transition:box-shadow .25s,background .25s,border-color .25s;min-width:0;overflow-wrap:anywhere;position:relative}
+.box:hover{filter:brightness(.97)}
+.box small{display:block;font-weight:normal;color:var(--ink-2);font-size:18px}
+.box.sel{box-shadow:0 0 0 4px var(--pink)}
+.box.lit{border-color:var(--amber)!important;box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)!important}
+.b-blue{border-color:var(--blue);color:var(--blue-d)}
+.b-green{border-color:var(--green);color:var(--green-d)}
+.b-orange{border-color:var(--amber);color:var(--amber-d)}
+.b-ink{border-color:var(--ink);color:var(--ink)}
+.kt{display:none;margin-top:4px;padding:1px 9px;border-radius:12px;background:var(--pink-t);color:var(--pink-d);border:1px solid var(--pink);font-size:18px;font-weight:600;font-style:italic;white-space:normal;line-height:1.3}
+body.kitchen .kt{display:inline-block}
+.now{border-left:4px solid var(--blue);background:var(--blue-t);border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:10px}
+.now .t{font-size:22px;font-weight:700;color:var(--amber-d);margin:0 0 4px}
+.rtn{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--blue-d);background:#fff;border:2px solid var(--blue);border-radius:8px;padding:4px 12px;display:inline-block;margin:4px 0 6px;max-width:100%;overflow-wrap:anywhere}
+.rtn.tw{color:var(--ink-2);border-style:dashed;border-color:var(--ink-3)}
+.plain{margin:4px 0 0;font-size:20px}
+.ms,.twl,.watch,.kline{padding:8px 12px;margin-top:8px;font-size:19px;border-radius:0 8px 8px 0;border-left:4px solid}
+.ms{background:var(--green-t);border-left-color:var(--green)}
+.twl{background:var(--wash);border-left-color:#94A3B8}
+.watch{background:var(--red-t);border-left-color:var(--red)}
+.kline{background:var(--pink-t);border-left-color:var(--pink)}
+.ms b.lab,.twl b.lab,.watch b.lab,.kline b.lab{display:block;font-size:18px;font-weight:700}
+.ms b.lab{color:var(--green-d)} .twl b.lab{color:var(--ink-2)} .watch b.lab{color:var(--red-d)} .kline b.lab{color:var(--pink-d)}
+.src{display:block;color:var(--ink-3);font-size:18px;font-style:italic;margin-top:2px}
+.badge{display:inline-block;font-size:18px;font-weight:600;font-style:normal;color:var(--ink-2);border:1px dashed var(--ink-3);border-radius:10px;padding:0 8px;margin-left:4px;white-space:nowrap;line-height:1.3}
+ol.steps{margin:0;padding-left:30px;font-size:18px;line-height:1.3}
+ol.steps li{padding:3px 6px;border-radius:6px;cursor:pointer;margin-bottom:2px}
+ol.steps li:hover{background:var(--wash)}
+ol.steps li.cur{background:var(--amber-t2);color:var(--ink);font-weight:700;box-shadow:inset 4px 0 0 var(--amber)}
+ol.steps li.done{color:var(--green-d)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.stepbar{position:sticky;bottom:0;z-index:6;background:#fff;margin:10px -18px -14px;padding:8px 18px 10px;border-top:1px solid var(--rule);border-radius:0 0 10px 10px;box-shadow:0 -6px 14px rgba(15,23,42,.06)}
+.stepbar .btn{padding:6px 16px}
+@media (min-width:1101px){.split > aside.card{position:sticky;top:12px;max-height:calc(100vh - 100px);overflow-y:auto}}
+.count{font-family:var(--mono);font-weight:600;color:var(--ink-2);font-size:18px}
+.keys{font-size:18px;color:var(--ink-2)}
+kbd{font-family:var(--mono);border:1px solid var(--ink-3);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:18px;background:#fff}
+
+/* ---------- Von Neumann */
+.vn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3.2fr) minmax(0,1fr);grid-template-areas:"in cpu out" "c1 c2 c3" "bus bus bus" "x c4 y" "mem mem mem";gap:0 14px;align-items:stretch}
+#vnIn{grid-area:in;align-self:center} #vnOut{grid-area:out;align-self:center} #vnCpu{grid-area:cpu}
+.conn{height:22px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='28' viewBox='0 0 16 28'%3E%3Cpath d='M8 2 L14 9 H10 V19 H14 L8 26 L2 19 H6 V9 H2 Z' fill='%23D97706'/%3E%3C/svg%3E") center/14px 22px no-repeat}
+#c1{grid-area:c1} #c2{grid-area:c2} #c3{grid-area:c3} #c4{grid-area:c4}
+#vnBuses{grid-area:bus;display:grid;gap:5px;padding:6px 8px;border:2px solid var(--amber);border-radius:12px;background:var(--amber-t)}
+#vnMem{grid-area:mem;justify-self:center;max-width:100%;min-width:0}
+table.memt td.mono{white-space:nowrap;font-size:18px}
+table.memt.h td{padding:3px 3px}
+table.memt.h th{padding:3px 6px}
+.cpu-in .box{display:flex;flex-direction:column;justify-content:center;align-items:center}
+.cpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px 10px}
+.cpu .ct{display:block;width:100%;text-align:left;color:var(--blue-d);font-weight:700;cursor:pointer;background:none;border:0;padding:2px 4px;border-radius:8px;font-size:20px}
+.cpu .ct small{font-weight:normal;font-size:18px}
+.cpu-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}
+.busbar{text-align:left;display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;padding:3px 12px}
+.busbar .dir{font-weight:normal;color:var(--ink-2);font-size:18px}
+.bb-a{border-color:var(--blue);color:var(--blue-d)} .bb-d{border-color:var(--green);color:var(--green-d)} .bb-c{border-color:var(--pink);color:var(--pink-d)}
+.mem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px 6px}
+.mem .mt{display:block;width:100%;background:none;border:0;color:var(--green-d);font-weight:700;cursor:pointer;text-align:center;font-size:20px;padding:2px;border-radius:8px}
+table.memt{border-collapse:collapse;margin:6px auto 0;font-size:19px}
+table.memt.h th{text-align:left}
+table.memt.h td{text-align:center;border-left:1px solid var(--rule)}
+.memV{display:none}
+@media (max-width:760px){.memH{display:none}.memV{display:table}}
+table.memt th{background:var(--wash);color:var(--ink-2);font-weight:700;padding:3px 6px;font-size:18px;border-bottom:1px solid var(--rule-2)}
+table.memt td{padding:3px 6px;border-bottom:1px solid var(--rule);background:#fff}
+table.memt td.ad{color:var(--blue-d);font-weight:700}
+.tag{display:inline-block;border-radius:8px;padding:0 5px;font-weight:700;font-size:18px}
+.tag.ins{color:var(--blue-d);border:2px solid var(--blue);background:var(--blue-t)}
+.tag.dat{color:var(--pink-d);border:2px solid var(--pink);background:var(--pink-t)}
+.spcap{text-align:center;margin:6px 0 0;font-size:18px;color:var(--ink-2)}
+@media (max-width:760px){
+  .vn{grid-template-columns:minmax(0,1fr);grid-template-areas:"cpu" "in" "out" "bus" "mem";gap:10px}
+  .conn{display:none}
+}
+
+/* ---------- Registers */
+.rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tray{border:2px solid var(--blue);border-radius:10px;background:#fff;padding:6px 10px 8px;cursor:pointer;min-width:0;text-align:left;position:relative;transition:box-shadow .25s,opacity .25s,background .25s}
+.tray .ab{font-size:26px;font-weight:700;color:var(--blue-d);line-height:1.1}
+.tray .fn{font-size:18px;color:var(--ink-2);line-height:1.2;min-height:2.4em}
+.tray .val{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--ink);background:var(--wash);border-radius:8px;padding:2px 8px;margin-top:4px;overflow-wrap:anywhere;text-align:center}
+.tray.sel{box-shadow:0 0 0 4px var(--pink)}
+.tray.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.tray.gp{border-color:var(--green)} .tray.gp .ab{color:var(--green-d)}
+.tray.dim{opacity:.35}
+.tray.sr{grid-column:span 2}
+.flags{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:6px}
+.flag{border:2px solid var(--blue);border-radius:8px;background:#fff;cursor:pointer;padding:2px 4px;text-align:center;min-width:0}
+.flag .fv{font-family:var(--mono);font-size:28px;font-weight:700;display:block}
+.flag .fl{font-size:18px;color:var(--ink-2);display:block}
+.flag.set{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.flag.set .fl{color:#fff}
+.flag.sel{box-shadow:0 0 0 4px var(--pink)}
+.grouplab{font-weight:700;font-size:20px;margin:10px 0 6px;color:var(--blue-d)}
+.grouplab.g{color:var(--green-d)}
+@media (max-width:1250px){.rgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.tray .val{font-size:24px}}
+@media (max-width:420px){.flag .fv{font-size:24px}.flags{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- Buses */
+.busdia{display:grid;grid-template-columns:170px minmax(0,1fr) 228px;gap:12px;align-items:start;margin-top:12px}
+.bcpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;display:flex;flex-direction:column;gap:8px}
+.bcpu .h,.bright .h{font-weight:700;color:var(--blue-d);font-size:20px}
+.mini{border:2px solid var(--blue);border-radius:8px;background:#fff;padding:4px 8px;min-width:0}
+.mini .ab{font-weight:700;color:var(--blue-d);font-size:19px}
+.mini .val{font-family:var(--mono);font-size:23px;font-weight:700;overflow-wrap:anywhere}
+.mini.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.lanes{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
+.lane{border:2px solid var(--rule-2);border-radius:10px;padding:4px 10px;background:#fff;min-width:0;transition:border-color .25s,box-shadow .25s}
+.lane .lh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 10px;font-weight:700;font-size:19px}
+.lane .ld{font-weight:normal;color:var(--ink-2);font-size:18px}
+.lane .wires{position:relative;margin:4px 0;overflow:hidden;border-radius:4px}
+.lane svg{display:block;width:100%}
+.lane .arrowrow{display:flex;justify-content:space-between;align-items:center;font-size:18px;line-height:1.1;color:var(--ink-2);font-weight:700}
+.lane .arrowrow .act{font-size:24px;color:var(--rule-2)}
+.lane .bits{font-family:var(--mono);font-size:18px;font-weight:700;min-height:1.3em;overflow-wrap:anywhere}
+.lane.on{box-shadow:0 0 0 4px var(--amber-t2);border-color:var(--amber)}
+.lane.on .arrowrow .act{color:var(--amber-d)}
+.lane-a .lh{color:var(--blue-d)} .lane-d .lh{color:var(--green-d)} .lane-c .lh{color:var(--pink-d)}
+.flow{position:absolute;inset:0;pointer-events:none;opacity:0}
+.lane.on .flow{opacity:1}
+.flow.r{background:linear-gradient(90deg,transparent 0,rgba(255,255,255,.85) 50%,transparent 100%);background-size:40% 100%;background-repeat:no-repeat;animation:flowR 1.2s linear infinite}
+.flow.l{background:linear-gradient(90deg,transparent 0,rgba(255,255,255,.85) 50%,transparent 100%);background-size:40% 100%;background-repeat:no-repeat;animation:flowL 1.2s linear infinite}
+@keyframes flowR{from{background-position:-60% 0}to{background-position:160% 0}}
+@keyframes flowL{from{background-position:160% 0}to{background-position:-60% 0}}
+@media (prefers-reduced-motion:reduce){.flow.r,.flow.l{animation:none}}
+.sigs{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 2px}
+.sig{border:2px solid var(--pink);color:var(--pink-d);border-radius:14px;padding:0 9px;font-size:18px;font-weight:700;background:#fff}
+.sig.on{background:var(--pink-d);border-color:var(--pink-d);color:#fff}
+.bright{display:flex;flex-direction:column;gap:10px;min-width:0}
+.bmem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px}
+.bmem .h{color:var(--green-d)}
+table.bm{border-collapse:collapse;width:100%;font-size:19px}
+table.bm td{padding:2px 6px;border-bottom:1px solid var(--rule);background:#fff}
+table.bm td.ad{color:var(--blue-d);font-weight:700;width:3.2em}
+table.bm td.v{font-family:var(--mono);font-weight:700}
+table.bm tr.lit td{background:var(--amber-t);box-shadow:inset 0 0 0 2px var(--amber)}
+.dev{border:2px solid var(--ink);border-radius:10px;background:#fff;padding:6px 8px;min-width:0}
+.dev .h{color:var(--ink);font-weight:700;font-size:19px}
+.dev.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.dev .val{font-family:var(--mono);font-weight:700;font-size:18px}
+@media (max-width:900px){.busdia{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Fetch–Execute */
+.phases{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.phase{border:2px solid var(--rule-2);border-radius:20px;padding:2px 16px;font-weight:700;color:var(--ink-2);font-size:19px}
+.phase.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.fe{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.fecpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start}
+.fecpu .h{grid-column:1/-1;font-weight:700;color:var(--blue-d)}
+.fecpu .cu{grid-column:1/-1}
+.mini.cu{border-color:var(--ink)} .mini.cu .ab{color:var(--ink)}
+.mini .dec{font-size:18px;color:var(--ink-2);min-height:1.3em}
+.febus{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
+.febus .fb{border:2px solid var(--rule-2);border-radius:10px;padding:5px 8px;background:#fff;min-width:0;margin:0;font-size:inherit;line-height:1.35}
+.fb .n{font-weight:700;font-size:19px}
+.fb .c{font-family:var(--mono);font-weight:700;font-size:19px;min-height:1.3em;color:var(--ink-3);overflow-wrap:anywhere}
+.febus .fb.on{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.fb.on .c{color:var(--ink)}
+.fb-a .n{color:var(--blue-d)} .fb-d .n{color:var(--green-d)} .fb-c .n{color:var(--pink-d)}
+.femem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px;min-width:0}
+.femem .h{font-weight:700;color:var(--green-d)}
+.legend{margin-top:10px;background:var(--wash);border-radius:8px;padding:6px 12px;font-size:18px}
+.legend code{font-family:var(--mono);font-weight:700;color:var(--blue-d);font-size:19px}
+.reveal{font-size:19px;font-weight:700;border:2px dashed var(--blue);background:#fff;color:var(--blue-d);border-radius:8px;padding:6px 14px;cursor:pointer;margin:4px 0 6px}
+@media (max-width:900px){.fe{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Interrupts */
+.intctl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:center}
+.intctl .l{font-weight:700}
+.intgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.9fr);gap:12px;margin-top:10px;align-items:stretch}
+.wro{font-weight:700;color:var(--blue-d)}
+.proc{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;min-width:0}
+.proc .h,.stackbox .h,.isr .h{font-weight:700;font-size:20px}
+.proc .h{color:var(--blue-d)}
+.cyc{display:flex;gap:6px;margin:6px 0}
+.cyc span{flex:1;text-align:center;border:2px solid var(--rule-2);border-radius:8px;font-weight:700;font-size:18px;padding:2px;background:#fff;color:var(--ink-2)}
+.cyc span.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.pregs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ireg{margin-top:8px}
+.ibits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:4px}
+.ibit{border:2px solid var(--blue);border-radius:8px;background:#fff;padding:2px 8px;min-width:0;display:flex;align-items:center;gap:8px}
+.ibit b{font-family:var(--mono);font-size:24px}
+.ibit span{font-size:18px;color:var(--ink-2);line-height:1.15;overflow-wrap:anywhere;min-width:0}
+.ibit.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.ibit.on span{color:#fff}
+.status{margin-top:8px;font-weight:700;font-size:19px;border-radius:8px;padding:4px 10px;background:#fff;border:2px solid var(--rule-2)}
+.status.isr{border-color:var(--pink);color:var(--pink-d)}
+.status.wait{border-color:var(--amber);color:var(--amber-d)}
+.status.run{border-color:var(--green);color:var(--green-d)}
+.stackbox{border:2px solid var(--ink);border-radius:12px;background:#fff;padding:8px;display:flex;flex-direction:column;min-width:0;transition:box-shadow .25s}
+.stackbox.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2)}
+.pile{flex:1;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:4px;border:2px solid var(--ink-3);border-top:0;border-radius:0 0 10px 10px;padding:6px;min-height:130px;background:var(--wash)}
+.plate{border:2px solid var(--blue);border-radius:6px;background:#fff;padding:2px 8px;font-family:var(--mono);font-weight:700;font-size:19px;text-align:center;animation:drop .35s ease-out}
+.plate.top{border-color:var(--amber);background:var(--amber-t)}
+@keyframes drop{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.plate{animation:none}}
+.toplab{font-size:18px;color:var(--ink-2);text-align:center;margin-bottom:2px}
+.lifo{font-size:18px;color:var(--ink-2);margin-top:6px}
+.isr{border:2px solid var(--pink);border-radius:12px;background:var(--pink-t);padding:8px;min-width:0}
+.isr .h{color:var(--pink-d)}
+.isr.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.isr ul{margin:4px 0 0;padding-left:20px;font-size:18px}
+.isr li.on{font-weight:700;color:var(--amber-d)}
+.cmp{margin-top:10px;font-size:20px;font-weight:700;text-align:center;border-radius:8px;padding:6px;background:var(--wash);min-height:1.5em}
+.cmp.hi{background:var(--green-d);color:#fff} .cmp.lo{background:var(--amber-d);color:#fff}
+@media (max-width:900px){.intgrid{grid-template-columns:minmax(0,1fr)}.pile{min-height:110px}}
+
+/* ---------- 6 Mark it like an examiner + 7 completion code */
+.wide{max-width:1180px;margin:0 auto}
+.stage-no{font-family:var(--mono);font-size:18px;color:var(--ink-3);margin:0 0 4px}
+.wide h2{font-size:30px}
+.lead{color:var(--ink-2);font-size:20px;margin:0 0 10px;max-width:72ch}
+.roundbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:4px 0 12px}
+.roundbar .counter{font-family:var(--mono);font-size:18px;color:var(--ink-2);margin:0}
+#eq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sortq{border:1px solid var(--rule-2);border-radius:10px;padding:12px 14px;margin:0;background:#fff;min-width:0}
+.sortq .s{font-size:19px;margin:0 0 10px;line-height:1.45}
+.sortq .ctx{font-weight:700;color:var(--ink)}
+.exlab{display:table;margin:6px 0 4px;font-size:18px;font-weight:700;color:var(--pink-d);background:var(--pink-t);border:1px solid var(--pink);border-radius:10px;padding:0 9px}
+.ans{display:block;font-family:Georgia,"Times New Roman",serif;font-size:21px;border-left:3px solid var(--rule-2);padding:2px 0 2px 12px;color:var(--ink)}
+.sortq .b{display:flex;gap:8px;flex-wrap:wrap}
+.sortq .b button{font-size:18px;font-weight:600;padding:6px 14px}
+.sortq .fb{font-size:18px;margin:10px 0 0;line-height:1.45;color:var(--ink)}
+.sortq .fb.ok,.sortq .fb.no{padding:8px 12px;border-left:4px solid;border-radius:0 8px 8px 0}
+.sortq .fb.ok{background:var(--green-t);border-left-color:var(--green)}
+.sortq .fb.no{background:var(--red-t);border-left-color:var(--red)}
+.sortq .fb q{font-style:italic}
+.sortq .fb .src{font-size:18px}
+.missions{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.missions div{font-size:18px;padding:8px 12px}
+.missions div:before{margin-top:5px}
+.namerow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 4px}
+.namerow label{font-weight:600;font-size:19px}
+#uname{font-family:var(--sans);font-size:20px;width:320px;max-width:100%}
+#codemsg{font-size:20px;margin:10px 0 0}
+.code-out{font-size:32px}
+@media (max-width:900px){#eq,.missions{grid-template-columns:minmax(0,1fr)}}
+
+@media (max-width:640px){
+  main{padding:12px 16px 24px} .rail-in{padding:8px 16px 0} .brand h1{font-size:26px}
+  .tabs button{font-size:18px;padding:4px 8px 12px}
+  .card{padding:12px}
+  .rtn{font-size:24px}
+  .stepbar{margin:10px -12px -12px;padding:8px 12px}
+  .stepbar .keys{display:none}
+  .intctl{grid-template-columns:minmax(0,1fr)}
+}
+
+.bitrow{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}
+.bitrow .lbl{width:150px;text-align:right;font-weight:700;color:var(--muted,#64748B);font-size:18px}
+.bc{width:46px;height:46px;border:2px solid #CBD5E1;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font:700 24px Consolas,"DejaVu Sans Mono",monospace;background:#fff}
+.bc.in{background:#DCFCE7;border-color:#16A34A}.bc.cp{background:#FCE7F3;border-color:#EC4899}.bc.wr{background:#FEF9C3;border-color:#D97706}
+.bc.fo{background:#DBEAFE;border-color:#1D4ED8}.bc.lost{background:#FEE2E2;border-color:#EF4444;color:#EF4444;width:36px;height:36px;font-size:18px}
+.bc.ed{cursor:pointer}.bc.ed:hover{border-color:#1D4ED8}
+.vals{font-size:17px;color:#475569;margin-left:8px}
+.pvh{display:flex;gap:6px;margin-left:156px}.pvh span{width:46px;text-align:center;font-size:14px;color:#64748B;font-weight:700}
+.seg2{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.seg2 button{font-size:17px}
+.seg2 button.on,.seg2 button.on:hover{background:#1D4ED8;color:#fff;border-color:#1D4ED8}
+.warnbox{background:#FEF9C3;border:1px solid #D97706;border-radius:8px;padding:8px 12px;font-size:17px;margin:6px 0}
+.devs{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin:8px 0}
+.devc{border:2px solid #CBD5E1;border-radius:10px;padding:8px 4px;text-align:center;background:#fff}
+.devc .bn{font-size:13px;color:#64748B;font-weight:700}.devc .nm{font-size:15px;font-weight:700;min-height:38px}
+.devc .st{font:700 28px Consolas,monospace}.devc.on{border-color:#16A34A;background:#F0FDF4}
+.devc.sensor{border-style:dashed}.devc.sensor.on{border-color:#D97706;background:#FEF9C3}
+.devc button{font-size:13px;padding:2px 6px;margin-top:4px}
+.job{border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;margin:8px 0;background:#fff}
+.job.done{border-color:#16A34A;background:#F0FDF4}.job .t{font-size:18px;font-weight:700;margin:0 0 6px}
+.prog{font:700 18px Consolas,monospace;background:#F1F5F9;border-radius:6px;padding:6px 10px;margin:6px 0;white-space:pre}
+input.mono{font:700 20px Consolas,monospace}
+</style>
+</head>
+<body>
+<header class="rail">
+  <div class="rail-in">
+    <div class="brand"><h1>Bit Lab</h1><p>9618 AS Level · 4.3 Bit manipulation · C4 Lessons 14–15</p></div>
+    <div class="railr"><span class="score" id="scoretxt">Examiner 0/11</span></div>
+    <nav class="tabs" aria-label="Sections">
+      <button data-mode="shift" class="on">1 Shifts</button>
+      <button data-mode="mask">2 Masks</button>
+      <button data-mode="dev">3 Device panel</button>
+      <button data-mode="exam">4 Mark like an examiner</button>
+      <button data-mode="code">5 Code</button>
+    </nav>
+  </div>
+</header>
+<main>
+<section id="m-shift" class="mode">
+  <div class="card wide">
+    <p class="stage-no">Section 1 of 5 · Lesson 14</p>
+    <h2>Shifts — one place at a time</h2>
+    <p class="lead">Click a bit to change it. Choose the kind of shift and the direction, then <b>Shift one place</b>.
+    Say it first: <i>left or right? logical, arithmetic or cyclic?</i></p>
+    <div class="pvh" id="pvh"></div>
+    <div id="srows"></div>
+    <div class="seg2" id="kind"><button class="btn ghost on" data-k="L">Logical</button><button class="btn ghost" data-k="A">Arithmetic</button><button class="btn ghost" data-k="C">Cyclic</button></div>
+    <div class="seg2" id="dir"><button class="btn ghost on" data-d="left">Left</button><button class="btn ghost" data-d="right">Right</button></div>
+    <div class="ctl"><button class="btn" id="sone" data-test="sone">Shift one place</button><button class="btn ghost" id="sreset">Start again</button>
+      <button class="btn ghost" id="srand">Random value</button><span class="modepill" id="sname" data-test="sname"></span></div>
+    <div class="warnbox hide" id="swarn" data-test="swarn"></div>
+    <p class="small" id="srule" data-test="srule"></p>
+  </div>
+  <div class="card wide">
+    <h2>Predict the shift <span class="counter" id="spc" data-test="spc"></span></h2>
+    <p class="qtext" id="spq" data-test="spq"></p>
+    <div class="ctl"><input type="text" id="spa" class="mono" maxlength="9" data-test="spa" autocomplete="off" placeholder="8 bits">
+      <button class="btn" id="spcheck" data-test="spcheck">Check</button><button class="btn ghost" id="spnext" data-test="spnext">New question</button></div>
+    <p class="fb" id="spf" data-test="spf"></p>
+  </div>
+</section>
+
+<section id="m-mask" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 2 of 5 · Lesson 15</p>
+    <h2>Masks — AND, OR, XOR</h2>
+    <p class="lead">Click the ACC bits to change them, then type ONE instruction: <span class="mono">AND B00001111</span>,
+    <span class="mono">OR #4</span>, <span class="mono">XOR &amp;FE</span> or <span class="mono">AND 104</span> (an address: memory below).</p>
+    <div class="pvh" id="pvh2"></div>
+    <div id="mrows"></div>
+    <div class="ctl"><label for="mins">Instruction</label><input type="text" id="mins" class="mono" value="AND B00001111" data-test="mins" autocomplete="off">
+      <button class="btn" id="mrun" data-test="mrun">Run it</button><button class="btn ghost" id="mrand">Random ACC</button></div>
+    <p class="err2" id="merr" data-test="merr"></p>
+    <p class="small" id="mrule" data-test="mrule"></p>
+    <table class="it" id="mtab" style="font-size:16px"></table>
+    <p class="small" id="mmem"></p>
+  </div>
+  <div class="card wide">
+    <h2>Predict the result <span class="counter" id="mpc" data-test="mpc"></span></h2>
+    <p class="qtext" id="mpq" data-test="mpq"></p>
+    <div class="ctl"><input type="text" id="mpa" class="mono" maxlength="9" data-test="mpa" autocomplete="off" placeholder="8 bits">
+      <button class="btn" id="mpcheck" data-test="mpcheck">Check</button><button class="btn ghost" id="mpnext" data-test="mpnext">New question</button></div>
+    <p class="fb" id="mpf" data-test="mpf"></p>
+  </div>
+</section>
+
+<section id="m-dev" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 3 of 5 · Lesson 15</p>
+    <h2>Device panel — one byte, eight devices</h2>
+    <p class="lead">The byte <b>HOME</b> (the Lesson 15 example). Dashed cards are SENSORS — click <b>sense</b> to change
+    their reading. For each job type ONE instruction; the lab runs <span class="mono">LDD HOME</span>, your instruction,
+    then <span class="mono">STO HOME</span>, and checks that only the right bit(s) changed.</p>
+    <div class="devs" id="devs" data-test="devs"></div>
+    <div class="ctl"><span class="mono" id="homev" data-test="home" style="font-size:24px"></span><button class="btn ghost" id="dreset">Reset HOME</button></div>
+    <div id="jobs"></div>
+  </div>
+</section>
+
+<section id="m-exam" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 4 of 5</p>
+    <h2>Mark it like an examiner</h2>
+    <p class="lead">Each card shows an example student answer, written for this lab. Would the published mark scheme give it the mark?
+    Choose <b>Scores 1</b> or <b>Scores 0</b>. Every explanation quotes a mark scheme or an examiner report.</p>
+    <div class="roundbar"><span class="counter" id="eqcount" data-test="eqcount"></span><button id="eqAgain" class="btn ghost">Start the set again</button></div>
+    <div id="eq"></div>
+  </div>
+</section>
+
+<section id="m-code" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 5 of 5</p>
+    <h2>Your completion code</h2>
+    <p class="lead">Finish the missions, then type your name to get your code.</p>
+    <div class="missions" id="missions"></div>
+    <div class="namerow"><label for="uname">Your name</label><input type="text" id="uname" placeholder="Your name" autocomplete="off"></div>
+    <p id="codemsg"></p>
+    <div class="code-out hide" id="codeout" data-test="code"></div>
+    <p class="small">Submit this code on Teams if your teacher asks for it.</p>
+  </div>
+</section>
+</main>
+<script>
+"use strict";
+const D = {"exam": [{"id": "J25-13a", "src": "9618/13/M/J/25 Q7(a)(ii) · report", "ctx": "Show the result of an arithmetic right shift of 3 places on the two’s complement binary integer 10011110.", "ans": "1000 0011", "a": "Scores 0", "f": "The sign bit is kept but not copied. The report: “Candidates generally found this question more challenging. A common mistake was the correct preservation of the sign bit but then omitting to copy the sign bit as the shift was accomplished.”"}, {"id": "J25-13b", "src": "9618/13/M/J/25 Q7(a)(ii) · mark scheme", "ctx": "Show the result of an arithmetic right shift of 3 places on the two’s complement binary integer 10011110.", "ans": "1111 0011", "a": "Scores 1", "f": "The published scheme prints “1111 0011”: the 1 is copied into each new place."}, {"id": "J25-13c", "src": "9618/13/M/J/25 Q7(a)(i) · report", "ctx": "Show the result of a logical left shift of 2 places on the two’s complement binary integer 11001010.", "ans": "0010 1011", "a": "Scores 0", "f": "That is a cyclic shift: the two 1s came back on the right. The report: “This question was generally answered well. Some candidates confused the logical shift with a cyclic shift, and some candidates shifted the value right instead of left.” The scheme prints “0010 1000”."}, {"id": "N22-11", "src": "9618/11/O/N/22 Q6(b)(iv) · report", "ctx": "The ACC holds 10010011. Show the result after LSR #2.", "ans": "0100 1100", "a": "Scores 0", "f": "Shifted LEFT. The report: “A small number of candidates confused right and left and so shifted the bits the wrong way.” The scheme prints “0010 0100”."}, {"id": "J21-11a", "src": "9618/11/M/J/21 Q3(c)(ii) · report", "ctx": "Identify the mathematical operation that LSR #3 will perform on the contents of the accumulator.", "ans": "Bits in ACC are shifted logically 3 places to the right", "a": "Scores 0", "f": "That copies the table. The report: “answers often repeated the exact wording given in the table of opcodes, whereas the question asked for the equivalent mathematical operation.”"}, {"id": "J21-11b", "src": "9618/11/M/J/21 Q3(c)(ii) · mark scheme", "ctx": "Identify the mathematical operation that LSR #3 will perform on the contents of the accumulator.", "ans": "The number is divided by 8", "a": "Scores 1", "f": "The published scheme: “The number is divided by 8 (and only whole number retained)”"}, {"id": "N24-12a", "src": "9618/12/O/N/24 Q8(b)(ii) · report", "ctx": "Explain how bit manipulation can be used to test whether the number in the ACC is odd (one explanation point).", "ans": "If the number is odd the end bit will be 1", "a": "Scores 0", "f": "Which end? The report: “Some candidates should understand that statements such as, ‘if the number is odd the end bit will be 1’ are not enough. It does not explain which ‘end’ bit.”"}, {"id": "N24-12b", "src": "9618/12/O/N/24 Q8(b)(ii) · mark scheme", "ctx": "Explain how bit manipulation can be used to test whether the number in the ACC is odd (one explanation point).", "ans": "An odd binary number will have a 1 in the least significant bit", "a": "Scores 1", "f": "The published scheme: “An odd binary number will have a 1 in the Least Significant Bit (LSB)” The report: “The use of the correct wording, such as, ‘if the number is odd the least significant bit will be 1’ makes it clear.”"}, {"id": "J25-11a", "src": "9618/11/M/J/25 Q8(b)(i) · report", "ctx": "Write the bit manipulation instruction that can be used to set the least significant bit to 1 (all other bits unchanged).", "ans": "OR 00000001", "a": "Scores 0", "f": "No symbol, so 00000001 is read as an address. The scheme prints “OR B0000 0001 // OR #1 // OR &1”; the report: “A few candidates confused the least significant (rightmost) bit with the most significant (leftmost) bit, and some candidates should take care to include the appropriate symbol to indicate the type of the operand.”"}, {"id": "J25-11b", "src": "9618/11/M/J/25 Q8(b)(i) · mark scheme", "ctx": "Write the bit manipulation instruction that can be used to set the least significant bit to 1 (all other bits unchanged).", "ans": "OR #1", "a": "Scores 1", "f": "The published scheme: “OR B0000 0001 // OR #1 // OR &1”"}, {"id": "N22-13", "src": "9618/13/O/N/22 Q6(b)(i) · mark scheme", "ctx": "The ACC holds 00110110. Show the contents of the ACC after AND B01001100.", "ans": "0111 1110", "a": "Scores 0", "f": "That is OR. AND keeps a 1 only where BOTH bits are 1: the scheme prints “0000 0100”."}], "lsl": "Bits in ACC are shifted logically n places to the left. Zeros are introduced on the right hand end", "lsr": "Bits in ACC are shifted logically n places to the right. Zeros are introduced on the left hand end", "asrMS": "An arithmetic shift moves all bits to the right but copies the sign bit into the Most Significant Bit (MSB)", "iset": [{"op": "AND", "opd": "#n / Bn / &n", "expl": "Bitwise AND operation of the contents of ACC with the operand"}, {"op": "AND", "opd": "<address>", "expl": "Bitwise AND operation of the contents of ACC with the contents of <address>"}, {"op": "XOR", "opd": "#n / Bn / &n", "expl": "Bitwise XOR operation of the contents of ACC with the operand"}, {"op": "XOR", "opd": "<address>", "expl": "Bitwise XOR operation of the contents of ACC with the contents of <address>"}, {"op": "OR", "opd": "#n / Bn / &n", "expl": "Bitwise OR operation of the contents of ACC with the operand"}, {"op": "OR", "opd": "<address>", "expl": "Bitwise OR operation of the contents of ACC with the contents of <address>"}], "notation": ["# denotes a denary number, e.g. #123", "B denotes a binary number, e.g. B01001010", "& denotes a hexadecimal number, e.g. &4A"], "mem": {"100": "00001111", "101": "11110000", "102": "01010101", "103": "11111111", "104": "00000000"}, "home": [{"bit": 7, "name": "alarm", "kind": "out"}, {"bit": 6, "name": "door lock", "kind": "out"}, {"bit": 5, "name": "heating", "kind": "out"}, {"bit": 4, "name": "lights", "kind": "out"}, {"bit": 3, "name": "motion sensor", "kind": "in"}, {"bit": 2, "name": "window sensor", "kind": "in"}, {"bit": 1, "name": "fan", "kind": "out"}, {"bit": 0, "name": "camera", "kind": "out"}], "home0": "00101100", "jobs": [{"id": "lights", "t": "Switch the LIGHTS on (bit 4). Leave every other device as it is.", "kind": "set", "bit": 4}, {"id": "heating", "t": "Switch the HEATING off (bit 5). Leave every other device as it is.", "kind": "clear", "bit": 5}, {"id": "fan", "t": "TOGGLE the FAN (bit 1) — whatever it is now, flip it.", "kind": "toggle", "bit": 1}, {"id": "two", "t": "Switch the ALARM (bit 7) and the CAMERA (bit 0) on with ONE instruction.", "kind": "set2", "bits": [7, 0]}, {"id": "window", "t": "TEST the WINDOW sensor (bit 2): which ONE instruction keeps bit 2 and clears all the others, ready for the compare?", "kind": "test", "bit": 2}]};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function hex(v,n){let s=v.toString(16).toUpperCase();while(s.length<n)s='0'+s;return s;}
+const bin8 = v => (v & 255).toString(2).padStart(8,'0');
+const sp = b => b.slice(0,4)+' '+b.slice(4);
+const un = b => parseInt(b,2);
+const tc = b => b[0]==='1' ? un(b)-256 : un(b);
+
+/* ---------------------------------------------------------------- the shift engine (= t14.py) */
+const lsl = (b,n=1) => (b+'0'.repeat(n)).slice(n);
+const lsr = (b,n=1) => ('0'.repeat(n)+b).slice(0,8);
+const asr = (b,n=1) => (b[0].repeat(n)+b).slice(0,8);
+const cyl = (b,n=1) => { n%=8; return b.slice(n)+b.slice(0,n); };
+const cyr = (b,n=1) => { n%=8; return n ? b.slice(8-n)+b.slice(0,8-n) : b; };
+const aslSafe = (b,n=1) => (b[0]+lsl(b.slice(1),n)) === lsl(b,n);
+const keptNotCopied = (b,n=1) => b[0]+('0'.repeat(n)+b.slice(1)).slice(0,7);
+function shift1(b, k, d){            // one place; returns {r, lost, inIdx, err}
+  if(k==='L') return d==='left' ? {r:lsl(b), lost:b[0], inIdx:7} : {r:lsr(b), lost:b[7], inIdx:0};
+  if(k==='C') return d==='left' ? {r:cyl(b), inIdx:7, wrap:true} : {r:cyr(b), inIdx:0, wrap:true};
+  if(d==='right') return {r:asr(b), lost:b[7], inIdx:1, copy:true};
+  if(!aslSafe(b)) return {err:true};
+  return {r:lsl(b), lost:b[1], inIdx:7};
+}
+
+/* ---------------------------------------------------------------- the mask engine (= t15.py) */
+function operand(s, mem){
+  let m;
+  if((m=/^#(\d+)$/.exec(s))) return {v:parseInt(m[1],10), form:'denary'};
+  if((m=/^B([01]{1,8})$/.exec(s))) return {v:parseInt(m[1],2), form:'binary'};
+  if((m=/^&([0-9A-F]{1,2})$/i.exec(s))) return {v:parseInt(m[1],16), form:'hexadecimal'};
+  if(/^\d+$/.test(s)) { const c = (mem||D.mem)[s]; return c===undefined ? {err:'Address '+s+' is not in the memory shown.'} : {v:un(c), form:'address '+s}; }
+  return {err:'Write the operand as #n, Bn, &n or an address.'};
+}
+function maskRun(acc, ins, mem){
+  const p = (ins||'').trim().toUpperCase().split(/\s+/);
+  if(p.length!==2 || !['AND','OR','XOR'].includes(p[0])) return {err:'Type ONE instruction: AND, OR or XOR, then the operand.'};
+  const o = operand(p[1], mem); if(o.err) return {err:o.err};
+  if(o.v>255) return {err:'The operand must fit in 8 bits (0 to 255).'};
+  const a = un(acc), r = p[0]==='AND' ? a & o.v : p[0]==='OR' ? a | o.v : a ^ o.v;
+  return {op:p[0], mask:bin8(o.v), form:o.form, r:bin8(r)};
+}
+
+/* ---------------------------------------------------------------- progress */
+const P = {cases:new Set(), spOk:0, spDone:0, mpOk:0, mpDone:0, jobs:new Set(), eqBest:0, eqScore:0, eqDone:0, total:0};
+function setMode(m){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));
+  document.querySelectorAll('.mode').forEach(s=>s.classList.toggle('hidden', s.id!=='m-'+m));
+  if(m==='code') drawCode();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+const PVH = ['128','64','32','16','8','4','2','1'];
+function cells(b, cls, ed){ return b.split('').map((c,i)=>'<div class="bc'+(cls[i]?' '+cls[i]:'')+(ed?' ed':'')+'" data-i="'+i+'"'+
+  (ed?' tabindex="0" role="button" aria-label="bit worth '+PVH[i]+': '+c+'. Press to flip it."':'')+'>'+c+'</div>').join(''); }
+/* editable bits: click, Enter or Space flips a bit; after a key press the focus returns to the same bit (audit A2-18) */
+function bindEd(root, flip){
+  root.querySelectorAll('.bc.ed').forEach(c=>{ const i=+c.dataset.i;
+    c.onclick=()=>flip(i);
+    c.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(i);
+      const n=root.querySelector('.bc.ed[data-i="'+i+'"]'); if(n) n.focus(); } }; });
+}
+
+/* ---------------------------------------------------------------- 1 SHIFTS */
+let S0 = '10110100', SR = [], KIND = 'L', DIR = 'left';
+$('pvh').innerHTML = PVH.map(x=>'<span>'+x+'</span>').join('');
+function sDraw(){
+  let h = '<div class="bitrow"><span class="lbl">start</span>'+cells(S0, [], true)+'<span class="vals">'+un(S0)+' unsigned · '+tc(S0)+' two’s complement</span></div>';
+  SR.forEach((s,k)=>{ const cls=[]; cls[s.inIdx] = s.copy ? 'cp' : s.wrap ? 'wr' : 'in'; if(s.copy) cls[0]='cp';
+    h += '<div class="bitrow" data-test="srow"><span class="lbl">'+(k+1)+' place'+(k?'s':'')+'</span>'+cells(s.r, cls)+
+         (s.lost!==undefined ? '<div class="bc lost" title="the bit that fell off">'+s.lost+'</div>' : '')+
+         '<span class="vals">'+s.name+' · '+un(s.r)+' unsigned · '+tc(s.r)+' two’s complement</span></div>'; });
+  $('srows').innerHTML = h;
+  bindEd($('srows'), i=>{ S0 = S0.slice(0,i)+(S0[i]==='1'?'0':'1')+S0.slice(i+1); SR=[]; $('swarn').classList.add('hide'); sDraw(); });
+  const nm = {L:'Logical', A:'Arithmetic', C:'Cyclic'}[KIND]+' '+DIR;
+  $('sname').textContent = nm;
+  $('srule').innerHTML = KIND==='L' ? (DIR==='left' ? 'LSL #n — “'+esc(D.lsl)+'”' : 'LSR #n — “'+esc(D.lsr)+'”')
+    : KIND==='C' ? 'Cyclic: the bit that falls off one end comes back in at the other (no opcode: done by hand).'
+    : DIR==='right' ? 'Arithmetic right — the November 2024 P13 scheme: “'+esc(D.asrMS)+'” (no opcode: done by hand).'
+    : 'Arithmetic left: shown only where keeping or shifting the sign bit gives the same answer — no 9618 scheme prints one.';
+}
+function sOne(){
+  const cur = SR.length ? SR[SR.length-1].r : S0;
+  const s = shift1(cur, KIND, DIR);
+  if(s.err){ $('swarn').classList.remove('hide');
+    $('swarn').textContent = 'Not for this value: keeping the sign bit gives '+sp(cur[0]+lsl(cur.slice(1)))+', shifting all 8 gives '+sp(lsl(cur))+'. They disagree, so the result would be wrong (overflow). Try 1111 1010.';
+    const b = document.createElement('button'); b.id='ssafe'; b.textContent='Use 1111 1010'; b.style.marginLeft='8px';
+    b.onclick=()=>{ S0='11111010'; SR=[]; $('swarn').classList.add('hide'); sDraw(); $('sone').focus(); };
+    $('swarn').appendChild(b); return; }
+  $('swarn').classList.add('hide');
+  s.name = {L:'logical', A:'arithmetic', C:'cyclic'}[KIND]+' '+DIR; SR.push(s);
+  P.cases.add(KIND+DIR); sDraw(); drawCode();
+}
+document.querySelectorAll('#kind button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#kind button').forEach(x=>x.classList.toggle('on',x===b)); KIND=b.dataset.k; SR=[]; $('swarn').classList.add('hide'); sDraw(); });
+document.querySelectorAll('#dir button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#dir button').forEach(x=>x.classList.toggle('on',x===b)); DIR=b.dataset.d; SR=[]; $('swarn').classList.add('hide'); sDraw(); });
+$('sone').onclick = sOne; $('sreset').onclick = ()=>{ SR=[]; $('swarn').classList.add('hide'); sDraw(); };
+$('srand').onclick = ()=>{ S0 = bin8(rnd(0,255)); SR=[]; $('swarn').classList.add('hide'); sDraw(); };
+
+let SQ = null, sAns = false;
+const SCASES = [['a logical left shift', lsl, 'LSL'], ['a logical right shift', lsr, 'LSR'], ['an arithmetic right shift', asr],
+                ['a cyclic left shift', cyl], ['a cyclic right shift', cyr]];
+function spNext(){
+  const c = pick(SCASES), n = rnd(1,3), v = bin8(rnd(0,255));
+  SQ = {v, n, c, ans: c[1](v, n)}; sAns = false;
+  $('spq').innerHTML = 'Show the result of '+c[0]+' of <b>'+n+'</b> place'+(n>1?'s':'')+' on <b class="mono">'+v+'</b>'+(c[2]?' ('+c[2]+' #'+n+')':'')+'.';
+  $('spa').value=''; $('spf').textContent=''; $('spf').className='fb';
+}
+function spCheck(){
+  if(!SQ || sAns) return;
+  const a = $('spa').value.replace(/\s/g,'');
+  if(!/^[01]{8}$/.test(a)){ $('spf').className='fb no'; $('spf').textContent='Type all 8 bits (0s and 1s).'; return; }
+  sAns = true; const ok = a===SQ.ans; P.spDone++; P.total++; if(ok) P.spOk++;
+  let why = '';
+  if(!ok){ if(SQ.c[1]===asr && a===keptNotCopied(SQ.v,SQ.n)) why=' You kept the sign bit but did not COPY it (the June 2025 P13 report’s error).';
+    else if(a===(SQ.c[1]===lsl?lsr:SQ.c[1]===lsr?lsl:SQ.c[1]===cyl?cyr:SQ.c[1]===cyr?cyl:lsl)(SQ.v,SQ.n)) why=' That is the other direction — read left/right first.';
+    else if((SQ.c[1]===lsl && a===cyl(SQ.v,SQ.n))||(SQ.c[1]===lsr && a===cyr(SQ.v,SQ.n))) why=' That is a cyclic shift: in a logical shift the bits that fall off are lost and 0s come in.';
+    else if((SQ.c[1]===cyl && a===lsl(SQ.v,SQ.n))||(SQ.c[1]===cyr && a===lsr(SQ.v,SQ.n))) why=' That is a logical shift: in a cyclic shift the bits that fall off come back at the other end.'; }
+  $('spf').className = 'fb '+(ok?'ok':'no');
+  $('spf').innerHTML = (ok?'✓ ':'✗ The answer is <b class="mono">'+sp(SQ.ans)+'</b>.')+why;
+  $('spc').textContent = P.spOk+' right of '+P.spDone; drawCode();
+}
+$('spnext').onclick=spNext; $('spcheck').onclick=spCheck; $('spa').onkeydown=e=>{if(e.key==='Enter') spCheck();};
+
+/* ---------------------------------------------------------------- 2 MASKS */
+let MACC = '10010011';
+$('pvh2').innerHTML = PVH.map(x=>'<span>'+x+'</span>').join('');
+$('mtab').innerHTML = '<tr><th>Opcode</th><th>Operand</th><th>Explanation (2027–29 syllabus, word for word)</th></tr>'+
+  D.iset.map(r=>'<tr><td class="o">'+esc(r.op)+'</td><td class="o">'+esc(r.opd)+'</td><td>'+esc(r.expl)+'</td></tr>').join('');
+$('mmem').innerHTML = 'Memory: '+Object.keys(D.mem).map(a=>'<span class="mono">'+a+': '+D.mem[a]+'</span>').join(' · ')+' &nbsp;·&nbsp; '+D.notation.map(esc).join(' · ');
+function mDraw(res){
+  let h = '<div class="bitrow"><span class="lbl">ACC</span>'+cells(MACC, [], true)+'</div>';
+  if(res && !res.err){
+    const focus = res.mask.split('').map(c=> (res.op==='AND' ? c==='0' : c==='1') ? 'fo' : '');
+    h += '<div class="bitrow"><span class="lbl">'+res.op+' mask</span>'+cells(res.mask, focus)+'<span class="vals">'+res.form+'</span></div>';
+    const cls = res.r.split('').map((c,i)=> c!==MACC[i] ? 'in' : '');
+    h += '<div class="bitrow" data-test="mres"><span class="lbl">result</span>'+cells(res.r, cls)+'<span class="vals">green = changed</span></div>';
+  }
+  $('mrows').innerHTML = h;
+  bindEd($('mrows'), i=>{ MACC = MACC.slice(0,i)+(MACC[i]==='1'?'0':'1')+MACC.slice(i+1); mDraw(); });
+}
+function mRun(){
+  const res = maskRun(MACC, $('mins').value);
+  $('merr').textContent = res.err || '';
+  if(!res.err){ $('mrule').textContent = {AND:'AND: a 0 in the mask clears that bit; a 1 keeps it (blue = the bits the mask clears).',
+      OR:'OR: a 1 in the mask sets that bit to 1; a 0 leaves it (blue = the bits the mask sets).',
+      XOR:'XOR: a 1 in the mask flips that bit; a 0 leaves it (blue = the bits the mask flips).'}[res.op]; }
+  mDraw(res);
+}
+$('mrun').onclick = mRun; $('mins').onkeydown = e=>{ if(e.key==='Enter') mRun(); };
+$('mrand').onclick = ()=>{ MACC = bin8(rnd(0,255)); mDraw(); };
+
+let MQ = null, mAns = false;
+function mpNext(){
+  const op = pick(['AND','OR','XOR']), v = bin8(rnd(0,255)), m = rnd(1,254);
+  const form = pick(['B','B','#','&']);
+  const opd = form==='B' ? 'B'+bin8(m) : form==='#' ? '#'+m : '&'+hex(m,2);
+  MQ = {v, ins: op+' '+opd}; MQ.ans = maskRun(v, MQ.ins).r; mAns = false;
+  $('mpq').innerHTML = 'The ACC holds <b class="mono">'+v+'</b>. Show the result after <b class="mono">'+esc(MQ.ins)+'</b>.';
+  $('mpa').value=''; $('mpf').textContent=''; $('mpf').className='fb';
+}
+function mpCheck(){
+  if(!MQ || mAns) return;
+  const a = $('mpa').value.replace(/\s/g,'');
+  if(!/^[01]{8}$/.test(a)){ $('mpf').className='fb no'; $('mpf').textContent='Type all 8 bits (0s and 1s).'; return; }
+  mAns = true; const ok = a===MQ.ans; P.mpDone++; P.total++; if(ok) P.mpOk++;
+  const mk = maskRun(MQ.v, MQ.ins).mask;
+  $('mpf').className = 'fb '+(ok?'ok':'no');
+  $('mpf').innerHTML = (ok?'✓ ':'✗ The answer is <b class="mono">'+sp(MQ.ans)+'</b>. ')+'The mask is <span class="mono">'+sp(mk)+'</span>: work one column at a time.';
+  $('mpc').textContent = P.mpOk+' right of '+P.mpDone; drawCode();
+}
+$('mpnext').onclick=mpNext; $('mpcheck').onclick=mpCheck; $('mpa').onkeydown=e=>{if(e.key==='Enter') mpCheck();};
+
+/* ---------------------------------------------------------------- 3 DEVICE PANEL */
+let HOME = D.home0;
+const bitOf = (b,k) => b[7-k];
+function dDraw(){
+  $('devs').innerHTML = D.home.map(d=>{ const on = bitOf(HOME,d.bit)==='1';
+    return '<div class="devc'+(on?' on':'')+(d.kind==='in'?' sensor':'')+'" data-bit="'+d.bit+'"><div class="bn">bit '+d.bit+'</div><div class="nm">'+esc(d.name)+
+      '</div><div class="st">'+(on?'1':'0')+'</div><div class="small">'+(d.kind==='in'?(on?'detected':'clear'):(on?'ON':'off'))+'</div>'+
+      (d.kind==='in'?'<button class="btn ghost" data-sense="'+d.bit+'">sense</button>':'')+'</div>'; }).join('');
+  $('devs').querySelectorAll('[data-sense]').forEach(b=>b.onclick=()=>{ const k=+b.dataset.sense, i=7-k; HOME = HOME.slice(0,i)+(HOME[i]==='1'?'0':'1')+HOME.slice(i+1); dDraw(); });
+  $('homev').textContent = 'HOME = '+sp(HOME);
+}
+function jobCheck(job, ins){            // must work for EVERY value of HOME, and change only the right bit(s)
+  const r0 = maskRun(HOME, ins); if(r0.err) return {err:r0.err};
+  if(/^(AND|OR|XOR)\s+\d+$/i.test(ins.trim())) return {err:'That operand is an ADDRESS. Use #n, Bn or &n for a mask.'};
+  for(let v=0; v<256; v++){
+    const b = bin8(v), r = maskRun(b, ins).r;
+    for(let k=0;k<8;k++){
+      const was = bitOf(b,k), now = bitOf(r,k);
+      let want;
+      if(job.kind==='test') want = k===job.bit ? was : '0';
+      else if(job.kind==='set2') want = job.bits.includes(k) ? '1' : was;
+      else if(k!==job.bit) want = was;
+      else want = job.kind==='set' ? '1' : job.kind==='clear' ? '0' : (was==='1'?'0':'1');
+      if(now!==want) return {ok:false, v:b, r, k};
+    }
+  }
+  return {ok:true, r:r0.r};
+}
+function jobsDraw(){
+  $('jobs').innerHTML = D.jobs.map((j,i)=>'<div class="job'+(P.jobs.has(j.id)?' done':'')+'" data-job="'+j.id+'"><p class="t">'+(i+1)+'. '+esc(j.t)+'</p>'+
+    '<div class="ctl"><input type="text" class="mono" id="ji'+i+'" data-test="ji'+i+'" placeholder="e.g. OR B00000001" autocomplete="off">'+
+    '<button class="btn" id="jb'+i+'" data-test="jb'+i+'">Run</button></div><div class="prog hide" id="jp'+i+'"></div><p class="fb" id="jf'+i+'" data-test="jf'+i+'"></p></div>').join('');
+  D.jobs.forEach((j,i)=>{ const run = ()=>{
+      const ins = $('ji'+i).value.trim().toUpperCase(), c = jobCheck(j, ins), f = $('jf'+i);
+      if(c.err){ f.className='fb no'; f.textContent=c.err; return; }
+      const before = HOME, after = maskRun(HOME, ins).r;
+      if(j.kind!=='test') HOME = after;
+      $('jp'+i).classList.remove('hide');
+      $('jp'+i).textContent = 'LDD HOME          ACC = '+sp(before)+'\n'+ins.padEnd(18)+'ACC = '+sp(after)+(j.kind==='test'?'\nCMP #'+(1<<j.bit)+'           then JPE …  (CMP takes #n)':'\nSTO HOME          HOME = '+sp(HOME));
+      P.total++;
+      if(c.ok){ P.jobs.add(j.id); f.className='fb ok';
+        f.innerHTML = '✓ Done — and it works whatever HOME holds: only '+(j.kind==='set2'?'bits 7 and 0':'bit '+j.bit)+(j.kind==='test'?' is kept; every other bit becomes 0.':' can change.'); }
+      else { f.className='fb no';
+        f.innerHTML = '✗ Not for every value. If HOME were <span class="mono">'+sp(c.v)+'</span>, the result would be <span class="mono">'+sp(c.r)+'</span>: bit '+c.k+' is wrong. '+
+          ({set:'Set: OR with a 1 under that bit.', clear:'Clear: AND with a 0 under that bit and 1s everywhere else.', toggle:'Toggle: XOR with a 1 under that bit.',
+            set2:'Two bits at once: one OR mask with a 1 under each.', test:'Test: AND with a 1 under that bit and 0s everywhere else.'}[j.kind]); }
+      document.querySelector('.job[data-job="'+j.id+'"]').classList.toggle('done', P.jobs.has(j.id));
+      dDraw(); drawCode(); };
+    $('jb'+i).onclick = run; $('ji'+i).onkeydown = e=>{ if(e.key==='Enter') run(); }; });
+}
+$('dreset').onclick = ()=>{ HOME = D.home0; dDraw(); };
+
+/* ---------------------------------------------------------------- 4 MARK IT LIKE AN EXAMINER */
+let EQ=[];
+function eqSet(){
+  EQ = shuffle(D.exam.slice()); P.eqScore=0; P.eqDone=0;
+  $('eq').innerHTML = EQ.map((q,i)=>'<div class="sortq" data-q="'+q.id+'"><p class="s"><span class="ctx">'+esc(q.ctx)+'</span></p>'+
+    '<span class="exlab">Example student answer</span><span class="ans">'+esc(q.ans)+'</span><div class="b" id="eb'+i+'">'+
+    '<button class="btn ghost">Scores 1</button><button class="btn ghost">Scores 0</button></div><p class="fb" id="ef'+i+'"></p></div>').join('');
+  EQ.forEach((q,i)=>{ const box=$('eb'+i); let done=false;
+    box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(done) return; done=true; const ok=b.textContent===q.a;
+      b.classList.add(ok?'picked-ok':'picked-no');
+      if(!ok) box.querySelectorAll('button').forEach(x=>{if(x.textContent===q.a) x.classList.add('picked-ok');});
+      const f=$('ef'+i); f.className='fb '+(ok?'ok':'no'); f.innerHTML=(ok?'✓ ':'✗ It '+q.a.toLowerCase()+'. ')+esc(q.f)+' <span class="src">('+esc(q.src)+')</span>';
+      P.eqDone++; P.total++; if(ok) P.eqScore++; if(P.eqDone===EQ.length) P.eqBest=Math.max(P.eqBest,P.eqScore);
+      eqCount(); drawCode(); });});
+  eqCount();
+}
+function eqCount(){ $('eqcount').textContent = 'This set: '+P.eqScore+' right of '+P.eqDone+' answered (of '+EQ.length+') · best complete set: '+P.eqBest;
+  $('scoretxt').textContent = 'Examiner '+Math.max(P.eqBest, P.eqDone===EQ.length?P.eqScore:0)+'/'+EQ.length; }
+$('eqAgain').onclick = eqSet;
+
+/* ---------------------------------------------------------------- 5 CODE */
+const NEED_SP=6, NEED_MP=6, NEED_EQ=9;
+const CASES = [['Lleft','logical left'],['Lright','logical right'],['Aright','arithmetic right'],['Aleft','arithmetic left (a safe value)'],['Cleft','cyclic left'],['Cright','cyclic right']];
+function missions(){
+  return [
+    {t:'Shifts: step all six cases ('+CASES.filter(c=>P.cases.has(c[0])).length+'/6'+(P.cases.size<6?': still to do — '+CASES.filter(c=>!P.cases.has(c[0])).map(c=>c[1]).join(', '):'')+')', ok:CASES.every(c=>P.cases.has(c[0]))},
+    {t:'Predict the shift: '+NEED_SP+' right ('+Math.min(P.spOk,NEED_SP)+'/'+NEED_SP+')', ok:P.spOk>=NEED_SP},
+    {t:'Predict the mask result: '+NEED_MP+' right ('+Math.min(P.mpOk,NEED_MP)+'/'+NEED_MP+')', ok:P.mpOk>=NEED_MP},
+    {t:'Device panel: all '+D.jobs.length+' jobs done ('+P.jobs.size+'/'+D.jobs.length+')', ok:P.jobs.size>=D.jobs.length},
+    {t:'Examiner: '+NEED_EQ+' of '+D.exam.length+' right in one complete set (best '+P.eqBest+')', ok:P.eqBest>=NEED_EQ}];
+}
+function drawCode(){
+  const ms = missions();
+  $('missions').innerHTML = ms.map(m=>'<div class="'+(m.ok?'done':'')+'">'+esc(m.t)+'</div>').join('');
+  const n = ($('uname').value||'').trim(), box=$('codeout'), msg=$('codemsg');
+  if(!ms.every(m=>m.ok)){ msg.textContent='Keep going: '+ms.filter(m=>m.ok).length+' of '+ms.length+' missions done.'; box.classList.add('hide'); return; }
+  if(!n){ msg.textContent='All missions done. Type your name to get your code.'; box.classList.add('hide'); return; }
+  let h=0; for(let i=0;i<n.length;i++) h=(h*31+n.toUpperCase().charCodeAt(i))&0xFFF;
+  msg.textContent='Best examiner set: '+P.eqBest+' of '+D.exam.length+' · shifts right: '+P.spOk+' · masks right: '+P.mpOk+' · answers in all: '+P.total+'.';
+  box.textContent='BIT-'+hex(h,3)+'-'+hex(P.eqBest&0xFF,2)+'-'+hex(P.total&0xFF,2); box.classList.remove('hide');
+}
+$('uname').oninput = drawCode;
+
+/* ---------------------------------------------------------------- start */
+sDraw(); spNext(); mDraw(); mpNext(); dDraw(); jobsDraw(); eqSet(); drawCode();
+window.BIT = {lsl, lsr, asr, cyl, cyr, aslSafe, keptNotCopied, maskRun, jobCheck, P, setHome:v=>{HOME=v; dDraw();}, getHome:()=>HOME};
+
+</script>
+</body>
+</html>
