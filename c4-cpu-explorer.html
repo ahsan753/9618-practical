@@ -1,0 +1,1493 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPU Explorer — C4 Processor Fundamentals</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='14' y='14' width='36' height='36' rx='6' fill='%231D4ED8'/%3E%3Crect x='23' y='23' width='18' height='18' rx='3' fill='%23fff'/%3E%3Cg stroke='%23EC4899' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M22 4v8M32 4v8M42 4v8M22 52v8M32 52v8M42 52v8M4 22h8M4 32h8M4 42h8M52 22h8M52 32h8M52 42h8'/%3E%3C/g%3E%3C/svg%3E">
+<!--
+=====================================================================================
+ CPU Explorer — 9618 AS Level, 4.1 Central Processing Unit (CPU) architecture
+ C4 Lessons 1–7 (L1 Von Neumann model, L2 registers, L4 buses, L5 F–E cycle,
+ L7 interrupts). Single file, offline, no network requests.
+
+ EXAM-WORDING LEDGER — every line shown as "In the exam write" / exam wording
+ comes from a published 9618 Paper 1 mark scheme (MS) listed here, or is shown
+ in the tool with a "teacher-written" label. Wording is copied from the MS text;
+ where an MS offers alternatives with " / " or " // " they are kept.
+
+ Von Neumann model (mode 1)
+  "Instructions and data are stored in the same memory space / in main memory."      → Nov 2022 P11 Q5(a) MS
+  "to manage the execution of instructions (in sequence)"                             → Nov 2022 P11 Q5(b)(iii) MS
+  "to send / receive control signals along the control bus"                           → Nov 2022 P11 Q5(b)(iii) MS
+  "to coordinate / synchronise the actions of other components in the CPU"            → Nov 2022 P11 Q5(b)(iii) MS
+  "to control the communication between the components of the CPU"                    → Nov 2022 P11 Q5(b)(iii) MS
+  "The arithmetic logic unit/ALU performs mathematical operations and logical
+   comparisons."                                                                      → Jun 2021 P12 Q5(a) MS
+  "synchronise operations" / "... by creating timing signals"                         → Nov 2022 P13 Q4(b) MS
+  "... by creating and transmitting timing signals on the control bus"                → Nov 2024 P11 Q3(a) MS
+  "The control unit synchronises the actions of the processor / by sending a command /
+   signal on each timing signal produced by the system clock / using / along the
+   control bus"                                                                       → Jun 2025 P13 Q2(a)(i) MS
+  "Immediate Access Store holds all the data / instructions / programs currently in use"
+  "Immediate Access Store is volatile memory" / "... has fast access times"           → Nov 2023 P11 Q5(b) MS
+  "Control unit (CU) / Arithmetic and Logic Unit (ALU) / Immediate Access Store (IAS)
+   / (System clock)"                                                                  → Nov 2023 P13 Q9(a)(i) MS
+  "The data bus carries data to components, while the address bus carries the
+   address where data is being written to or read from."                             → Jun 2021 P12 Q5(a) MS
+  "The control unit/bus transmits the signals to coordinate events based on the
+   pulses of the (system) clock."                                                     → Jun 2021 P12 Q5(a) MS
+  Control bus signals "Interrupt / Timing / Read / Write"                             → Jun 2023 P12 Q5(a) MS
+  System clock ticked under Control bus; MAR ticked under Address bus                 → Nov 2022 P11 Q5(b)(ii) MS
+
+ Registers (mode 2)
+  PC  "The Program Counter (PC) stores the address of the next instruction to be
+       fetched from memory."                                                          → Jun 2025 P12 Q1(a) MS (correction 1)
+      "…and the contents are incremented / changed to the next address each cycle"   → Jun 2022 P11 Q6(a)(i) MS
+  MAR "holds address in memory from which data will be read / to which data will be
+       written"                                                                       → Nov 2022 P13 Q4(a)(i) MS
+      "stores the address of the memory location (or an I/O component) currently
+       being read from or written to"                                                 → Nov 2023 P11 Q5(a) MS
+  MDR "holds the data/instructions which has been read from or is to be written to
+       the address in the MAR"                                                        → Nov 2022 P13 Q4(a)(i) MS
+      "The Memory Data Register (MDR) holds data to be stored in the memory address in
+       the MAR. // ... holds data read from the memory address in the MAR"           → Jun 2025 P12 Q1(a) MS (correction 4)
+  CIR "holds the instruction currently being decoded and/or executed"                 → Nov 2023 P11 Q5(a) MS; Nov 2025 P11 Q6(a) MS
+  ACC "stores the intermediate results of arithmetic and logical operations // holds
+       the result of a calculation"                                                   → Nov 2025 P11 Q6(a) MS
+  IX  "Stores a number that will be added to the operand, to form the address of the
+       data"                                                                          → Nov 2024 P12 Q3(a) MS
+      "to store a value that is added to an address to give another address"          → Nov 2022 P11 Q5(b)(i) MS
+  SR  "to store flags which are set by events // from the results of arithmetic and
+       logic operations and interrupt flags"                                          → Nov 2022 P11 Q5(b)(i) MS
+      "Contains bits which can be referenced individually and set or cleared depending
+       on the operation e.g. overflow, underflow"                                     → Nov 2023 P11 Q5(a) MS
+      "To allow flags to be checked" / "… to change instruction sequence"             → Nov 2024 P11 Q8(a) MS
+  Overflow "The answer cannot be represented in the number of bits available"         → Nov 2024 P11 Q1(d) MS
+  General vs special purpose (both points)                                            → Nov 2023 P13 Q9(a)(ii) MS; Nov 2024 P11 Q8(b) MS
+  Interrupt register "To store details of any interrupts that have occurred"          → Jun 2025 P12 Q1(b) MS
+  Incorrect statement shown as a trap: "The Memory Data Register (MDR) transfers data
+   to the memory address stored in the Memory Address Register (MAR)."                → Jun 2025 P12 Q1(a) question paper, statement 4
+                                                                                        (corrected by the MS)
+
+ Buses (mode 3)
+  "Wider data bus means more data can be transferred between components at a time"
+  "Wider address bus means larger memory addresses can be used" / "allowing more
+   memory locations to be accessed directly"                                          → Jun 2025 P11 Q6(a)(iii) MS
+  "Larger bus width means that more data transferred at the same time"                → Nov 2024 P11 Q3(b)(i) MS
+  "The Control Unit initiates data transfer" / "…by generating signals that are sent
+   on the control bus to other components"                                           → Jun 2023 P13 Q7(b) MS
+  "The address of the data to be written to the device (in RAM) is carried on the
+   address bus" / "All data to be written to the device / buffer is carried on the
+   data bus" / "A buffer temporarily holds data until it is ready to be transmitted
+   to the device"                                                                     → Nov 2023 P12 Q8(c)(ii) MS
+  "MDR ← [[MAR]]"                                                                     → Jun 2025 P13 Q2(a)(ii) MS
+
+ Fetch–Execute (mode 4)
+  "MAR ← [PC]"  "PC ← [PC] + 1"  "MDR ← [[MAR]]"  "CIR ← [MDR]" (this order)           → Jun 2025 P13 Q2(a)(ii) MS
+    (its first mark is "MAR ← [PC] and PC ← [PC] + 1" together, so neither line scores alone there)
+  "MAR ← [PC]"  "PC ← [PC] + 1"  "CIR ← [MDR]", "1 mark for each correct row:"            → Nov 2022 P12 Q7(c) MS
+  "The contents of the PC are copied to the MAR"                                      → Jun 2022 P13 Q2(a) MS
+  "The address in PC is incremented."                                                 → Nov 2023 P13 Q9(b) MS
+  "The data in the location pointed to by the MAR is copied to the MDR."              → Nov 2023 P13 Q9(b) MS
+  "The contents of MDR are copied into CIR."                                          → Nov 2023 P13 Q9(b) MS
+  "... the Control Unit decodes the instruction's opcode."                            → Jun 2021 P11 Q3(a) MS
+  "The Program Counter (PC) holds the address of the next instruction …"              → Jun 2022 P11 Q6(a)(i) MS
+  LDD: "Direct addressing. Load the contents of the location at the given address to
+   ACC"                                                                               → instruction set printed in Jun 2021 P11 question paper
+  Interrupts detected "after completion of the execute stage // before the cycle
+   begins"                                                                            → Nov 2022 P13 Q4(a)(ii) MS
+  EXECUTE-STAGE RTN FOR LDD: no 2021–2025 Paper 1 MS prints it → shown in words and
+   labelled teacher-written in the tool.
+
+ Interrupts (mode 5)
+  "An interrupt flag is raised in the (interrupt) register"                           → Jun 2023 P11 Q6 MS
+  "At the end of the current FE cycle // at the start of the next FE cycle"           → Jun 2023 P11 Q6 MS
+  "At the start / end of FE cycle the interrupt register is checked"                  → Jun 2025 P12 Q1(c) MS
+  "The priority of any interrupts waiting is checked"                                 → Jun 2025 P12 Q1(c) MS
+  "if the priority of the interrupt is higher than the current process"               → Jun 2025 P12 Q1(c) MS
+  "If lower priority than current process continue with F-E cycle"                    → Jun 2022 P13 Q2(b) MS (also Jun 2022 P11 Q6(a)(ii))
+  "If true, it stores the current contents of the registers on the stack"             → Jun 2023 P11 Q6 MS
+  "Location / type of interrupt identified..." / "…appropriate ISR is called to handle
+   the interrupt"                                                                     → Jun 2022 P11 Q6(a)(ii) MS
+  "The address of the Interrupt Service (ISR) handling routine is loaded into the
+   Program Counter (PC)."                                                             → Nov 2023 P13 Q9(d) (statement A; placed by the MS)
+  "The input data from the keyboard is processed"                                     → Jun 2023 P11 Q6 MS (key press only)
+  "When the ISR has finished, a further check is made for higher priority interrupts" → Jun 2025 P12 Q1(c) MS
+  "The contents of the registers are restored from the stack"                         → Jun 2023 P11 Q6 MS
+  "... and control is passed back to previous process"                                → Jun 2023 P11 Q6 MS
+  "if no more interrupts of higher priority, the register contents are restored and
+   the next FE cycle continues"                                                       → Jun 2025 P12 Q1(c) MS
+  "to send a signal from a device or process" / "... seeking the attention of the
+   processor"                                                                         → Nov 2022 P11 Q5(c) MS
+  Key press = hardware, printer out of paper = hardware, division by zero = software  → Nov 2021 P12 Q7(a) MS
+  Division by zero as a software interrupt cause                                      → Nov 2023 P13 Q9(c) MS; Nov 2022 P11 Q5(d) MS
+
+ Examiner-report quotes ("Examiner watch") are cited to the Principal Examiner Report.
+ TEACHER-WRITTEN (labelled in the tool): kitchen analogy extensions beyond the L1 deck,
+ input/output device descriptions, the four Status Register flag meanings (except the
+ overflow MS line), the execute-stage RTN for LDD, the timer interrupt and its ISR,
+ the printer and division-by-zero ISR actions, the "equal priority waits" reasoning,
+ the stack explanation, bus directions, and the 2^n addressable-locations line.
+=====================================================================================
+-->
+<style>
+:root{
+  --paper:#ffffff; --ink:#1f2933; --ink-2:#57616e; --ink-3:#8b95a3;
+  --rule:#dde1e7; --rule-2:#c3cad3; --wash:#f6f7f9;
+  --write:#1d4ed8; --write-wash:#e6efff; --write-deep:#15389e;
+  --run:#15803d; --run-wash:#e5f4ea; --run-deep:#0f5c2c;
+  --fix:#be185d; --fix-wash:#fbe9f1; --fix-deep:#8f1146;
+  --amb:#9a6700; --amb-wash:#fdf3e0;
+  --good:#2c7a4b; --good-wash:#e6f3ea; --bad:#b3352f; --bad-wash:#fbeae9;
+  --kw:#b45309; --bi:#6d28d9; --st:#15803d; --cm:#b91c1c;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+body.board{font-size:21px}
+.rail{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.rail-in{max-width:900px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pips{display:flex;gap:4px;flex:1;min-width:180px}
+.pip{height:5px;flex:1;background:var(--rule);border-radius:3px;cursor:pointer}
+.pip.done{background:var(--ink-2)} .pip.now{background:var(--write)}
+.railtxt,.score{font-size:13px;color:var(--ink-2);white-space:nowrap}
+.score{font-family:var(--mono)}
+main{max-width:900px;margin:0 auto;padding:28px 20px 80px}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:34px;line-height:1.2;margin:0 0 6px;letter-spacing:-0.01em}
+h2{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:27px;line-height:1.25;margin:0 0 4px}
+h3{font-size:16px;font-weight:600;margin:22px 0 8px}
+p{margin:0 0 14px;max-width:70ch}
+.stage-no{font-family:var(--mono);font-size:13px;color:var(--ink-3);margin:0 0 10px}
+.lead{color:var(--ink-2);max-width:68ch}
+.stage{display:none} .stage.on{display:block}
+.panel{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:18px 0}
+.note{border-left:3px solid var(--rule-2);padding:2px 0 2px 14px;margin:16px 0;color:var(--ink-2);font-size:16px}
+.note.warn{border-left-color:var(--fix);color:var(--ink)}
+button{font-family:inherit;font-size:15px;padding:8px 15px;border:1px solid var(--rule-2);background:var(--paper);color:var(--ink);border-radius:7px;cursor:pointer;line-height:1.3}
+button:hover{border-color:var(--ink-3);background:var(--wash)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--write);outline-offset:2px}
+button.go{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:500} button.go:hover{background:#000}
+button.on{background:var(--write-wash);border-color:var(--write);color:var(--write-deep);font-weight:600}
+input[type=text]{font-family:inherit;font-size:17px;padding:8px 11px;border:1px solid var(--rule-2);border-radius:7px;width:260px}
+select{font-family:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--rule-2);border-radius:7px;background:#fff;color:var(--ink);max-width:100%}
+.qbox{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:14px 0}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.qtag{font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+.qtext{font-size:18px;margin:0 0 10px}
+.fb{font-size:15px;margin:10px 0 0;line-height:1.6} .fb.ok{color:var(--good)} .fb.no{color:var(--bad)}
+.mcq{display:grid;gap:8px;margin:10px 0}
+.mcq button{text-align:left;padding:11px 14px;font-size:16px;line-height:1.5}
+.picked-ok{background:var(--good-wash)!important;border-color:var(--good)!important;color:var(--good)!important}
+.picked-no{background:var(--bad-wash)!important;border-color:var(--bad)!important;color:var(--bad)!important}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:32px;padding-top:18px;border-top:1px solid var(--rule);flex-wrap:wrap}
+.hide{display:none!important}
+.code-out{font-family:var(--mono);font-size:30px;letter-spacing:.12em;color:var(--write-deep);background:var(--write-wash);border:1px solid var(--write);border-radius:9px;padding:14px 18px;display:inline-block;margin:10px 0}
+.fam{display:inline-block;font-size:12px;font-weight:700;color:#fff;border-radius:10px;padding:1px 9px;margin-right:6px;vertical-align:2px}
+.fam.w{background:var(--write)} .fam.r{background:var(--run)} .fam.x{background:var(--fix)}
+.kw{color:var(--kw);font-weight:700} .bi{color:var(--bi)} .st{color:var(--st)} .cm{color:var(--cm)}
+
+
+.twins{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.place{border-radius:10px;padding:14px 16px;color:#fff;font-size:16px;line-height:1.5}
+.place.w{background:var(--write)} .place.s{background:#a85a07}
+.sortq{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;margin:10px 0}
+.sortq .s{font-size:16.5px;margin:0 0 8px}
+.sortq .b{display:flex;gap:6px;flex-wrap:wrap}
+.sortq .b button{font-size:14px;padding:6px 11px}
+.missions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.missions div{border:1px solid var(--rule);border-radius:8px;padding:7px 11px;font-size:14.5px;display:flex;gap:8px;align-items:flex-start}
+.missions div:before{content:"";flex:0 0 16px;height:16px;border:2px solid var(--rule-2);border-radius:3px;margin-top:3px}
+.missions div.done{border-color:var(--good);background:var(--good-wash)}
+.missions div.done:before{background:var(--good);border-color:var(--good)}
+.sim{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin:14px 0}
+.code{border:1px solid var(--rule-2);border-radius:10px;overflow:hidden;font-family:var(--mono);font-size:15px;background:#fff}
+.code .ln{padding:2px 10px;white-space:pre;border-left:4px solid transparent}
+.code .ln .n{display:inline-block;width:2em;color:var(--ink-3);text-align:right;margin-right:.8em}
+.code .ln.ran{background:var(--good-wash);border-left-color:var(--good)}
+.code .ln.bad{background:var(--bad-wash);border-left-color:var(--bad);color:var(--bad);font-weight:700}
+.side .btns{display:flex;flex-direction:column;gap:6px}
+.side .btns button{text-align:left}
+.counter{font-family:var(--mono);font-size:13px;color:var(--ink-2);margin:8px 0}
+.out{border:1px solid var(--rule);border-radius:8px;background:#fbfbfc;font-family:var(--mono);font-size:14.5px;padding:8px 10px;min-height:120px;white-space:pre-wrap}
+.out .e{color:var(--cm);font-weight:600} .out .ok{color:var(--good);font-weight:700} .out .s{color:var(--ink-3)}
+.flash{font-size:14.5px;margin:6px 0 0;min-height:1.4em;color:var(--write-deep);font-weight:600}
+.parcel{border-radius:10px;padding:12px 14px;margin:8px 0;font-size:15.5px}
+.parcel.good{background:var(--good-wash);border:1px solid var(--good)} .parcel.bad{background:var(--bad-wash);border:1px solid var(--bad)}
+label.chk2{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:15.5px;cursor:pointer}
+label.chk2 input{margin-top:5px;transform:scale(1.2)}
+@media (max-width:640px){.twins,.missions,.sim{grid-template-columns:1fr}}
+input[type=text]{font-family:var(--mono);font-size:17px;padding:8px 11px;border:1px solid var(--rule-2);border-radius:7px;width:190px;background:var(--paper);color:var(--ink)}
+.qrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 0}
+.err{font-size:14px;color:var(--bad);margin:8px 0 0;min-height:0}
+.dots{display:flex;gap:5px;margin-top:12px;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--rule-2)}
+.dot.hit{background:var(--good);border-color:var(--good)}
+.dotlbl{font-size:13px;color:var(--ink-3);margin-left:6px}
+.wk{display:block;white-space:pre-line;font-family:var(--mono);font-size:14px;line-height:1.65;color:var(--ink-2);margin-top:9px;padding-top:9px;border-top:1px solid var(--rule);word-break:break-word}
+
+/* =========================================================== CPU Explorer on the house engine */
+:root{
+  --ink:#1E293B; --ink-2:#475569; --ink-3:#64748B; --bg:#F8FAFC; --rule:#E2E8F0; --rule-2:#CBD5E1; --wash:#F1F5F9;
+  --blue:#1D4ED8; --blue-t:#EFF6FF; --blue-t2:#DBEAFE; --blue-d:#1E40AF;
+  --pink:#EC4899; --pink-t:#FDF2F8; --pink-t2:#FCE7F3; --pink-d:#BE185D;
+  --green:#16A34A; --green-t:#F0FDF4; --green-t2:#DCFCE7; --green-d:#15803D;
+  --amber:#D97706; --amber-t:#FFFBEB; --amber-t2:#FEF3C7; --amber-d:#B45309;
+  --red:#EF4444; --red-t:#FEF2F2; --red-d:#B91C1C;
+  --write:#1D4ED8; --write-wash:#EFF6FF; --write-deep:#1E40AF;
+  --good:#15803D; --good-wash:#F0FDF4; --bad:#B91C1C; --bad-wash:#FEF2F2;
+}
+body{background:var(--bg);color:var(--ink);font-size:20px;line-height:1.4}
+main p{max-width:none}
+.hidden{display:none !important}
+.mono{font-family:var(--mono)}
+button{font-size:18px}
+button:focus-visible,select:focus-visible,input:focus-visible,.box:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+
+/* ---------- rail (header) */
+header.rail{position:static;background:#fff;border-bottom:1px solid var(--rule)}
+.rail-in{max-width:1440px;margin:0 auto;padding:8px 28px 0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 16px}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 14px;min-width:0}
+.brand h1{font-size:30px;margin:0;line-height:1.15;color:var(--ink)}
+.brand p{margin:0;color:var(--ink-2);font-size:18px}
+.railr{margin-left:auto;display:flex;align-items:center;gap:12px}
+.score{font-family:var(--mono);font-size:18px;color:var(--ink-2);white-space:nowrap}
+#kitchenBtn{font-size:18px;font-weight:600;padding:4px 12px;border:1px solid var(--pink);color:var(--pink-d);background:#fff;border-radius:7px}
+#kitchenBtn.on{background:var(--pink-d);border-color:var(--pink-d);color:#fff}
+.tabs{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:2px 4px;margin:0 -8px}
+.tabs button{position:relative;font-size:18px;font-weight:600;padding:4px 9px 12px;border:0;background:transparent;color:var(--ink-2);border-radius:7px 7px 0 0;line-height:1.3}
+.tabs button:after{content:"";position:absolute;left:9px;right:9px;bottom:4px;height:5px;border-radius:3px;background:var(--rule)}
+.tabs button.done:after{background:var(--ink-2)}
+.tabs button.on{background:transparent;border:0;color:var(--blue-d)}
+.tabs button.on:after{background:var(--blue)}
+.tabs button:hover{background:var(--wash)}
+
+/* ---------- layout + cards */
+main{max-width:1440px;margin:0 auto;padding:14px 28px 28px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+@media (max-width:1100px){.split{grid-template-columns:minmax(0,1fr)}}
+.card{background:#fff;border:1px solid var(--rule-2);border-top:4px solid var(--blue);border-radius:10px;padding:14px 18px;min-width:0;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.card.pink{border-top-color:var(--pink)}
+h2{font-size:26px;margin:0 0 8px;color:var(--ink)}
+aside h2{font-size:22px}
+h3{font-size:20px;margin:0}
+.small{color:var(--ink-2);font-size:18px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button{font-size:18px;font-weight:600;padding:5px 12px;border-radius:7px;color:var(--ink)}
+.btn{font-size:18px;font-weight:600;padding:7px 16px;border-radius:7px;border:1px solid var(--pink-d);background:var(--pink-d);color:#fff;cursor:pointer}
+.btn:hover{background:#9D174D;border-color:#9D174D}
+.btn.ghost,.btn.blue.ghost{background:#fff;color:var(--ink);border-color:var(--rule-2)}
+.btn.ghost:hover,.btn.blue.ghost:hover{background:var(--wash);border-color:var(--ink-3)}
+.btn.blue{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.blue:hover{background:#000}
+.btn:disabled{opacity:.4;cursor:default}
+label.tog{display:inline-flex;gap:8px;align-items:center;font-weight:600;cursor:pointer;font-size:18px}
+label.tog input{width:22px;height:22px;margin:0;accent-color:var(--blue)}
+select{font-size:18px;padding:4px 8px;border:1px solid var(--rule-2);border-radius:7px;background:#fff;color:var(--ink)}
+
+/* ---------- components */
+.box{border:2px solid var(--ink-3);border-radius:10px;background:#fff;padding:8px 10px;cursor:pointer;text-align:center;font-weight:600;transition:box-shadow .25s,background .25s,border-color .25s;min-width:0;overflow-wrap:anywhere;position:relative}
+.box:hover{filter:brightness(.97)}
+.box small{display:block;font-weight:normal;color:var(--ink-2);font-size:18px}
+.box.sel{box-shadow:0 0 0 4px var(--pink)}
+.box.lit{border-color:var(--amber)!important;box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)!important}
+.b-blue{border-color:var(--blue);color:var(--blue-d)}
+.b-green{border-color:var(--green);color:var(--green-d)}
+.b-orange{border-color:var(--amber);color:var(--amber-d)}
+.b-ink{border-color:var(--ink);color:var(--ink)}
+.kt{display:none;margin-top:4px;padding:1px 9px;border-radius:12px;background:var(--pink-t);color:var(--pink-d);border:1px solid var(--pink);font-size:18px;font-weight:600;font-style:italic;white-space:normal;line-height:1.3}
+body.kitchen .kt{display:inline-block}
+.now{border-left:4px solid var(--blue);background:var(--blue-t);border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:10px}
+.now .t{font-size:22px;font-weight:700;color:var(--amber-d);margin:0 0 4px}
+.rtn{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--blue-d);background:#fff;border:2px solid var(--blue);border-radius:8px;padding:4px 12px;display:inline-block;margin:4px 0 6px;max-width:100%;overflow-wrap:anywhere}
+.rtn.tw{color:var(--ink-2);border-style:dashed;border-color:var(--ink-3)}
+.plain{margin:4px 0 0;font-size:20px}
+.ms,.twl,.watch,.kline{padding:8px 12px;margin-top:8px;font-size:19px;border-radius:0 8px 8px 0;border-left:4px solid}
+.ms{background:var(--green-t);border-left-color:var(--green)}
+.twl{background:var(--wash);border-left-color:#94A3B8}
+.watch{background:var(--red-t);border-left-color:var(--red)}
+.kline{background:var(--pink-t);border-left-color:var(--pink)}
+.ms b.lab,.twl b.lab,.watch b.lab,.kline b.lab{display:block;font-size:18px;font-weight:700}
+.ms b.lab{color:var(--green-d)} .twl b.lab{color:var(--ink-2)} .watch b.lab{color:var(--red-d)} .kline b.lab{color:var(--pink-d)}
+.src{display:block;color:var(--ink-3);font-size:18px;font-style:italic;margin-top:2px}
+.badge{display:inline-block;font-size:18px;font-weight:600;font-style:normal;color:var(--ink-2);border:1px dashed var(--ink-3);border-radius:10px;padding:0 8px;margin-left:4px;white-space:nowrap;line-height:1.3}
+ol.steps{margin:0;padding-left:30px;font-size:18px;line-height:1.3}
+ol.steps li{padding:3px 6px;border-radius:6px;cursor:pointer;margin-bottom:2px}
+ol.steps li:hover{background:var(--wash)}
+ol.steps li.cur{background:var(--amber-t2);color:var(--ink);font-weight:700;box-shadow:inset 4px 0 0 var(--amber)}
+ol.steps li.done{color:var(--green-d)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.stepbar{position:sticky;bottom:0;z-index:6;background:#fff;margin:10px -18px -14px;padding:8px 18px 10px;border-top:1px solid var(--rule);border-radius:0 0 10px 10px;box-shadow:0 -6px 14px rgba(15,23,42,.06)}
+.stepbar .btn{padding:6px 16px}
+@media (min-width:1101px){.split > aside.card{position:sticky;top:12px;max-height:calc(100vh - 100px);overflow-y:auto}}
+.count{font-family:var(--mono);font-weight:600;color:var(--ink-2);font-size:18px}
+.keys{font-size:18px;color:var(--ink-2)}
+kbd{font-family:var(--mono);border:1px solid var(--ink-3);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:18px;background:#fff}
+
+/* ---------- Von Neumann */
+.vn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3.2fr) minmax(0,1fr);grid-template-areas:"in cpu out" "c1 c2 c3" "bus bus bus" "x c4 y" "mem mem mem";gap:0 14px;align-items:stretch}
+#vnIn{grid-area:in;align-self:center} #vnOut{grid-area:out;align-self:center} #vnCpu{grid-area:cpu}
+.conn{height:22px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='28' viewBox='0 0 16 28'%3E%3Cpath d='M8 2 L14 9 H10 V19 H14 L8 26 L2 19 H6 V9 H2 Z' fill='%23D97706'/%3E%3C/svg%3E") center/14px 22px no-repeat}
+#c1{grid-area:c1} #c2{grid-area:c2} #c3{grid-area:c3} #c4{grid-area:c4}
+#vnBuses{grid-area:bus;display:grid;gap:5px;padding:6px 8px;border:2px solid var(--amber);border-radius:12px;background:var(--amber-t)}
+#vnMem{grid-area:mem;justify-self:center;max-width:100%;min-width:0}
+table.memt td.mono{white-space:nowrap;font-size:18px}
+table.memt.h td{padding:3px 3px}
+table.memt.h th{padding:3px 6px}
+.cpu-in .box{display:flex;flex-direction:column;justify-content:center;align-items:center}
+.cpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px 10px}
+.cpu .ct{display:block;width:100%;text-align:left;color:var(--blue-d);font-weight:700;cursor:pointer;background:none;border:0;padding:2px 4px;border-radius:8px;font-size:20px}
+.cpu .ct small{font-weight:normal;font-size:18px}
+.cpu-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}
+.busbar{text-align:left;display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;padding:3px 12px}
+.busbar .dir{font-weight:normal;color:var(--ink-2);font-size:18px}
+.bb-a{border-color:var(--blue);color:var(--blue-d)} .bb-d{border-color:var(--green);color:var(--green-d)} .bb-c{border-color:var(--pink);color:var(--pink-d)}
+.mem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px 6px}
+.mem .mt{display:block;width:100%;background:none;border:0;color:var(--green-d);font-weight:700;cursor:pointer;text-align:center;font-size:20px;padding:2px;border-radius:8px}
+table.memt{border-collapse:collapse;margin:6px auto 0;font-size:19px}
+table.memt.h th{text-align:left}
+table.memt.h td{text-align:center;border-left:1px solid var(--rule)}
+.memV{display:none}
+@media (max-width:760px){.memH{display:none}.memV{display:table}}
+table.memt th{background:var(--wash);color:var(--ink-2);font-weight:700;padding:3px 6px;font-size:18px;border-bottom:1px solid var(--rule-2)}
+table.memt td{padding:3px 6px;border-bottom:1px solid var(--rule);background:#fff}
+table.memt td.ad{color:var(--blue-d);font-weight:700}
+.tag{display:inline-block;border-radius:8px;padding:0 5px;font-weight:700;font-size:18px}
+.tag.ins{color:var(--blue-d);border:2px solid var(--blue);background:var(--blue-t)}
+.tag.dat{color:var(--pink-d);border:2px solid var(--pink);background:var(--pink-t)}
+.spcap{text-align:center;margin:6px 0 0;font-size:18px;color:var(--ink-2)}
+@media (max-width:760px){
+  .vn{grid-template-columns:minmax(0,1fr);grid-template-areas:"cpu" "in" "out" "bus" "mem";gap:10px}
+  .conn{display:none}
+}
+
+/* ---------- Registers */
+.rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tray{border:2px solid var(--blue);border-radius:10px;background:#fff;padding:6px 10px 8px;cursor:pointer;min-width:0;text-align:left;position:relative;transition:box-shadow .25s,opacity .25s,background .25s}
+.tray .ab{font-size:26px;font-weight:700;color:var(--blue-d);line-height:1.1}
+.tray .fn{font-size:18px;color:var(--ink-2);line-height:1.2;min-height:2.4em}
+.tray .val{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--ink);background:var(--wash);border-radius:8px;padding:2px 8px;margin-top:4px;overflow-wrap:anywhere;text-align:center}
+.tray.sel{box-shadow:0 0 0 4px var(--pink)}
+.tray.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.tray.gp{border-color:var(--green)} .tray.gp .ab{color:var(--green-d)}
+.tray.dim{opacity:.35}
+.tray.sr{grid-column:span 2}
+.flags{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:6px}
+.flag{border:2px solid var(--blue);border-radius:8px;background:#fff;cursor:pointer;padding:2px 4px;text-align:center;min-width:0}
+.flag .fv{font-family:var(--mono);font-size:28px;font-weight:700;display:block}
+.flag .fl{font-size:18px;color:var(--ink-2);display:block}
+.flag.set{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.flag.set .fl{color:#fff}
+.flag.sel{box-shadow:0 0 0 4px var(--pink)}
+.grouplab{font-weight:700;font-size:20px;margin:10px 0 6px;color:var(--blue-d)}
+.grouplab.g{color:var(--green-d)}
+@media (max-width:1250px){.rgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.tray .val{font-size:24px}}
+@media (max-width:420px){.flag .fv{font-size:24px}.flags{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- Buses */
+.busdia{display:grid;grid-template-columns:170px minmax(0,1fr) 228px;gap:12px;align-items:start;margin-top:12px}
+.bcpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;display:flex;flex-direction:column;gap:8px}
+.bcpu .h,.bright .h{font-weight:700;color:var(--blue-d);font-size:20px}
+.mini{border:2px solid var(--blue);border-radius:8px;background:#fff;padding:4px 8px;min-width:0}
+.mini .ab{font-weight:700;color:var(--blue-d);font-size:19px}
+.mini .val{font-family:var(--mono);font-size:23px;font-weight:700;overflow-wrap:anywhere}
+.mini.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.lanes{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
+.lane{border:2px solid var(--rule-2);border-radius:10px;padding:4px 10px;background:#fff;min-width:0;transition:border-color .25s,box-shadow .25s}
+.lane .lh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 10px;font-weight:700;font-size:19px}
+.lane .ld{font-weight:normal;color:var(--ink-2);font-size:18px}
+.lane .wires{position:relative;margin:4px 0;overflow:hidden;border-radius:4px}
+.lane svg{display:block;width:100%}
+.lane .arrowrow{display:flex;justify-content:space-between;align-items:center;font-size:18px;line-height:1.1;color:var(--ink-2);font-weight:700}
+.lane .arrowrow .act{font-size:24px;color:var(--rule-2)}
+.lane .bits{font-family:var(--mono);font-size:18px;font-weight:700;min-height:1.3em;overflow-wrap:anywhere}
+.lane.on{box-shadow:0 0 0 4px var(--amber-t2);border-color:var(--amber)}
+.lane.on .arrowrow .act{color:var(--amber-d)}
+.lane-a .lh{color:var(--blue-d)} .lane-d .lh{color:var(--green-d)} .lane-c .lh{color:var(--pink-d)}
+.flow{position:absolute;inset:0;pointer-events:none;opacity:0}
+.lane.on .flow{opacity:1}
+.flow.r{background:linear-gradient(90deg,transparent 0,rgba(255,255,255,.85) 50%,transparent 100%);background-size:40% 100%;background-repeat:no-repeat;animation:flowR 1.2s linear infinite}
+.flow.l{background:linear-gradient(90deg,transparent 0,rgba(255,255,255,.85) 50%,transparent 100%);background-size:40% 100%;background-repeat:no-repeat;animation:flowL 1.2s linear infinite}
+@keyframes flowR{from{background-position:-60% 0}to{background-position:160% 0}}
+@keyframes flowL{from{background-position:160% 0}to{background-position:-60% 0}}
+@media (prefers-reduced-motion:reduce){.flow.r,.flow.l{animation:none}}
+.sigs{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 2px}
+.sig{border:2px solid var(--pink);color:var(--pink-d);border-radius:14px;padding:0 9px;font-size:18px;font-weight:700;background:#fff}
+.sig.on{background:var(--pink-d);border-color:var(--pink-d);color:#fff}
+.bright{display:flex;flex-direction:column;gap:10px;min-width:0}
+.bmem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px}
+.bmem .h{color:var(--green-d)}
+table.bm{border-collapse:collapse;width:100%;font-size:19px}
+table.bm td{padding:2px 6px;border-bottom:1px solid var(--rule);background:#fff}
+table.bm td.ad{color:var(--blue-d);font-weight:700;width:3.2em}
+table.bm td.v{font-family:var(--mono);font-weight:700}
+table.bm tr.lit td{background:var(--amber-t);box-shadow:inset 0 0 0 2px var(--amber)}
+.dev{border:2px solid var(--ink);border-radius:10px;background:#fff;padding:6px 8px;min-width:0}
+.dev .h{color:var(--ink);font-weight:700;font-size:19px}
+.dev.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.dev .val{font-family:var(--mono);font-weight:700;font-size:18px}
+@media (max-width:900px){.busdia{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Fetch–Execute */
+.phases{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.phase{border:2px solid var(--rule-2);border-radius:20px;padding:2px 16px;font-weight:700;color:var(--ink-2);font-size:19px}
+.phase.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.fe{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.fecpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start}
+.fecpu .h{grid-column:1/-1;font-weight:700;color:var(--blue-d)}
+.fecpu .cu{grid-column:1/-1}
+.mini.cu{border-color:var(--ink)} .mini.cu .ab{color:var(--ink)}
+.mini .dec{font-size:18px;color:var(--ink-2);min-height:1.3em}
+.febus{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
+.febus .fb{border:2px solid var(--rule-2);border-radius:10px;padding:5px 8px;background:#fff;min-width:0;margin:0;font-size:inherit;line-height:1.35}
+.fb .n{font-weight:700;font-size:19px}
+.fb .c{font-family:var(--mono);font-weight:700;font-size:19px;min-height:1.3em;color:var(--ink-3);overflow-wrap:anywhere}
+.febus .fb.on{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.fb.on .c{color:var(--ink)}
+.fb-a .n{color:var(--blue-d)} .fb-d .n{color:var(--green-d)} .fb-c .n{color:var(--pink-d)}
+.femem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px;min-width:0}
+.femem .h{font-weight:700;color:var(--green-d)}
+.legend{margin-top:10px;background:var(--wash);border-radius:8px;padding:6px 12px;font-size:18px}
+.legend code{font-family:var(--mono);font-weight:700;color:var(--blue-d);font-size:19px}
+.reveal{font-size:19px;font-weight:700;border:2px dashed var(--blue);background:#fff;color:var(--blue-d);border-radius:8px;padding:6px 14px;cursor:pointer;margin:4px 0 6px}
+@media (max-width:900px){.fe{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Interrupts */
+.intctl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:center}
+.intctl .l{font-weight:700}
+.intgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.9fr);gap:12px;margin-top:10px;align-items:stretch}
+.wro{font-weight:700;color:var(--blue-d)}
+.proc{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;min-width:0}
+.proc .h,.stackbox .h,.isr .h{font-weight:700;font-size:20px}
+.proc .h{color:var(--blue-d)}
+.cyc{display:flex;gap:6px;margin:6px 0}
+.cyc span{flex:1;text-align:center;border:2px solid var(--rule-2);border-radius:8px;font-weight:700;font-size:18px;padding:2px;background:#fff;color:var(--ink-2)}
+.cyc span.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.pregs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ireg{margin-top:8px}
+.ibits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:4px}
+.ibit{border:2px solid var(--blue);border-radius:8px;background:#fff;padding:2px 8px;min-width:0;display:flex;align-items:center;gap:8px}
+.ibit b{font-family:var(--mono);font-size:24px}
+.ibit span{font-size:18px;color:var(--ink-2);line-height:1.15;overflow-wrap:anywhere;min-width:0}
+.ibit.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.ibit.on span{color:#fff}
+.status{margin-top:8px;font-weight:700;font-size:19px;border-radius:8px;padding:4px 10px;background:#fff;border:2px solid var(--rule-2)}
+.status.isr{border-color:var(--pink);color:var(--pink-d)}
+.status.wait{border-color:var(--amber);color:var(--amber-d)}
+.status.run{border-color:var(--green);color:var(--green-d)}
+.stackbox{border:2px solid var(--ink);border-radius:12px;background:#fff;padding:8px;display:flex;flex-direction:column;min-width:0;transition:box-shadow .25s}
+.stackbox.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2)}
+.pile{flex:1;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:4px;border:2px solid var(--ink-3);border-top:0;border-radius:0 0 10px 10px;padding:6px;min-height:130px;background:var(--wash)}
+.plate{border:2px solid var(--blue);border-radius:6px;background:#fff;padding:2px 8px;font-family:var(--mono);font-weight:700;font-size:19px;text-align:center;animation:drop .35s ease-out}
+.plate.top{border-color:var(--amber);background:var(--amber-t)}
+@keyframes drop{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.plate{animation:none}}
+.toplab{font-size:18px;color:var(--ink-2);text-align:center;margin-bottom:2px}
+.lifo{font-size:18px;color:var(--ink-2);margin-top:6px}
+.isr{border:2px solid var(--pink);border-radius:12px;background:var(--pink-t);padding:8px;min-width:0}
+.isr .h{color:var(--pink-d)}
+.isr.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.isr ul{margin:4px 0 0;padding-left:20px;font-size:18px}
+.isr li.on{font-weight:700;color:var(--amber-d)}
+.cmp{margin-top:10px;font-size:20px;font-weight:700;text-align:center;border-radius:8px;padding:6px;background:var(--wash);min-height:1.5em}
+.cmp.hi{background:var(--green-d);color:#fff} .cmp.lo{background:var(--amber-d);color:#fff}
+@media (max-width:900px){.intgrid{grid-template-columns:minmax(0,1fr)}.pile{min-height:110px}}
+
+/* ---------- 6 Mark it like an examiner + 7 completion code */
+.wide{max-width:1180px;margin:0 auto}
+.stage-no{font-family:var(--mono);font-size:18px;color:var(--ink-3);margin:0 0 4px}
+.wide h2{font-size:30px}
+.lead{color:var(--ink-2);font-size:20px;margin:0 0 10px;max-width:72ch}
+.roundbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:4px 0 12px}
+.roundbar .counter{font-family:var(--mono);font-size:18px;color:var(--ink-2);margin:0}
+#eq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sortq{border:1px solid var(--rule-2);border-radius:10px;padding:12px 14px;margin:0;background:#fff;min-width:0}
+.sortq .s{font-size:19px;margin:0 0 10px;line-height:1.45}
+.sortq .ctx{font-weight:700;color:var(--ink)}
+.exlab{display:table;margin:6px 0 4px;font-size:18px;font-weight:700;color:var(--pink-d);background:var(--pink-t);border:1px solid var(--pink);border-radius:10px;padding:0 9px}
+.ans{display:block;font-family:Georgia,"Times New Roman",serif;font-size:21px;border-left:3px solid var(--rule-2);padding:2px 0 2px 12px;color:var(--ink)}
+.sortq .b{display:flex;gap:8px;flex-wrap:wrap}
+.sortq .b button{font-size:18px;font-weight:600;padding:6px 14px}
+.sortq .fb{font-size:18px;margin:10px 0 0;line-height:1.45;color:var(--ink)}
+.sortq .fb.ok,.sortq .fb.no{padding:8px 12px;border-left:4px solid;border-radius:0 8px 8px 0}
+.sortq .fb.ok{background:var(--green-t);border-left-color:var(--green)}
+.sortq .fb.no{background:var(--red-t);border-left-color:var(--red)}
+.sortq .fb q{font-style:italic}
+.sortq .fb .src{font-size:18px}
+.missions{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.missions div{font-size:18px;padding:8px 12px}
+.missions div:before{margin-top:5px}
+.namerow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 4px}
+.namerow label{font-weight:600;font-size:19px}
+#uname{font-family:var(--sans);font-size:20px;width:320px;max-width:100%}
+#codemsg{font-size:20px;margin:10px 0 0}
+.code-out{font-size:32px}
+@media (max-width:900px){#eq,.missions{grid-template-columns:minmax(0,1fr)}}
+
+@media (max-width:640px){
+  main{padding:12px 16px 24px} .rail-in{padding:8px 16px 0} .brand h1{font-size:26px}
+  .tabs button{font-size:18px;padding:4px 8px 12px}
+  .card{padding:12px}
+  .rtn{font-size:24px}
+  .stepbar{margin:10px -12px -12px;padding:8px 12px}
+  .stepbar .keys{display:none}
+  .intctl{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+<!--
+ MARK IT LIKE AN EXAMINER (section 6, added in the restyle). The candidate answers are example
+ student answers written for this lab and are labelled as such. Every explanation quotes a line
+ that is already in the EXAM-WORDING LEDGER above (mark scheme or Principal Examiner Report):
+  stored    Nov 2022 P11 Q5(a) MS                    cbus      ER June 2023 P13 Q7(b)
+  gp        Nov 2023 P13 Q9(a)(ii) MS                pc        ER June 2025 P12 Q1(a); Jun 2025 P12 Q1(a) MS
+  fetch1    Nov 2022 P12 Q7(c) MS                    ias       ER November 2023 P11 Q5(b); Nov 2023 P11 Q5(b) MS
+  cir       Nov 2023 P11 Q5(a) MS                    stopnow   ER June 2023 P11 Q6; Jun 2023 P11 Q6 MS
+  endcheck  Jun 2025 P12 Q1(c) MS                    width     Jun 2025 P11 Q6(a)(iii) MS
+-->
+</head>
+<body>
+<header class="rail">
+  <div class="rail-in">
+    <div class="brand">
+      <h1>CPU Explorer</h1>
+      <p>9618 AS Level · 4.1 CPU architecture · C4 Lessons 1–7</p>
+    </div>
+    <div class="railr">
+      <span class="score" id="scoretxt" title="Best score in section 6, Mark it like an examiner">Examiner 0/10</span>
+      <button id="kitchenBtn" class="kbtn" aria-pressed="false" title="Add the restaurant-kitchen labels">Kitchen view</button>
+    </div>
+    <nav class="tabs" aria-label="Modes">
+      <button data-mode="vn" class="on" aria-current="page">1 Von Neumann</button>
+      <button data-mode="reg">2 Registers</button>
+      <button data-mode="bus">3 Buses</button>
+      <button data-mode="fe">4 Fetch–Execute</button>
+      <button data-mode="int">5 Interrupts</button>
+      <button data-mode="exam">6 Mark like an examiner</button>
+      <button data-mode="code">7 Code</button>
+    </nav>
+  </div>
+</header>
+<main>
+
+<!-- ======================================================== 1 VON NEUMANN -->
+<section id="m-vn" class="mode">
+  <div class="split">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">The Von Neumann model</h2>
+        <label class="tog"><input type="checkbox" id="spToggle"> Stored program: show instructions and data</label>
+      </div>
+      <div class="vn" id="vnDiagram" style="margin-top:8px">
+        <div class="box b-ink" id="vnIn" data-part="input" tabindex="0" role="button">Input device<small>(e.g. keyboard)</small><span class="kt">orders in from front of house</span></div>
+        <div class="cpu" id="vnCpu">
+          <button class="ct" data-part="cpu">CPU <small>(Central Processing Unit, the processor)</small> <span class="kt">the kitchen line</span></button>
+          <div class="cpu-in">
+            <div class="box b-blue" data-part="cu" tabindex="0" role="button">Control Unit (CU)<br><span class="kt">head chef</span></div>
+            <div class="box b-blue" data-part="alu" tabindex="0" role="button">Arithmetic and Logic Unit (ALU)<br><span class="kt">sous-chef</span></div>
+            <div class="box b-blue" data-part="clock" tabindex="0" role="button">System clock<br><span class="kt">the beat</span></div>
+            <div class="box b-blue" data-part="regs" tabindex="0" role="button">Registers<br><span class="kt">labelled trays on the pass</span></div>
+          </div>
+        </div>
+        <div class="box b-ink" id="vnOut" data-part="output" tabindex="0" role="button">Output device<small>(e.g. screen)</small><span class="kt">plates out to the diners</span></div>
+        <div class="conn" id="c1"></div><div class="conn" id="c2"></div><div class="conn" id="c3"></div>
+        <div id="vnBuses">
+          <div class="box busbar bb-a" data-part="abus" tabindex="0" role="button">Address bus <span class="dir">· one way: CPU → memory / I/O</span><span class="kt">runner with the shelf label</span></div>
+          <div class="box busbar bb-d" data-part="dbus" tabindex="0" role="button">Data bus <span class="dir">· both ways</span><span class="kt">runner carrying the food</span></div>
+          <div class="box busbar bb-c" data-part="cbus" tabindex="0" role="button">Control bus <span class="dir">· control signals, never data</span><span class="kt">the head chef's calls and the beat</span></div>
+        </div>
+        <div class="conn" id="c4"></div>
+        <div class="mem" id="vnMem">
+          <button class="mt" data-part="ias">Main memory = Immediate Access Store (IAS) <span class="kt">the shelf by the pass</span></button>
+          <table class="memt h memH" id="vnMemH" aria-label="Main memory contents"></table><table class="memt memV" id="vnMemT" aria-label="Main memory contents (narrow view)"></table>
+          <p class="spcap" id="spCap">Made-up 8-bit values. Can you tell which are instructions?</p>
+        </div>
+      </div>
+    </div>
+    <aside class="card pink" aria-live="polite">
+      <h2>About this part</h2>
+      <div id="vnPanel"></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ======================================================== 2 REGISTERS -->
+<section id="m-reg" class="mode hidden">
+  <div class="split">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Registers: the labelled trays</h2>
+        <div class="seg" role="group" aria-label="Register type">
+          <button id="rgSpecial" class="on">Special purpose</button><button id="rgGeneral">General purpose</button>
+        </div>
+      </div>
+      <p class="small" style="margin:4px 0 0" id="rgSnap">Snapshot: just after <span class="mono">LDD 205</span> (at address 200) has been executed. Click a register.</p>
+      <div class="grouplab">Special purpose registers (the seven in the syllabus)</div>
+      <div class="rgrid" id="rgSpecialGrid"></div>
+      <div id="rgGeneralWrap" class="hidden">
+        <div class="grouplab g">General purpose registers (example: R0–R3)</div>
+        <div class="rgrid" id="rgGeneralGrid"></div>
+      </div>
+      <div class="controls">
+        <span class="small" style="font-weight:bold">ALU demo (8-bit), watch the flags:</span>
+        <button class="btn blue ghost" data-demo="0">3 + 4</button>
+        <button class="btn blue ghost" data-demo="1">127 + 1</button>
+        <button class="btn blue ghost" data-demo="2">255 + 1</button>
+        <button class="btn ghost" id="rgReset">Reset</button>
+      </div>
+      <p class="small" id="demoOut" style="margin:6px 0 0;min-height:1.4em"></p>
+    </div>
+    <aside class="card pink" aria-live="polite">
+      <h2>What it does — in exam words</h2>
+      <div id="regPanel"></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ======================================================== 3 BUSES -->
+<section id="m-bus" class="mode hidden">
+  <div class="split">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Buses</h2>
+        <div class="seg" role="group" aria-label="Transfer" id="busSeg">
+          <button data-sc="read" class="on">Memory read</button><button data-sc="write">Memory write</button><button data-sc="out">To an I/O device</button><button data-sc="in">From an I/O device</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:8px;gap:6px 22px">
+        <span><label class="tog">Data bus <select id="dWidth"><option>8</option><option selected>16</option><option>32</option><option>64</option></select> lines</label> <span class="wro" id="wD"></span></span>
+        <span><label class="tog">Address bus <select id="aWidth"><option>8</option><option selected>16</option><option>32</option></select> lines</label> <span class="wro" id="wA"></span></span>
+      </div>
+      <div class="busdia">
+        <div class="bcpu">
+          <div class="h">CPU</div>
+          <div class="mini cu" id="bCU"><div class="ab">Control Unit <span class="kt">head chef</span></div></div>
+          <div class="mini" id="bMAR"><div class="ab">MAR <span class="kt">tray</span></div><div class="val" id="bMARv">–</div></div>
+          <div class="mini" id="bMDR"><div class="ab">MDR <span class="kt">tray</span></div><div class="val" id="bMDRv">–</div></div>
+        </div>
+        <div class="lanes">
+          <div class="lane lane-a" id="laneA">
+            <div class="lh"><span>Address bus <span class="kt">runner with the shelf label</span></span><span class="ld">one way</span></div>
+            <div class="arrowrow"><span>CPU</span><span class="act" id="aArrow">→ → →</span><span>mem / I/O</span></div>
+            <div class="wires"><svg id="aSvg" preserveAspectRatio="none" aria-hidden="true"></svg><div class="flow r"></div></div>
+            <div class="bits" id="aBits"></div>
+          </div>
+          <div class="lane lane-d" id="laneD">
+            <div class="lh"><span>Data bus <span class="kt">runner carrying the food</span></span><span class="ld">both ways</span></div>
+            <div class="arrowrow"><span>CPU</span><span class="act" id="dArrow">← →</span><span>mem / I/O</span></div>
+            <div class="wires"><svg id="dSvg" preserveAspectRatio="none" aria-hidden="true"></svg><div class="flow r" id="dFlow"></div></div>
+            <div class="bits" id="dBits"></div>
+          </div>
+          <div class="lane lane-c" id="laneC">
+            <div class="lh"><span>Control bus <span class="kt">the head chef's calls</span></span><span class="ld">signals</span></div>
+            <div class="sigs" id="sigs"></div>
+          </div>
+        </div>
+        <div class="bright">
+          <div class="bmem"><div class="h">Main memory <span class="kt">shelf by the pass</span></div><table class="bm" id="bMem" aria-label="Memory"></table></div>
+          <div class="dev" id="devP"><div class="h">Printer · I/O address 3</div><div class="small">buffer: <span class="val" id="devPv">empty</span></div></div>
+          <div class="dev" id="devK"><div class="h">Keyboard · I/O address 1</div><div class="small">last key: <span class="val" id="devKv">none</span></div></div>
+        </div>
+      </div>
+      <div class="controls stepbar" id="busBar">
+        <button class="btn blue ghost" id="busBack">◀ Back</button>
+        <button class="btn blue" id="busNext">Next ▶</button>
+        <button class="btn ghost" id="busReset">Reset</button>
+        <span class="count" id="busCount"></span>
+        <span class="keys" title="Keyboard: left/right arrow to step, R to reset"><kbd>←</kbd><kbd>→</kbd> <kbd>R</kbd></span>
+      </div>
+    </div>
+    <aside class="card pink" aria-live="polite">
+      <h2>What just happened — in exam words</h2>
+      <div id="busNow"></div>
+      <h2 style="margin-top:12px">The steps</h2>
+      <ol class="steps" id="busSteps"></ol>
+      <h2 style="margin-top:12px">Bus width — in exam words</h2>
+      <div id="busWidthEx"></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ======================================================== 4 FETCH–EXECUTE -->
+<section id="m-fe" class="mode hidden">
+  <div class="split">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h2 style="margin:0">Fetch–Execute: <span class="mono">LDD 205</span></h2>
+        <div class="phases"><span class="phase" id="phF">Fetch</span><span class="phase" id="phD">Decode</span><span class="phase" id="phE">Execute</span></div>
+      </div>
+      <div class="fe">
+        <div class="fecpu">
+          <div class="h">CPU <span class="kt">the kitchen line</span></div>
+          <div class="mini" id="fPC"><div class="ab">PC <span class="kt">tray</span></div><div class="val" id="fPCv"></div></div>
+          <div class="mini" id="fMAR"><div class="ab">MAR <span class="kt">tray</span></div><div class="val" id="fMARv"></div></div>
+          <div class="mini" id="fMDR"><div class="ab">MDR <span class="kt">tray</span></div><div class="val" id="fMDRv"></div></div>
+          <div class="mini" id="fCIR"><div class="ab">CIR <span class="kt">tray</span></div><div class="val" id="fCIRv"></div></div>
+          <div class="mini" id="fACC"><div class="ab">ACC <span class="kt">tray</span></div><div class="val" id="fACCv"></div></div>
+          <div class="mini cu" id="fCU"><div class="ab">Control Unit <span class="kt">head chef</span></div><div class="dec" id="fCUv"></div></div>
+        </div>
+        <div class="febus">
+          <div class="fb fb-a" id="fbA"><div class="n">Address bus →</div><div class="c" id="fbAc"></div></div>
+          <div class="fb fb-d" id="fbD"><div class="n" id="fbDn">Data bus ↔</div><div class="c" id="fbDc"></div></div>
+          <div class="fb fb-c" id="fbC"><div class="n">Control bus</div><div class="c" id="fbCc"></div></div>
+        </div>
+        <div class="femem">
+          <div class="h">Main memory <span class="kt">shelf by the pass</span></div>
+          <table class="bm" id="feMem" aria-label="Memory"></table>
+          <p class="small" style="margin:4px 0 0">Shown as mnemonics; in memory they are binary.</p>
+        </div>
+      </div>
+      <div class="legend">
+        <code>[X]</code> = the contents of X · <code>[[MAR]]</code> = the contents of the location whose address is in the MAR · <code>←</code> = is copied into (the right-hand side keeps its contents)
+      </div>
+      <div class="controls stepbar" id="feBar">
+        <button class="btn blue ghost" id="feBack">◀ Back</button>
+        <button class="btn blue" id="feNext">Next ▶</button>
+        <button class="btn ghost" id="feReset">Reset</button>
+        <span class="count" id="feCount"></span>
+        <label class="tog"><input type="checkbox" id="predict"> Predict (hide the RTN)</label>
+        <span class="keys" title="Keyboard: left/right arrow to step, R to reset"><kbd>←</kbd><kbd>→</kbd> <kbd>R</kbd></span>
+      </div>
+    </div>
+    <aside class="card pink" aria-live="polite">
+      <h2>What just happened — in exam words</h2>
+      <div id="feNow"></div>
+      <h2 style="margin-top:12px">The steps</h2>
+      <ol class="steps" id="feSteps"></ol>
+    </aside>
+  </div>
+</section>
+
+<!-- ======================================================== 5 INTERRUPTS -->
+<section id="m-int" class="mode hidden">
+  <div class="split">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Interrupts</h2>
+        <div class="seg" role="group" aria-label="Cause of the interrupt" id="intSeg">
+          <button data-src="key" class="on">Key press</button><button data-src="printer">Printer out of paper</button><button data-src="timer">Timer</button><button data-src="div0">Division by zero</button>
+        </div>
+      </div>
+      <div class="intctl" style="margin-top:8px">
+        <span class="l">Priorities</span>
+        <div class="row">
+          <label class="tog">Interrupt <select id="iPri"><option value="1">1 (lowest)</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5 (highest)</option></select></label>
+          <label class="tog">Current process <select id="pPri"><option value="1">1 (lowest)</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5 (highest)</option></select></label>
+        </div>
+      </div>
+      <div class="intgrid">
+        <div class="proc" id="iProc">
+          <div class="h">Running: <span id="iProcName">a word processor</span></div>
+          <div class="cyc" aria-label="Fetch-Execute cycle"><span id="cF">Fetch</span><span id="cD">Decode</span><span id="cE">Execute</span></div>
+          <div class="pregs">
+            <div class="mini" id="iPC"><div class="ab">PC <span class="kt">tray</span></div><div class="val" id="iPCv"></div></div>
+            <div class="mini" id="iACC"><div class="ab">ACC <span class="kt">tray</span></div><div class="val" id="iACCv"></div></div>
+            <div class="mini" id="iSR"><div class="ab">SR <span class="kt">tray</span></div><div class="val" id="iSRv"></div></div>
+          </div>
+          <div class="ireg"><b>Interrupt register</b> <span class="kt">urgent call from front of house</span>
+            <div class="ibits" id="ibits"></div>
+          </div>
+          <div class="status run" id="iStatus"></div>
+        </div>
+        <div class="stackbox" id="iStack">
+          <div class="h">The stack</div>
+          <div class="toplab">top ↓</div>
+          <div class="pile" id="pile"></div>
+          <div class="lifo">A pile: the last item on is the first off (last in, first out). Stacks come in Unit 10. <span class="badge">teacher-written</span></div>
+        </div>
+        <div class="isr" id="iIsr">
+          <div class="h">ISRs (start addresses)</div>
+          <ul id="isrList"></ul>
+          <div class="cmp" id="iCmp"></div>
+        </div>
+      </div>
+      <div class="controls stepbar" id="intBar">
+        <button class="btn" id="intRaise">Raise the interrupt</button>
+        <button class="btn blue ghost" id="intBack">◀ Back</button>
+        <button class="btn blue" id="intNext">Next ▶</button>
+        <button class="btn ghost" id="intReset">Reset</button>
+        <span class="count" id="intCount"></span>
+        <span class="keys" title="Keyboard: left/right arrow to step, R to reset"><kbd>←</kbd><kbd>→</kbd> <kbd>R</kbd></span>
+      </div>
+    </div>
+    <aside class="card pink" aria-live="polite">
+      <h2>What just happened — in exam words</h2>
+      <div id="intNow"></div>
+      <h2 style="margin-top:12px">The steps</h2>
+      <ol class="steps" id="intSteps"></ol>
+    </aside>
+  </div>
+</section>
+
+<!-- ======================================================== 6 MARK IT LIKE AN EXAMINER (restyle addition) -->
+<section id="m-exam" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 6 of 7 · 4.1 CPU architecture</p>
+    <h2>Mark it like an examiner</h2>
+    <p class="lead">Each card shows an example student answer, written for this lab. Would the published mark scheme give it the mark?
+    Choose <b>Scores 1</b> or <b>Scores 0</b>. Every explanation quotes a mark scheme or an examiner report.</p>
+    <div class="roundbar"><span class="counter" id="eqcount" data-test="eqcount"></span><button id="eqAgain" class="btn ghost">Start the set again</button></div>
+    <div id="eq"></div>
+  </div>
+</section>
+
+<!-- ======================================================== 7 COMPLETION CODE (restyle addition) -->
+<section id="m-code" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 7 of 7</p>
+    <h2>Your completion code</h2>
+    <p class="lead">Open all five tabs and get at least 8 of the 10 examiner cards right in one set. Then type your name to get your code.</p>
+    <div class="missions" id="missions"></div>
+    <div class="namerow"><label for="uname">Your name</label><input type="text" id="uname" placeholder="Your name" autocomplete="off" oninput="updateCode()"></div>
+    <p id="codemsg"></p>
+    <div class="code-out hide" id="codeout" data-test="code"></div>
+    <p class="small">Submit this code on Teams if your teacher asks for it.</p>
+  </div>
+</section>
+</main>
+
+<script>
+(function () {
+'use strict';
+
+/* ---------------------------------------------------------------- sources */
+const S = {
+  J21_11_3a: '9618 Jun 2021 P11 Q3(a) mark scheme',
+  J21_11_QP: 'instruction set printed in 9618 Jun 2021 P11 (question paper)',
+  J21_12_5a: '9618 Jun 2021 P12 Q5(a) mark scheme',
+  J22_11_6a1: '9618 Jun 2022 P11 Q6(a)(i) mark scheme',
+  J22_11_6a2: '9618 Jun 2022 P11 Q6(a)(ii) mark scheme',
+  J22_13_2a: '9618 Jun 2022 P13 Q2(a) mark scheme',
+  J22_13_2b: '9618 Jun 2022 P13 Q2(b) mark scheme',
+  J23_11_6: '9618 Jun 2023 P11 Q6 mark scheme',
+  J23_12_5a: '9618 Jun 2023 P12 Q5(a) mark scheme',
+  J23_13_7b: '9618 Jun 2023 P13 Q7(b) mark scheme',
+  J25_11_6a3: '9618 Jun 2025 P11 Q6(a)(iii) mark scheme',
+  J25_12_1a: '9618 Jun 2025 P12 Q1(a) mark scheme',
+  J25_12_1b: '9618 Jun 2025 P12 Q1(b) mark scheme',
+  J25_12_1c: '9618 Jun 2025 P12 Q1(c) mark scheme',
+  J25_12_QP: '9618 Jun 2025 P12 Q1(a) question paper, statement 4 (an incorrect statement)',
+  J25_13_2a1: '9618 Jun 2025 P13 Q2(a)(i) mark scheme',
+  J25_13_2a2: '9618 Jun 2025 P13 Q2(a)(ii) mark scheme',
+  N22_12_7c: '9618 Nov 2022 P12 Q7(c) mark scheme',
+  N21_12_7a: '9618 Nov 2021 P12 Q7(a) mark scheme',
+  N22_11_5a: '9618 Nov 2022 P11 Q5(a) mark scheme',
+  N22_11_5b1: '9618 Nov 2022 P11 Q5(b)(i) mark scheme',
+  N22_11_5b2: '9618 Nov 2022 P11 Q5(b)(ii) mark scheme',
+  N22_11_5b3: '9618 Nov 2022 P11 Q5(b)(iii) mark scheme',
+  N22_11_5c: '9618 Nov 2022 P11 Q5(c) mark scheme',
+  N22_13_4a1: '9618 Nov 2022 P13 Q4(a)(i) mark scheme',
+  N22_13_4a2: '9618 Nov 2022 P13 Q4(a)(ii) mark scheme',
+  N22_13_4b: '9618 Nov 2022 P13 Q4(b) mark scheme',
+  N23_11_5a: '9618 Nov 2023 P11 Q5(a) mark scheme',
+  N23_11_5b: '9618 Nov 2023 P11 Q5(b) mark scheme',
+  N23_12_8c2: '9618 Nov 2023 P12 Q8(c)(ii) mark scheme',
+  N23_13_9a1: '9618 Nov 2023 P13 Q9(a)(i) mark scheme',
+  N23_13_9a2: '9618 Nov 2023 P13 Q9(a)(ii) mark scheme',
+  N23_13_9b: '9618 Nov 2023 P13 Q9(b) mark scheme',
+  N23_13_9c: '9618 Nov 2023 P13 Q9(c) mark scheme',
+  N23_13_9d: '9618 Nov 2023 P13 Q9(d): statement A, placed by the mark scheme',
+  N24_11_1d: '9618 Nov 2024 P11 Q1(d) mark scheme',
+  N24_11_3a: '9618 Nov 2024 P11 Q3(a) mark scheme',
+  N24_11_3b: '9618 Nov 2024 P11 Q3(b)(i) mark scheme',
+  N24_11_8a: '9618 Nov 2024 P11 Q8(a) mark scheme',
+  N24_11_8b: '9618 Nov 2024 P11 Q8(b) mark scheme',
+  N24_12_3a: '9618 Nov 2024 P12 Q3(a) mark scheme',
+  N25_11_6a: '9618 Nov 2025 P11 Q6(a) mark scheme',
+  ER_J25_12: 'Principal Examiner Report, June 2025, Paper 12 Q1(a)',
+  ER_N21_12: 'Principal Examiner Report, November 2021, Paper 12 Q8(a)(i)',
+  ER_J22_11: 'Principal Examiner Report, June 2022, Paper 11 Q6(a)(ii)',
+  ER_J23_11: 'Principal Examiner Report, June 2023, Paper 11 Q6',
+  ER_J23_13: 'Principal Examiner Report, June 2023, Paper 13 Q7(b)',
+  ER_J25_13: 'Principal Examiner Report, June 2025, Paper 13 Q2(a)',
+  ER_N23_11: 'Principal Examiner Report, November 2023, Paper 11 Q5(b)'
+};
+const ms = (t, s) => ({t, s});          // published mark-scheme line
+const tw = t => ({t, tw: true});        // teacher-written line
+
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const $ = id => document.getElementById(id);
+
+function msBlock(lines, label) {
+  if (!lines || !lines.length) return '';
+  let h = '';
+  const pub = lines.filter(l => !l.tw), own = lines.filter(l => l.tw);
+  if (pub.length) {
+    h += '<div class="ms"><b class="lab">' + (label || 'In the exam write') + '</b>';
+    h += pub.map(l => '“' + esc(l.t) + '”<span class="src">' + esc(S[l.s] || l.s) + '</span>').join('');
+    h += '</div>';
+  }
+  if (own.length) {
+    h += '<div class="twl"><b class="lab">In plain words <span class="badge">teacher-written</span></b>' + own.map(l => '<div>' + esc(l.t) + '</div>').join('') + '</div>';
+  }
+  return h;
+}
+function watchBlock(w) {
+  if (!w) return '';
+  return '<div class="watch"><b class="lab">Examiner watch</b>“' + esc(w.t) + '”<span class="src">' + esc(S[w.s]) + '</span></div>';
+}
+function kitchenBlock(k) {
+  if (!k) return '';
+  return '<div class="kline"><b class="lab">In the kitchen' + (k.deck ? ' · from the L1 deck' : ' <span class="badge">teacher-written</span>') + '</b>' + esc(k.t) + '</div>';
+}
+
+/* ---------------------------------------------------------------- global: modes, kitchen, keys */
+let mode = 'vn';
+const steppers = {};
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tabs button[data-mode]').forEach(b => { b.classList.toggle('on', b.dataset.mode === m); if (b.dataset.mode === m) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  document.querySelectorAll('.mode').forEach(s => s.classList.toggle('hidden', s.id !== 'm-' + m));
+  if (window.__onMode) window.__onMode(m);   // restyle: progress pips + completion code
+}
+document.querySelectorAll('.tabs button[data-mode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+$('kitchenBtn').addEventListener('click', () => {
+  const on = document.body.classList.toggle('kitchen');
+  $('kitchenBtn').classList.toggle('on', on);
+  $('kitchenBtn').setAttribute('aria-pressed', on ? 'true' : 'false');
+});
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const tag = (e.target && e.target.tagName) || '';
+  if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+  const st = steppers[mode];
+  if (!st) return;
+  if (e.key === 'ArrowRight') { st.next(); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { st.back(); e.preventDefault(); }
+  else if (e.key === 'r' || e.key === 'R') { st.reset(); e.preventDefault(); }
+});
+
+/* generic stepper: steps[] each {title, list, rtn?, rtnTw?, plain, exam[], watch?, state} */
+function makeStepper(cfg) {
+  const st = {i: 0, steps: []};
+  st.build = () => { st.steps = cfg.build(); if (st.i >= st.steps.length) st.i = st.steps.length - 1; };
+  st.render = () => {
+    const s = st.steps[st.i];
+    cfg.draw(s, st);
+    $(cfg.count).textContent = 'Step ' + st.i + ' of ' + (st.steps.length - 1);
+    $(cfg.back).disabled = st.i === 0;
+    $(cfg.next).disabled = st.i === st.steps.length - 1;
+    $(cfg.now).innerHTML = narr(s, st, cfg);
+    const ol = $(cfg.list);
+    ol.innerHTML = st.steps.map((x, k) => k === 0 ? '' : '<li data-k="' + k + '" class="' + (k === st.i ? 'cur' : k < st.i ? 'done' : '') + '">' + esc((cfg.predict && cfg.predict() && x.rtn && (k > st.i || (k === st.i && !st.revealed))) ? x.title : (x.list || x.title)) + '</li>').join('');
+    ol.querySelectorAll('li').forEach(li => li.addEventListener('click', () => { st.i = +li.dataset.k; st.render(); }));
+    const rv = $(cfg.now).querySelector('.reveal');
+    if (rv) rv.addEventListener('click', () => { st.revealed = true; st.render(); });
+  };
+  st.next = () => { if (st.i < st.steps.length - 1) { st.i++; st.revealed = false; st.render(); } };
+  st.back = () => { if (st.i > 0) { st.i--; st.revealed = false; st.render(); } };
+  st.reset = () => { st.i = 0; st.revealed = false; st.render(); };
+  $(cfg.next).addEventListener('click', st.next);
+  $(cfg.back).addEventListener('click', st.back);
+  $(cfg.reset).addEventListener('click', st.reset);
+  return st;
+}
+function narr(s, st, cfg) {
+  let h = '<div class="now"><p class="t" data-test="title">' + esc(s.title) + '</p>';
+  if (s.rtn) {
+    const hide = cfg.predict && cfg.predict() && !st.revealed;
+    if (hide) h += '<button class="reveal" data-test="reveal">Predict the RTN, then click to reveal</button>';
+    else h += '<div class="rtn' + (s.rtnTw ? ' tw' : '') + '" data-test="rtn">' + esc(s.rtn) + '</div>' + (s.rtnTw ? ' <span class="badge">teacher-written RTN</span>' : '');
+  }
+  const hidden = s.rtn && cfg.predict && cfg.predict() && !st.revealed;
+  h += '<p class="plain" data-test="plain">' + esc(s.plain) + '</p></div>';
+  if (!hidden) h += msBlock(s.exam);   // predict mode: the exam wording would give the RTN away
+  h += watchBlock(s.watch);
+  return h;
+}
+
+/* ================================================================ 1 VON NEUMANN */
+const VN_MEM = [['200', '0001 1101', 'ins'], ['201', '0010 1110', 'ins'], ['202', '0011 1111', 'ins'], ['203', '0001 1101', 'dat'], ['204', '0000 0111', 'dat'], ['205', '0010 1110', 'dat']];
+const VN = {
+  intro: {title: 'Click any part of the diagram', does: [tw('One processor, one memory for instructions and data, joined by buses. Each part opens here: what it does, its kitchen line, and what to write in the exam.')]},
+  cpu: {title: 'CPU — Central Processing Unit',
+    does: [tw('The processor. In the Von Neumann model it contains the Control Unit, the Arithmetic and Logic Unit, the registers and the system clock.')],
+    kitchen: {t: 'The whole kitchen line: the head chef, the sous-chef, the trays and the beat everyone works to.', deck: false},
+    exam: [ms('Control unit (CU)', 'N23_13_9a1'), ms('Arithmetic and Logic Unit (ALU)', 'N23_13_9a1'), ms('Immediate Access Store (IAS)', 'N23_13_9a1'), ms('(System clock)', 'N23_13_9a1')],
+    examLabel: 'In the exam write · “Identify three other components” (not registers or buses)'},
+  cu: {title: 'Control Unit (CU)',
+    does: [tw('Manages the execution of instructions, in sequence. Sends control signals on the control bus to coordinate the other components. It does not calculate and it does not store the program.')],
+    kitchen: {t: 'Head chef: reads the next recipe step and tells everyone what to do, and when. The chef does not chop.', deck: true},
+    exam: [ms('to manage the execution of instructions (in sequence)', 'N22_11_5b3'), ms('to send / receive control signals along the control bus', 'N22_11_5b3'), ms('to coordinate / synchronise the actions of other components in the CPU', 'N22_11_5b3'), ms('to control the communication between the components of the CPU', 'N22_11_5b3')],
+    correct: [ms('The Control Unit (CU) sends signals to other components on the control bus.', 'J25_12_1a')]},
+  alu: {title: 'Arithmetic and Logic Unit (ALU)',
+    does: [tw('Does the arithmetic (add, subtract) and the logic (AND, OR, NOT and comparisons such as “is A bigger than B?”), but only when the CU tells it to.')],
+    kitchen: {t: 'Sous-chef: cuts, weighs and compares, but only when the head chef says so.', deck: true},
+    exam: [ms('The arithmetic logic unit/ALU performs mathematical operations and logical comparisons.', 'J21_12_5a')]},
+  clock: {title: 'System clock',
+    does: [tw('Produces a stream of timing signals. They travel on the control bus and synchronise the components so that steps happen in order. Its purpose is why it is needed (to synchronise), not how fast it is.')],
+    kitchen: {t: 'The beat: a ticking metronome. Every cook moves on the tick, so nobody is out of step.', deck: true},
+    exam: [ms('synchronise operations', 'N22_13_4b'), ms('... by creating timing signals', 'N22_13_4b'), ms('... by creating and transmitting timing signals on the control bus', 'N24_11_3a'), ms('The control unit synchronises the actions of the processor', 'J25_13_2a1'), ms('by sending a command / signal on each timing signal produced by the system clock', 'J25_13_2a1')],
+    watch: {t: 'There was also confusion about which bus was used for the transmission of the signals. The data bus was a popular incorrect choice.', s: 'ER_J25_13'}},
+  regs: {title: 'Registers',
+    does: [tw('Very small, very fast storage locations inside the CPU. Each one holds one item: an address, an instruction or a value. Mode 2 opens each register.')],
+    kitchen: {t: 'Labelled trays on the pass: each tray holds one thing.', deck: true},
+    exam: [ms('Special purpose registers are specialised for a specific use, whereas general purpose registers are used for any purpose.', 'N23_13_9a2')],
+    watch: {t: 'Candidates should understand that registers hold or store data, they do not transfer it.', s: 'ER_J25_12'}},
+  ias: {title: 'Main memory = Immediate Access Store (IAS)',
+    does: [tw('Main memory (RAM). Holds the instructions and the data of the programs in use now. The CPU accesses it directly over the buses.')],
+    kitchen: {t: 'The shelf by the pass: in the chef’s reach. The storeroom (the hard disk) is far away.', deck: true},
+    exam: [ms('Immediate Access Store holds all the data / instructions / programs currently in use', 'N23_11_5b'), ms('Immediate Access Store is volatile memory', 'N23_11_5b'), ms('Immediate Access Store has fast access times', 'N23_11_5b')],
+    watch: {t: 'Answers such as ‘immediate access store is storage that can be accessed immediately’ which simply return the name are vague and imprecise.', s: 'ER_N23_11'}},
+  stored: {title: 'The stored program concept',
+    does: [tw('A program is a sequence of instructions. The instructions are held in main memory, in the same memory as the data, in the same binary form. The CPU fetches and executes the instructions one at a time, in sequence.')],
+    kitchen: {t: 'The recipes (instructions) and the ingredients (data) are kept on the same shelf.', deck: true},
+    exam: [ms('Instructions and data are stored in the same memory space / in main memory.', 'N22_11_5a')]},
+  abus: {title: 'Address bus',
+    does: [tw('Carries an address from the CPU to main memory or an I/O device: which location to read from or write to. It goes one way only, out of the CPU.')],
+    kitchen: {t: 'The runner carrying the slip that says which shelf to go to.', deck: false},
+    exam: [ms('the address bus carries the address where data is being written to or read from', 'J21_12_5a'), ms('Wider address bus means larger memory addresses can be used', 'J25_11_6a3')]},
+  dbus: {title: 'Data bus',
+    does: [tw('Carries data and instructions between the CPU, main memory and I/O devices. It goes both ways: into the CPU on a read, out of the CPU on a write.')],
+    kitchen: {t: 'The runner carrying the food, to the shelf and back.', deck: false},
+    exam: [ms('The data bus carries data to components', 'J21_12_5a'), ms('Wider data bus means more data can be transferred between components at a time', 'J25_11_6a3')]},
+  cbus: {title: 'Control bus',
+    does: [tw('Carries control signals, never data or instructions: memory read, memory write, timing signals from the clock, interrupt requests.')],
+    kitchen: {t: 'The head chef’s calls (“fetch!”, “put it back!”) and the beat.', deck: false},
+    exam: [ms('The control unit/bus transmits the signals to coordinate events based on the pulses of the (system) clock.', 'J21_12_5a'), ms('Interrupt', 'J23_12_5a'), ms('Timing', 'J23_12_5a'), ms('Read', 'J23_12_5a'), ms('Write', 'J23_12_5a')],
+    examLabel: 'In the exam write · signals on the control bus',
+    watch: {t: 'Answers frequently included statements such as “the control bus carries the data” or “the control bus carries the instruction” both of which are incorrect. A control bus carries (control) signals.', s: 'ER_J23_13'}},
+  input: {title: 'Input device',
+    does: [tw('Gets data into the computer, for example a keyboard or a sensor. Its data reaches the CPU on the data bus; a key press also raises an interrupt (mode 5).')],
+    kitchen: {t: 'Orders coming in from front of house.', deck: false}, exam: []},
+  output: {title: 'Output device',
+    does: [tw('Takes results out of the computer, for example a screen or a printer. Data reaches it on the data bus, often into a buffer first.')],
+    kitchen: {t: 'Plates going out to the diners.', deck: false},
+    exam: [ms('A buffer temporarily holds data until it is ready to be transmitted to the device', 'N23_12_8c2')]}
+};
+let vnSel = 'intro';
+function vnPanel(key) {
+  vnSel = key;
+  const p = VN[key];
+  document.querySelectorAll('#vnDiagram [data-part]').forEach(el => el.classList.toggle('sel', el.dataset.part === key));
+  let h = '<div class="now"><p class="t" data-test="title">' + esc(p.title) + '</p><p class="plain" data-test="plain">' + esc(p.does[0].t) + (key !== 'intro' ? ' <span class="badge">teacher-written</span>' : '') + '</p></div>';
+  h += kitchenBlock(p.kitchen);
+  if (p.exam && p.exam.length) h += msBlock(p.exam, p.examLabel);
+  else if (key !== 'intro') h += '<div class="twl"><b class="lab">In the exam</b>No mark scheme line for this part: name it as part of the model (input and output devices). <span class="badge">teacher-written</span></div>';
+  if (p.correct) h += msBlock(p.correct, 'Which bus? The mark scheme’s corrected statement');
+  h += watchBlock(p.watch);
+  $('vnPanel').innerHTML = h;
+}
+function vnMem() {
+  const on = $('spToggle').checked;
+  $('vnMemT').innerHTML = '<tr><th>Address</th><th>Contents</th>' + (on ? '<th>Holds</th>' : '') + '</tr>' +
+    VN_MEM.map(r => '<tr><td class="ad">' + r[0] + '</td><td class="mono">' + r[1] + '</td>' + (on ? '<td><span class="tag ' + r[2] + '">' + (r[2] === 'ins' ? 'instruction' : 'data') + '</span></td>' : '') + '</tr>').join('');
+  const tag = r => '<span class="tag ' + r[2] + '">' + (r[2] === 'ins' ? 'instruction' : 'data') + '</span>';
+  $('vnMemH').innerHTML = '<tr><th>Address</th>' + VN_MEM.map(r => '<td class="ad">' + r[0] + '</td>').join('') + '</tr>' +
+    '<tr><th>Contents</th>' + VN_MEM.map(r => '<td class="mono">' + r[1] + '</td>').join('') + '</tr>' +
+    (on ? '<tr><th>Holds</th>' + VN_MEM.map(r => '<td>' + tag(r) + '</td>').join('') + '</tr>' : '');
+  $('spCap').textContent = on ? 'Same memory, same binary form: compare 200 and 203. An instruction and a number look the same.' : 'Made-up 8-bit values. Can you tell which are instructions?';
+}
+document.querySelectorAll('#vnDiagram [data-part]').forEach(el => {
+  el.addEventListener('click', () => vnPanel(el.dataset.part));
+  el.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && el.tagName !== 'BUTTON') { e.preventDefault(); vnPanel(el.dataset.part); } });
+});
+$('spToggle').addEventListener('change', () => { vnMem(); vnPanel($('spToggle').checked ? 'stored' : 'ias'); });
+vnMem(); vnPanel('intro');
+
+/* ================================================================ 2 REGISTERS */
+const SNAP = {PC: '201', MAR: '205', MDR: '25', CIR: 'LDD 205', ACC: '25', IX: '0'};
+const REGS = [
+  {ab: 'PC', fn: 'Program Counter',
+    exam: [ms('The Program Counter (PC) stores the address of the next instruction to be fetched from memory.', 'J25_12_1a'), ms('…and the contents are incremented / changed to the next address each cycle', 'J22_11_6a1')],
+    plain: 'Holds the address of the next instruction. It does not count instructions.',
+    kitchen: 'The tray holding the ticket that says which recipe step is next.',
+    watch: {t: 'A popular incorrect change for statement 1 was that the Program Counter counted the number of statements that had been executed.', s: 'ER_J25_12'}},
+  {ab: 'MAR', fn: 'Memory Address Register',
+    exam: [ms('holds address in memory from which data will be read / to which data will be written', 'N22_13_4a1'), ms('stores the address of the memory location (or an I/O component) currently being read from or written to', 'N23_11_5a')],
+    plain: 'Holds an address: the memory location (or I/O device) about to be read from or written to.',
+    kitchen: 'The tray holding the shelf label: which shelf to go to.'},
+  {ab: 'MDR', fn: 'Memory Data Register',
+    exam: [ms('holds the data/instructions which has been read from or is to be written to the address in the MAR', 'N22_13_4a1'), ms('The Memory Data Register (MDR) holds data to be stored in the memory address in the MAR. // The Memory Data Register (MDR) holds data read from the memory address in the MAR', 'J25_12_1a')],
+    plain: 'Holds the data or instruction just read from memory, or about to be written to memory.',
+    kitchen: 'The tray holding whatever has just come off the shelf, or is about to go on it.',
+    trap: 'The Memory Data Register (MDR) transfers data to the memory address stored in the Memory Address Register (MAR).'},
+  {ab: 'CIR', fn: 'Current Instruction Register',
+    exam: [ms('holds the instruction currently being decoded and/or executed', 'N23_11_5a')],
+    plain: 'Holds the instruction being decoded and executed now. The mark needs “decoded / executed”, not just “current instruction”.',
+    kitchen: 'The tray holding the recipe step being followed right now.'},
+  {ab: 'ACC', fn: 'Accumulator',
+    exam: [ms('stores the intermediate results of arithmetic and logical operations // holds the result of a calculation', 'N25_11_6a')],
+    plain: 'Holds the value being worked on: the results of the ALU’s arithmetic and logic.',
+    kitchen: 'The tray where the sous-chef puts each result.'},
+  {ab: 'IX', fn: 'Index Register',
+    exam: [ms('Stores a number that will be added to the operand, to form the address of the data', 'N24_12_3a'), ms('to store a value that is added to an address to give another address', 'N22_11_5b1')],
+    plain: 'Holds a number that is added to an address (used in indexed addressing, C4 lesson on addressing modes).',
+    kitchen: 'The tray holding a number to add to a shelf label (“three shelves along”).'},
+  {ab: 'SR', fn: 'Status Register', sr: true,
+    exam: [ms('to store flags which are set by events // from the results of arithmetic and logic operations and interrupt flags', 'N22_11_5b1'), ms('Contains bits which can be referenced individually and set or cleared depending on the operation e.g. overflow, underflow', 'N23_11_5a'), ms('To allow flags to be checked', 'N24_11_8a'), ms('… to change instruction sequence', 'N24_11_8a')],
+    plain: 'Each bit is a flag that the ALU sets or clears after an operation. Click a flag for its meaning.',
+    kitchen: 'The tray of little flags (“too much!”, “nothing left”) the head chef glances at before choosing what to do next.'}
+];
+const GP = [{ab: 'R0', v: '12'}, {ab: 'R1', v: '7'}, {ab: 'R2', v: '0'}, {ab: 'R3', v: '255'}];
+const FLAGS = [
+  {k: 'C', n: 'Carry', m: 'Set when an addition carries a 1 out of the most significant bit: the true result needs one more bit than the register has.'},
+  {k: 'Z', n: 'Zero', m: 'Set when the result is zero: every bit of the result is 0.'},
+  {k: 'N', n: 'Negative', m: 'Set when the most significant bit of the result is 1: in two’s complement the result is negative.'},
+  {k: 'V', n: 'Overflow', m: 'Set when a two’s complement result is too big for the register, so its sign bit is wrong (e.g. 127 + 1 gives −128).'}
+];
+const rg = {acc: SNAP.ACC, flags: {C: 0, Z: 0, N: 0, V: 0}, sel: null, view: 'special'};
+function trayHTML(r) {
+  let val;
+  if (r.sr) {
+    val = '<div class="flags">' + FLAGS.map(f => '<div class="flag' + (rg.flags[f.k] ? ' set' : '') + (rg.sel === 'flag' + f.k ? ' sel' : '') + '" data-flag="' + f.k + '" tabindex="0" role="button"><span class="fv">' + f.k + '=' + rg.flags[f.k] + '</span><span class="fl">' + f.n + '</span></div>').join('') + '</div>';
+  } else {
+    const v = r.ab === 'ACC' ? rg.acc : SNAP[r.ab];
+    val = '<div class="val">' + esc(v) + '</div>';
+  }
+  return '<div class="tray' + (r.sr ? ' sr' : '') + (rg.sel === r.ab ? ' sel' : '') + (rg.view === 'general' ? ' dim' : '') + '" data-reg="' + r.ab + '" tabindex="0" role="button"><div class="ab">' + r.ab + ' <span class="kt">tray</span></div><div class="fn">' + r.fn + '</div>' + val + '</div>';
+}
+function regDraw() {
+  $('rgSpecialGrid').innerHTML = REGS.map(trayHTML).join('');
+  $('rgGeneralGrid').innerHTML = GP.map(g => '<div class="tray gp' + (rg.sel === g.ab ? ' sel' : '') + '" data-reg="' + g.ab + '" tabindex="0" role="button"><div class="ab">' + g.ab + ' <span class="kt">spare tray</span></div><div class="fn">General purpose register</div><div class="val">' + g.v + '</div></div>').join('');
+  $('rgGeneralWrap').classList.toggle('hidden', rg.view !== 'general');
+  $('rgSpecial').classList.toggle('on', rg.view === 'special');
+  $('rgGeneral').classList.toggle('on', rg.view === 'general');
+  document.querySelectorAll('#m-reg [data-reg]').forEach(el => {
+    const go = e => { if (e.target.closest('[data-flag]')) return; regPanel(el.dataset.reg); };
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
+  });
+  document.querySelectorAll('#m-reg [data-flag]').forEach(el => {
+    const go = e => { e.stopPropagation(); regPanel('flag' + el.dataset.flag); };
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
+  });
+}
+function regPanel(key) {
+  rg.sel = key;
+  let h = '';
+  if (key === 'intro') {
+    h = '<div class="now"><p class="t" data-test="title">Click a register (a tray)</p><p class="plain">Each register holds one item. Its contents are copied from place to place; the register itself never sends anything.</p></div>' +
+      '<div class="watch"><b class="lab">Examiner watch</b>“A register is a storage location; its function is to hold or store a binary value. A register cannot transfer the value; the content of the register is transferred by other means.”<span class="src">' + S.ER_N21_12 + '</span></div>';
+  } else if (key.startsWith('flag')) {
+    const f = FLAGS.find(x => x.k === key.slice(4));
+    h = '<div class="now"><p class="t" data-test="title">Status Register flag: ' + f.n + ' (' + f.k + ')</p><p class="plain" data-test="plain">' + esc(f.m) + ' <span class="badge">teacher-written</span></p></div>';
+    if (f.k === 'V') h += msBlock([ms('The answer cannot be represented in the number of bits available', 'N24_11_1d')], 'In the exam write · overflow');
+    h += msBlock([ms('Contains bits which can be referenced individually and set or cleared depending on the operation e.g. overflow, underflow', 'N23_11_5a')], 'In the exam write · the Status Register');
+  } else if (/^R\d$/.test(key)) {
+    h = '<div class="now"><p class="t" data-test="title">' + key + ': a general purpose register</p><p class="plain" data-test="plain">Holds whatever the program needs while it works: a value, a count, a part-result. The syllabus names only the special purpose registers; general purpose ones are here for the contrast. <span class="badge">teacher-written</span></p></div>' + gpExam();
+  } else {
+    const r = REGS.find(x => x.ab === key);
+    h = '<div class="now"><p class="t" data-test="title">' + r.ab + ' — ' + r.fn + '</p><p class="plain" data-test="plain">' + esc(r.plain) + ' <span class="badge">teacher-written</span></p></div>';
+    h += msBlock(r.exam);
+    h += kitchenBlock({t: r.kitchen, deck: false});
+    if (r.trap) h += '<div class="watch"><b class="lab">Trap: Cambridge printed this as an incorrect statement</b>“' + esc(r.trap) + '”<span class="src">' + S.J25_12_QP + '</span><div style="margin-top:4px">Registers hold or store. They do not transfer.</div></div>';
+    if (r.watch) h += watchBlock(r.watch);
+    h += '<div class="twl"><b class="lab">Watch the verb <span class="badge">teacher-written</span></b>Write “holds” or “stores”. The register never sends or transfers: its contents are copied.</div>';
+  }
+  $('regPanel').innerHTML = h;
+  regDraw();
+}
+function gpExam() {
+  return msBlock([ms('Special purpose registers hold the status of a program whereas general purpose registers hold the temporary data while performing operations.', 'N23_13_9a2'),
+    ms('Special purpose registers are specialised for a specific use, whereas general purpose registers are used for any purpose.', 'N23_13_9a2'),
+    ms('General purpose registers can be used by most instructions, whereas special purpose can only be used by certain instruction', 'N23_13_9a2'),
+    ms('Special purpose registers have a specified role in the machine whereas general purpose registers can be used for all purposes defined by the programmer', 'N24_11_8b')], 'In the exam write · general vs special purpose');
+}
+$('rgSpecial').addEventListener('click', () => { rg.view = 'special'; regPanel('intro'); });
+$('rgGeneral').addEventListener('click', () => {
+  rg.view = 'general'; rg.sel = null;
+  $('regPanel').innerHTML = '<div class="now"><p class="t" data-test="title">General purpose vs special purpose</p><p class="plain" data-test="plain">The seven named registers are special purpose: each has one job. General purpose registers (R0–R3 here) can hold anything the program needs. <span class="badge">teacher-written</span></p></div>' + gpExam();
+  regDraw();
+});
+const DEMOS = [[3, 4], [127, 1], [255, 1]];
+document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click', () => {
+  const [a, n] = DEMOS[+b.dataset.demo];
+  const raw = a + n, r = raw & 255;
+  const sa = a > 127 ? a - 256 : a, sn = n > 127 ? n - 256 : n, sr = r > 127 ? r - 256 : r;
+  rg.flags = {C: raw > 255 ? 1 : 0, Z: r === 0 ? 1 : 0, N: r > 127 ? 1 : 0, V: (sa + sn) !== sr ? 1 : 0};
+  rg.acc = String(r);
+  const bin = x => x.toString(2).padStart(8, '0').replace(/(\d{4})(\d{4})/, '$1 $2');
+  $('demoOut').innerHTML = bin(a) + ' + ' + bin(n) + ' = <b>' + bin(r) + '</b> (ACC now ' + r + ' unsigned, ' + sr + ' in two’s complement). Flags set: ' +
+    (Object.keys(rg.flags).filter(k => rg.flags[k]).map(k => FLAGS.find(f => f.k === k).n).join(', ') || 'none') + '. <span class="badge">teacher-written</span>';
+  regPanel('SR');
+}));
+$('rgReset').addEventListener('click', () => { rg.acc = SNAP.ACC; rg.flags = {C: 0, Z: 0, N: 0, V: 0}; $('demoOut').textContent = ''; regPanel('intro'); });
+regPanel('intro');
+
+/* ================================================================ 3 BUSES */
+const MEM0 = {204: 3, 205: 25, 206: 12, 207: 0};
+const KEY_A = 65;
+const binN = (v, n) => { let s = (v >>> 0).toString(2); if (s.length > n) s = s.slice(-n); s = s.padStart(n, '0'); return s.replace(/(\d{4})(?=\d)/g, '$1 '); };
+function busSteps(sc) {
+  const base = {mar: '–', mdr: '–', addr: null, data: null, ddir: null, sigs: [], lit: [], mem: Object.assign({}, MEM0), memLit: null, pbuf: 'empty', key: 'none'};
+  const steps = [];
+  const add = (o) => { const prev = steps.length ? steps[steps.length - 1].state : base; steps.push(Object.assign({}, o, {state: Object.assign({}, prev, {addr: null, data: null, ddir: null, sigs: ['clock'], lit: [], memLit: null}, o.state || {})})); };
+  if (sc === 'read') {
+    add({title: 'Ready: read address 205', plain: 'The CPU needs the contents of memory location 205. Press Next.', exam: [], state: {sigs: []}});
+    add({title: 'The address is in the MAR', list: 'The address 205 is held in the MAR', plain: 'The address of the location to read, 205, is held in the MAR.', exam: [ms('stores the address of the memory location (or an I/O component) currently being read from or written to', 'N23_11_5a')], state: {mar: '205', lit: ['bMAR']}});
+    add({title: 'Address bus: CPU → memory', list: 'The contents of the MAR go on the address bus', plain: 'The contents of the MAR (205) are put on the address bus. The address travels one way: from the CPU to memory.', exam: [ms('the address bus carries the address where data is being written to or read from', 'J21_12_5a')], state: {addr: 205, lit: ['bMAR'], memLit: 205}});
+    add({title: 'Control bus: memory read', list: 'The CU sends a memory read signal', plain: 'The Control Unit sends a memory read signal on the control bus. A signal, not data.', exam: [ms('The Control Unit initiates data transfer', 'J23_13_7b'), ms('…by generating signals that are sent on the control bus to other components', 'J23_13_7b')], state: {addr: 205, sigs: ['clock', 'read'], lit: ['bCU'], memLit: 205}});
+    add({title: 'Data bus: memory → CPU', list: 'The contents of 205 travel on the data bus', plain: 'The contents of location 205 (25) are put on the data bus and travel into the CPU.', exam: [ms('The data bus carries data to components', 'J21_12_5a')], state: {addr: 205, data: 25, ddir: 'in', sigs: ['clock', 'read'], memLit: 205}});
+    add({title: 'Copied into the MDR', list: 'The data is copied into the MDR', rtn: 'MDR ← [[MAR]]', plain: 'The data from location 205 is copied into the MDR. Location 205 still holds 25: reading copies, it does not remove.', exam: [ms('MDR ← [[MAR]]', 'J25_13_2a2'), ms('holds the data/instructions which has been read from or is to be written to the address in the MAR', 'N22_13_4a1')], state: {mdr: '25', lit: ['bMDR']}});
+  } else if (sc === 'write') {
+    add({title: 'Ready: write 37 to address 207', plain: 'The CPU will store the value 37 in memory location 207. Press Next.', exam: [], state: {sigs: []}});
+    add({title: 'Address in the MAR, data in the MDR', list: 'MAR holds 207; MDR holds 37', plain: 'The MAR holds the address to write to (207). The MDR holds the data to be written (37).', exam: [ms('holds address in memory from which data will be read / to which data will be written', 'N22_13_4a1'), ms('The Memory Data Register (MDR) holds data to be stored in the memory address in the MAR.', 'J25_12_1a')], state: {mar: '207', mdr: '37', lit: ['bMAR', 'bMDR']}});
+    add({title: 'Address bus: CPU → memory', list: 'The contents of the MAR go on the address bus', plain: 'The contents of the MAR (207) are put on the address bus: one way, from the CPU to memory.', exam: [ms('the address bus carries the address where data is being written to or read from', 'J21_12_5a')], state: {addr: 207, lit: ['bMAR'], memLit: 207}});
+    add({title: 'Data bus: CPU → memory', list: 'The contents of the MDR go on the data bus', plain: 'The contents of the MDR (37) are put on the data bus. This time the data travels out of the CPU: the data bus works both ways.', exam: [ms('The data bus carries data to components', 'J21_12_5a')], state: {addr: 207, data: 37, ddir: 'out', lit: ['bMDR'], memLit: 207}});
+    add({title: 'Control bus: memory write', list: 'The CU sends a memory write signal', plain: 'The Control Unit sends a memory write signal on the control bus.', exam: [ms('The Control Unit initiates data transfer', 'J23_13_7b'), ms('…by generating signals that are sent on the control bus to other components', 'J23_13_7b')], state: {addr: 207, data: 37, ddir: 'out', sigs: ['clock', 'write'], lit: ['bCU'], memLit: 207}});
+    add({title: 'Stored in location 207', list: 'Memory location 207 now holds 37', plain: 'Location 207 now holds 37. Its old contents (0) are overwritten. The MDR still holds 37: it was copied, not moved.', exam: [tw('Writing overwrites the old contents of the location; the MDR keeps its copy.')], state: (() => { const m = Object.assign({}, MEM0); m[207] = 37; return {mem: m, memLit: 207}; })()});
+  } else if (sc === 'out') {
+    add({title: 'Ready: print the value at 206', plain: 'The value in memory location 206 (12) is to be sent to the printer. Press Next.', exam: [], state: {sigs: []}});
+    add({title: 'Address bus: the RAM address', list: 'Address 206 goes on the address bus', plain: 'The MAR holds 206, the address in RAM of the data to output. Its contents go on the address bus to memory.', exam: [ms('The address of the data to be written to the device (in RAM) is carried on the address bus', 'N23_12_8c2')], state: {mar: '206', addr: 206, lit: ['bMAR'], memLit: 206}});
+    add({title: 'Control bus: memory read', list: 'The CU sends a memory read signal', plain: 'The Control Unit sends a memory read signal on the control bus.', exam: [ms('The Control Unit initiates data transfer', 'J23_13_7b')], state: {addr: 206, sigs: ['clock', 'read'], lit: ['bCU'], memLit: 206}});
+    add({title: 'Data bus: memory → CPU', list: 'The data travels into the MDR', rtn: 'MDR ← [[MAR]]', plain: 'The contents of 206 (12) travel on the data bus and are copied into the MDR.', exam: [ms('MDR ← [[MAR]]', 'J25_13_2a2')], state: {addr: 206, data: 12, ddir: 'in', sigs: ['clock', 'read'], mdr: '12', lit: ['bMDR'], memLit: 206}});
+    add({title: 'Address bus: the printer', list: 'The printer’s I/O address goes on the address bus', plain: 'The MAR now holds 3, the printer’s I/O address. Its contents go on the address bus, out to the device.', exam: [ms('stores the address of the memory location (or an I/O component) currently being read from or written to', 'N23_11_5a')], state: {mar: '3', addr: 3, lit: ['bMAR', 'devP']}});
+    add({title: 'Data bus: CPU → printer buffer', list: 'Data and a write signal go to the printer', plain: 'The Control Unit sends a write signal; the contents of the MDR (12) travel out on the data bus into the printer’s buffer.', exam: [ms('All data to be written to the device / buffer is carried on the data bus', 'N23_12_8c2'), ms('A buffer temporarily holds data until it is ready to be transmitted to the device', 'N23_12_8c2')], state: {addr: 3, data: 12, ddir: 'out', sigs: ['clock', 'write'], lit: ['bMDR', 'devP'], pbuf: '12'}});
+  } else {
+    add({title: 'Ready: a key is pressed', plain: 'The user presses the A key on the keyboard. Press Next.', exam: [], state: {sigs: [], key: 'none'}});
+    add({title: 'Control bus: interrupt request', list: 'The keyboard sends an interrupt signal', plain: 'The keyboard sends an interrupt signal on the control bus: it needs the processor’s attention. (Mode 5 shows what the CPU does next.)', exam: [ms('Interrupt', 'J23_12_5a'), ms('to send a signal from a device or process', 'N22_11_5c'), ms('... seeking the attention of the processor', 'N22_11_5c')], state: {sigs: ['clock', 'irq'], lit: ['devK'], key: 'A pressed'}});
+    add({title: 'Address bus: the keyboard', list: 'The keyboard’s I/O address goes on the address bus', plain: 'The MAR holds 1, the keyboard’s I/O address. Its contents go on the address bus, out to the device.', exam: [ms('stores the address of the memory location (or an I/O component) currently being read from or written to', 'N23_11_5a')], state: {mar: '1', addr: 1, lit: ['bMAR', 'devK']}});
+    add({title: 'Control bus: read', list: 'The CU sends a read signal', plain: 'The Control Unit sends a read signal on the control bus.', exam: [ms('Read', 'J23_12_5a')], state: {addr: 1, sigs: ['clock', 'read'], lit: ['bCU', 'devK']}});
+    add({title: 'Data bus: keyboard → CPU', list: 'The key code travels on the data bus', plain: 'The keyboard puts the code for A (65 in ASCII) on the data bus; it travels into the CPU.', exam: [ms('The data bus carries data to components', 'J21_12_5a')], state: {addr: 1, data: KEY_A, ddir: 'in', sigs: ['clock', 'read'], lit: ['devK']}});
+    add({title: 'Copied into the MDR', list: 'The key code is copied into the MDR', plain: 'The code 65 is copied into the MDR, ready to be used.', exam: [ms('holds the data/instructions which has been read from or is to be written to the address in the MAR', 'N22_13_4a1')], state: {mdr: '65', lit: ['bMDR']}});
+  }
+  return steps;
+}
+let busSc = 'read';
+function drawWires(svgId, n, on, color) {
+  const pitch = n <= 8 ? 4 : n <= 16 ? 3 : n <= 32 ? 2 : 1.25;
+  const H = n * pitch, svg = $(svgId);
+  svg.setAttribute('viewBox', '0 0 100 ' + H);
+  svg.style.height = H + 'px';
+  let r = '';
+  for (let i = 0; i < n; i++) r += '<rect x="0" y="' + (i * pitch + pitch * 0.2) + '" width="100" height="' + (pitch * 0.6) + '" fill="' + (on ? color : '#CBD5E1') + '"/>';
+  svg.innerHTML = r;
+  svg.dataset.lines = n;
+  svg.dataset.lit = on ? n : 0;
+}
+function busWidths() {
+  const d = +$('dWidth').value, a = +$('aWidth').value;
+  $('wD').textContent = '= ' + d + ' bits at the same time';
+  const n = Math.pow(2, a);
+  $('wA').innerHTML = '→ 2<sup>' + a + '</sup> = ' + n.toLocaleString('en-GB') + ' addresses';
+  $('busWidthEx').innerHTML = msBlock([ms('Larger bus width means that more data transferred at the same time', 'N24_11_3b'),
+    ms('Wider address bus means larger memory addresses can be used', 'J25_11_6a3'), ms('allowing more memory locations to be accessed directly', 'J25_11_6a3'),
+    tw('An n-bit address bus can carry 2^n different addresses, so 2^n memory locations can be addressed (' + a + ' lines → ' + n.toLocaleString('en-GB') + ').')]);
+}
+const SIGS = [['read', 'read'], ['write', 'write'], ['clock', 'timing'], ['irq', 'interrupt']];  // the four signal types in J23/12 Q5(a) MS
+const busSt = makeStepper({
+  build: () => busSteps(busSc), count: 'busCount', back: 'busBack', next: 'busNext', reset: 'busReset', now: 'busNow', list: 'busSteps',
+  draw: (s) => {
+    const x = s.state, d = +$('dWidth').value, a = +$('aWidth').value;
+    $('bMARv').textContent = x.mar; $('bMDRv').textContent = x.mdr;
+    ['bMAR', 'bMDR', 'bCU', 'devP', 'devK'].forEach(id => $(id).classList.toggle('lit', x.lit.indexOf(id) >= 0));
+    const aOn = x.addr !== null, dOn = x.data !== null;
+    $('laneA').classList.toggle('on', aOn); $('laneD').classList.toggle('on', dOn);
+    $('laneC').classList.toggle('on', x.sigs.some(g => g !== 'clock'));
+    drawWires('aSvg', a, aOn, '#1D4ED8'); drawWires('dSvg', d, dOn, '#16A34A');
+    $('aBits').textContent = aOn ? x.addr + ' = ' + binN(x.addr, a) : '';
+    $('dBits').textContent = dOn ? x.data + ' = ' + binN(x.data, d) : '';
+    $('dArrow').textContent = x.ddir === 'in' ? '← ← ←' : x.ddir === 'out' ? '→ → →' : '← →';
+    $('dFlow').className = 'flow ' + (x.ddir === 'in' ? 'l' : 'r');
+    $('sigs').innerHTML = SIGS.map(g => '<span class="sig' + (x.sigs.indexOf(g[0]) >= 0 ? ' on' : '') + '" data-sig="' + g[0] + '">' + g[1] + '</span>').join('');
+    $('bMem').innerHTML = Object.keys(x.mem).map(k => '<tr' + (+k === x.memLit ? ' class="lit"' : '') + '><td class="ad">' + k + '</td><td class="v">' + x.mem[k] + '</td></tr>').join('');
+    $('devPv').textContent = x.pbuf; $('devKv').textContent = x.key;
+    busWidths();
+  }
+});
+steppers.bus = busSt;
+document.querySelectorAll('#busSeg button').forEach(b => b.addEventListener('click', () => {
+  busSc = b.dataset.sc;
+  document.querySelectorAll('#busSeg button').forEach(x => x.classList.toggle('on', x === b));
+  busSt.i = 0; busSt.build(); busSt.render();
+}));
+['dWidth', 'aWidth'].forEach(id => $(id).addEventListener('change', () => busSt.render()));
+busSt.build(); busSt.render();
+
+/* ================================================================ 4 FETCH–EXECUTE */
+const FE_MEM = [['200', 'LDD 205'], ['201', 'ADD 206'], ['202', 'END'], ['203', ''], ['204', ''], ['205', '25'], ['206', '12']];
+function feSteps() {
+  const S0 = {PC: '200', MAR: '–', MDR: '–', CIR: '–', ACC: '0', cu: '', ph: null, lit: [], A: '', D: '', Ddir: '', C: '', mem: null};
+  const out = [];
+  const add = (o, st) => { const prev = out.length ? out[out.length - 1].state : S0; out.push(Object.assign(o, {state: Object.assign({}, prev, {lit: [], A: '', D: '', Ddir: '', C: '', mem: null}, st)})); };
+  add({title: 'Ready to fetch', plain: 'The PC holds 200: the address of the next instruction. Press Next to start the fetch.', exam: [ms('The Program Counter (PC) holds the address of the next instruction …', 'J22_11_6a1')]}, {lit: ['fPC']});
+  add({title: 'Fetch 1 of 4', list: 'MAR ← [PC]', rtn: 'MAR ← [PC]', plain: 'The contents of the PC are copied to the MAR. The MAR now holds 200; the PC still holds 200.', exam: [ms('MAR ← [PC]', 'N22_12_7c'), ms('The contents of the PC are copied to the MAR', 'J22_13_2a')]}, {ph: 'F', MAR: '200', lit: ['fPC', 'fMAR']});
+  add({title: 'Fetch 2 of 4', list: 'PC ← [PC] + 1', rtn: 'PC ← [PC] + 1', plain: 'The address in the PC is incremented: 200 + 1 = 201, ready for the next instruction.', exam: [ms('PC ← [PC] + 1', 'N22_12_7c'), ms('The address in PC is incremented.', 'N23_13_9b')]}, {ph: 'F', PC: '201', lit: ['fPC']});
+  add({title: 'Fetch 3 of 4', list: 'MDR ← [[MAR]]', rtn: 'MDR ← [[MAR]]', plain: 'The MAR holds 200, so the contents of location 200 (the instruction LDD 205) are copied into the MDR. The address goes out on the address bus; the instruction comes back on the data bus.', exam: [ms('MDR ← [[MAR]]', 'J25_13_2a2'), ms('The data in the location pointed to by the MAR is copied to the MDR.', 'N23_13_9b')]}, {ph: 'F', MDR: 'LDD 205', lit: ['fMAR', 'fMDR'], A: '200', D: 'LDD 205', Ddir: 'in', C: 'memory read', mem: '200'});
+  add({title: 'Fetch 4 of 4', list: 'CIR ← [MDR]', rtn: 'CIR ← [MDR]', plain: 'The contents of the MDR are copied into the CIR. The CIR now holds the instruction LDD 205.', exam: [ms('CIR ← [MDR]', 'J25_13_2a2'), ms('The contents of MDR are copied into CIR.', 'N23_13_9b')]}, {ph: 'F', CIR: 'LDD 205', lit: ['fMDR', 'fCIR']});
+  add({title: 'Decode', list: 'The CU decodes the instruction in the CIR', plain: 'The Control Unit decodes the instruction in the CIR. Opcode LDD = load (direct addressing). Operand 205 = the address of the data.', exam: [ms('... the Control Unit decodes the instruction’s opcode.', 'J21_11_3a'), ms('holds the instruction currently being decoded and/or executed', 'N23_11_5a')]}, {ph: 'D', cu: 'LDD = load direct · 205 = address', lit: ['fCIR', 'fCU']});
+  add({title: 'Execute 1 of 3', list: 'The address part (205) is copied into the MAR', rtn: 'MAR ← 205', rtnTw: true, plain: 'The address part of the instruction, 205, is copied from the CIR into the MAR. (Some books write this as MAR ← [CIR], address part only.)', exam: [tw('No 9618 mark scheme prints execute-stage RTN for LDD. This line is teacher-written.'), ms('Direct addressing. Load the contents of the location at the given address to ACC', 'J21_11_QP')]}, {ph: 'E', MAR: '205', cu: 'LDD = load direct · 205 = address', lit: ['fCIR', 'fMAR']});
+  add({title: 'Execute 2 of 3', list: 'The contents of 205 are copied into the MDR', rtn: 'MDR ← [[MAR]]', rtnTw: true, plain: 'The MAR holds 205, so the contents of location 205 (the number 25) travel on the data bus and are copied into the MDR.', exam: [tw('Same notation as fetch step 3; using it here in the execute stage is teacher-written.'), ms('The data in the location pointed to by the MAR is copied to the MDR.', 'N23_13_9b')]}, {ph: 'E', MDR: '25', cu: 'LDD = load direct · 205 = address', lit: ['fMAR', 'fMDR'], A: '205', D: '25', Ddir: 'in', C: 'memory read', mem: '205'});
+  add({title: 'Execute 3 of 3', list: 'The contents of the MDR are copied into the ACC', rtn: 'ACC ← [MDR]', rtnTw: true, plain: 'The contents of the MDR (25) are copied into the accumulator. LDD 205 is complete: the ACC holds 25.', exam: [tw('Execute-stage RTN is teacher-written.'), ms('stores the intermediate results of arithmetic and logical operations // holds the result of a calculation', 'N25_11_6a')]}, {ph: 'E', ACC: '25', cu: 'LDD = load direct · 205 = address', lit: ['fMDR', 'fACC']});
+  add({title: 'Cycle complete', list: 'Check for interrupts, then fetch again from 201', plain: 'The cycle is complete. The CPU checks for interrupts now, between cycles (mode 5). The PC already holds 201, so the next fetch starts at 201.', exam: [ms('after completion of the execute stage // before the cycle begins', 'N22_13_4a2')]}, {ph: null, cu: '', lit: ['fPC']});
+  return out;
+}
+const feSt = makeStepper({
+  build: feSteps, count: 'feCount', back: 'feBack', next: 'feNext', reset: 'feReset', now: 'feNow', list: 'feSteps', predict: () => $('predict').checked,
+  draw: (s) => {
+    const x = s.state;
+    ['PC', 'MAR', 'MDR', 'CIR', 'ACC'].forEach(r => { $('f' + r + 'v').textContent = x[r]; $('f' + r).classList.toggle('lit', x.lit.indexOf('f' + r) >= 0); });
+    $('fCU').classList.toggle('lit', x.lit.indexOf('fCU') >= 0); $('fCUv').textContent = x.cu;
+    $('phF').classList.toggle('on', x.ph === 'F'); $('phD').classList.toggle('on', x.ph === 'D'); $('phE').classList.toggle('on', x.ph === 'E');
+    $('fbA').classList.toggle('on', !!x.A); $('fbAc').textContent = x.A ? x.A + ' →' : '';
+    $('fbD').classList.toggle('on', !!x.D); $('fbDc').textContent = x.D ? '← ' + x.D : '';
+    $('fbC').classList.toggle('on', !!x.C); $('fbCc').textContent = x.C;
+    $('feMem').innerHTML = FE_MEM.map(r => '<tr' + (r[0] === x.mem ? ' class="lit"' : '') + '><td class="ad">' + r[0] + '</td><td class="v">' + esc(r[1]) + '</td></tr>').join('');
+  }
+});
+steppers.fe = feSt;
+$('predict').addEventListener('change', () => { feSt.revealed = false; feSt.render(); });
+feSt.build(); feSt.render();
+
+/* ================================================================ 5 INTERRUPTS */
+const SRCS = {
+  key: {name: 'Key press', bit: 'KEY', type: 'hardware', isr: 'Keyboard ISR', addr: '800', run: ms('The input data from the keyboard is processed', 'J23_11_6'), cause: ms('User has pressed a key on the keyboard (hardware interrupt)', 'N21_12_7a')},
+  printer: {name: 'Printer out of paper', bit: 'PRN', type: 'hardware', isr: 'Printer ISR', addr: '820', run: tw('The printer ISR runs: e.g. a “printer out of paper” message is shown to the user.'), cause: ms('Printer is out of paper (hardware interrupt)', 'N21_12_7a')},
+  timer: {name: 'Timer', bit: 'TMR', type: 'hardware', isr: 'Timer ISR', addr: '840', run: tw('The timer ISR runs: e.g. the operating system checks whether this program has used up its time slice.'), cause: tw('A hardware timer goes off at a set interval (no 9618 mark scheme names the timer).')},
+  div0: {name: 'Division by zero', bit: 'ERR', type: 'software', isr: 'Run-time error ISR', addr: '860', run: tw('The ISR handles the run-time error, e.g. it reports the division by zero. The operating system may then end the program that caused it.'), cause: ms('Division by zero (software interrupt)', 'N21_12_7a')}
+};
+const BITS = ['KEY', 'PRN', 'TMR', 'ERR'];
+const BITNAME = {KEY: 'keyboard', PRN: 'printer', TMR: 'timer', ERR: 'run-time error'};
+let iSrc = 'key';
+function intSteps() {
+  const src = SRCS[iSrc], ip = +$('iPri').value, pp = +$('pPri').value, hi = ip > pp;
+  const R0 = {PC: '202', ACC: '25', SR: '0000'};
+  const base = {cyc: 'E', flag: false, stack: [], pc: R0.PC, acc: R0.ACC, sr: R0.SR, status: 'run', statusT: 'Running the program · priority ' + pp, cmp: '', cmpC: '', isr: false, isrOn: false, lit: []};
+  const out = [];
+  const add = (o, st) => { const prev = out.length ? out[out.length - 1].state : base; out.push(Object.assign(o, {state: Object.assign({}, prev, {lit: []}, st)})); };
+  add({title: 'The program is running', plain: 'The current process (priority ' + pp + ') is running, one F–E cycle after another. The CPU is part-way through executing an instruction. Choose a cause and priority, then raise the interrupt.', exam: [ms('to send a signal from a device or process', 'N22_11_5c'), ms('... seeking the attention of the processor', 'N22_11_5c')]}, {});
+  add({title: 'Interrupt raised: ' + src.name, list: 'The interrupt flag is set in the interrupt register', plain: 'The ' + src.name.toLowerCase() + ' (a ' + src.type + ' interrupt, priority ' + ip + ') sets its flag in the interrupt register. The CPU is in the middle of executing an instruction, so it does not stop: it finishes the instruction first.', exam: [ms('An interrupt flag is raised in the (interrupt) register', 'J23_11_6'), src.cause], watch: {t: 'There seemed to be an assumption that all current processes would be stopped immediately and the interrupt from the keyboard would be processed without any delay.', s: 'ER_J23_11'}}, {flag: true, cyc: 'E', lit: ['ireg']});
+  add({title: 'End of the F–E cycle: check', list: 'At the end of the current F–E cycle the interrupt register is checked', plain: 'The instruction has finished executing. Now, at the end of the cycle (never in the middle of an instruction), the interrupt register is checked: a flag is set.', exam: [ms('At the end of the current FE cycle // at the start of the next FE cycle', 'J23_11_6'), ms('At the start / end of FE cycle the interrupt register is checked', 'J25_12_1c')]}, {cyc: 'end', lit: ['ireg']});
+  add({title: 'Compare the priorities', list: 'The priority is compared with the current process', plain: 'Interrupt priority ' + ip + ' vs current process priority ' + pp + ': ' + (hi ? ip + ' is higher, so the interrupt will be serviced now.' : ip === pp ? 'equal is not higher, so the interrupt waits.' : ip + ' is lower, so the interrupt waits.'), exam: [ms('The priority of any interrupts waiting is checked', 'J25_12_1c'), ms('if the priority of the interrupt is higher than the current process', 'J25_12_1c')].concat(ip === pp ? [tw('Equal priority: the mark schemes service an interrupt only when its priority is higher than the current process, so an equal one waits.')] : []), watch: {t: 'Few mentioned the need to check the priority of the interrupt, and that for the interrupt to be serviced its priority needed to be higher than the priority of the current process.', s: 'ER_J22_11'}}, {cmp: 'Interrupt ' + ip + (hi ? ' > ' : ip === pp ? ' = ' : ' < ') + 'process ' + pp + (hi ? ' → service it' : ' → it waits'), cmpC: hi ? 'hi' : 'lo', lit: ['cmp']});
+  if (hi) {
+    const pushed = [{n: 'PC', v: R0.PC}, {n: 'ACC', v: R0.ACC}, {n: 'SR', v: R0.SR}];
+    add({title: 'Save the registers on the stack', list: 'The register contents are pushed onto the stack', plain: 'The current contents of the registers (PC 202, ACC 25, SR 0000) are copied onto the stack, one on top of another, so the program can carry on later exactly where it stopped.', exam: [ms('If true, it stores the current contents of the registers on the stack', 'J23_11_6')]}, {stack: pushed, status: 'isr', statusT: 'Program paused · registers saved', lit: ['stack']});
+    add({title: 'Call the appropriate ISR', list: 'The appropriate ISR is identified and its address loaded into the PC', plain: 'The type of interrupt is identified (' + BITNAME[src.bit] + '), so the matching routine is chosen: the ' + src.isr + '. Its start address, ' + src.addr + ', is loaded into the PC.', exam: [ms('Location / type of interrupt identified...', 'J22_11_6a2'), ms('…appropriate ISR is called to handle the interrupt', 'J22_11_6a2'), ms('The address of the Interrupt Service (ISR) handling routine is loaded into the Program Counter (PC).', 'N23_13_9d')], watch: {t: 'There was considerable confusion about the use of the Interrupt Service Routines (Interrupt Handlers) with answers often suggesting that a single ISR would be used no matter what the cause of the interrupt.', s: 'ER_J22_11'}}, {pc: src.addr, isr: true, isrOn: true, lit: ['isr', 'iPC'], status: 'isr', statusT: 'Running the ' + src.isr});
+    add({title: 'The ISR runs', list: 'The ISR services the interrupt', plain: 'The ' + src.isr + ' runs, one F–E cycle after another, and services the interrupt. Its flag is cleared.', exam: [src.run]}, {flag: false, isrOn: true, isr: true, lit: ['isr']});
+    add({title: 'ISR finished: check again', list: 'A further check for higher priority interrupts', plain: 'When the ISR has finished, the interrupt register is checked again for any other interrupt of higher priority. There are none.', exam: [ms('When the ISR has finished, a further check is made for higher priority interrupts', 'J25_12_1c')]}, {isrOn: false, isr: true, lit: ['ireg'], statusT: 'ISR finished'});
+    const d0 = iSrc === 'div0';
+    add({title: 'Restore the registers from the stack', list: 'The register contents are restored from the stack', plain: (d0 ? 'If the operating system lets the program carry on, the ' : 'The ') + 'register contents are taken back off the stack, top first (SR, then ACC, then PC): last in, first out. The PC holds 202 again.', exam: [ms('The contents of the registers are restored from the stack', 'J23_11_6')].concat(d0 ? [tw('Division by zero: the ISR has handled the error; the operating system may end the program instead of restoring it.')] : [])}, {stack: [], pc: R0.PC, acc: R0.ACC, sr: R0.SR, isr: false, lit: ['stack', 'iPC'], statusT: 'Registers restored'});
+    add({title: d0 ? 'The program continues, or is ended' : 'The program continues', list: d0 ? 'Control returns, unless the OS ends the program' : 'Control returns to the program', plain: d0 ? 'The division by zero was an error in this program, so it may not simply carry on: the operating system may end the program. If it does not, control is passed back and the next F–E cycle fetches from 202.' : 'Control is passed back to the program. The next F–E cycle fetches from address 202, exactly where it left off.', exam: [ms('... and control is passed back to previous process', 'J23_11_6'), ms('if no more interrupts of higher priority, the register contents are restored and the next FE cycle continues', 'J25_12_1c')].concat(d0 ? [tw('Division by zero: the ISR handles the error; the operating system may end the program that caused it.')] : [])}, {cyc: 'F', status: 'run', statusT: 'Running the program · priority ' + pp, cmp: '', cmpC: '', lit: ['iPC']});
+  } else {
+    add({title: 'Lower or equal: the interrupt waits', list: 'Not higher: the program continues; the interrupt waits', plain: 'The interrupt is not higher priority than the current process, so it is not serviced yet. Its flag stays set in the interrupt register. Nothing is pushed onto the stack.', exam: [ms('If lower priority than current process continue with F-E cycle', 'J22_13_2b')]}, {status: 'wait', statusT: 'Interrupt waiting · program carries on', lit: ['ireg']});
+    add({title: 'The program continues', list: 'Next F–E cycle; checked again at the end of each cycle', plain: 'The next F–E cycle of the program starts. The waiting interrupt is checked again at the end of every cycle; it is serviced once nothing of higher or equal priority is running.', exam: [tw('The flag stays set and is checked again at the end of each F–E cycle.')]}, {cyc: 'F', status: 'wait', statusT: 'Running the program · interrupt still waiting', lit: ['iPC']});
+  }
+  return out;
+}
+const intSt = makeStepper({
+  build: intSteps, count: 'intCount', back: 'intBack', next: 'intNext', reset: 'intReset', now: 'intNow', list: 'intSteps',
+  draw: (s, st) => {
+    const x = s.state, src = SRCS[iSrc];
+    $('cF').classList.toggle('on', x.cyc === 'F'); $('cD').classList.toggle('on', x.cyc === 'D'); $('cE').classList.toggle('on', x.cyc === 'E');
+    $('iPCv').textContent = x.pc; $('iACCv').textContent = x.acc; $('iSRv').textContent = x.sr;
+    $('iPC').classList.toggle('lit', x.lit.indexOf('iPC') >= 0);
+    $('ibits').innerHTML = BITS.map(b => '<div class="ibit' + (x.flag && b === src.bit ? ' on' : '') + '" data-bit="' + b + '"><b>' + (x.flag && b === src.bit ? 1 : 0) + '</b><span>' + BITNAME[b] + '</span></div>').join('');
+    $('iStatus').className = 'status ' + x.status; $('iStatus').textContent = x.statusT;
+    $('pile').innerHTML = x.stack.map((p, k) => '<div class="plate' + (k === x.stack.length - 1 ? ' top' : '') + '">' + p.n + ' = ' + p.v + '</div>').join('');
+    $('iStack').classList.toggle('lit', x.lit.indexOf('stack') >= 0);
+    $('isrList').innerHTML = Object.keys(SRCS).map(k => '<li class="' + (x.isr && k === iSrc ? 'on' : '') + '">' + SRCS[k].isr + ' · ' + SRCS[k].addr + '</li>').join('');
+    $('iIsr').classList.toggle('lit', !!x.isrOn);
+    $('iCmp').className = 'cmp ' + x.cmpC; $('iCmp').textContent = x.cmp || 'Priority comparison appears here';
+    $('intRaise').disabled = st.i !== 0;
+  }
+});
+steppers.int = intSt;
+function intRebuild() { intSt.i = 0; intSt.build(); intSt.render(); }
+document.querySelectorAll('#intSeg button').forEach(b => b.addEventListener('click', () => {
+  iSrc = b.dataset.src;
+  document.querySelectorAll('#intSeg button').forEach(x => x.classList.toggle('on', x === b));
+  intRebuild();
+}));
+['iPri', 'pPri'].forEach(id => $(id).addEventListener('change', intRebuild));
+$('intRaise').addEventListener('click', () => intSt.next());
+intRebuild();
+
+/* test hook (read-only) */
+window.__cpu = {steppers, setMode, VN, REGS};
+})();
+</script>
+<script>
+
+/* =========================================================== core (house engine, adapted from core.js)
+   score/attempted are for the current set of examiner cards; best = best set score; total = all answers. */
+var STAGES=7, cur=0, score=0, attempted=0, NEED=8, best=0, total=0, codeShown=false, visited={};
+var MODES=['vn','reg','bus','fe','int','exam','code'];
+var TABNAME={vn:'1 Von Neumann',reg:'2 Registers',bus:'3 Buses',fe:'4 Fetch–Execute',int:'5 Interrupts'};
+function go(n){window.__cpu.setMode(MODES[n]);}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function hex(v,n){var s=v.toString(16).toUpperCase();while(s.length<n)s='0'+s;return s;}
+function bump(ok){attempted++;total++;if(ok)score++;if(score>best)best=score;
+  document.getElementById('scoretxt').textContent='Examiner '+best+'/'+EQ.length;eqCount();updateCode();}
+function updateCode(){
+  var n=(document.getElementById('uname').value||'').trim(),box=document.getElementById('codeout'),msg=document.getElementById('codemsg');
+  var seen=MODES.slice(0,5).filter(function(m){return visited[m];}).length;
+  drawMissions(seen);codeShown=false;
+  if(seen<5||best<NEED){msg.textContent='Keep going: '+seen+' of 5 tabs opened; best examiner set '+best+' of '+EQ.length+' (you need '+NEED+').';box.classList.add('hide');drawPips();return;}
+  if(!n){msg.textContent='Type your name above to generate your code.';box.classList.add('hide');drawPips();return;}
+  var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.toUpperCase().charCodeAt(i))&0xFFF;
+  msg.textContent='Best examiner set: '+best+' of '+EQ.length+' correct, from '+total+' answers in all.';
+  box.textContent='CPU-'+hex(h,3)+'-'+hex(best&0xFF,2)+'-'+hex(total&0xFF,2);box.classList.remove('hide');codeShown=true;drawPips();
+}
+function choice(mount,items,labels){
+  var m=document.getElementById(mount),html='';shuffle(items);
+  items.forEach(function(q,i){html+='<div class="sortq"><p class="s">'+(i+1)+'. '+q.s+'</p><div class="b" id="'+mount+'b'+i+'"></div><p class="fb" id="'+mount+'f'+i+'"></p></div>';});
+  m.innerHTML=html;
+  items.forEach(function(q,i){var box=document.getElementById(mount+'b'+i),done=false;
+    labels.forEach(function(o){var b=document.createElement('button');b.textContent=o;
+      b.onclick=function(){if(done)return;done=true;var ok=o===q.a;b.className=ok?'picked-ok':'picked-no';
+        if(!ok)Array.prototype.forEach.call(box.children,function(x){if(x.textContent===q.a)x.className='picked-ok';});
+        var f=document.getElementById(mount+'f'+i);f.className='fb '+(ok?'ok':'no');f.innerHTML=(ok?'✓ ':'✗ ')+q.f;bump(ok);};
+      box.appendChild(b);});});
+}
+
+/* =========================================================== progress: pips on the tabs, missions */
+function drawPips(){
+  Array.prototype.forEach.call(document.querySelectorAll('.tabs button[data-mode]'),function(b){
+    var m=b.getAttribute('data-mode');
+    b.classList.toggle('done',m==='exam'?best>=NEED:m==='code'?codeShown:!!visited[m]);});
+}
+function drawMissions(seen){
+  var h='';MODES.slice(0,5).forEach(function(m){h+='<div class="'+(visited[m]?'done':'')+'" data-m="'+m+'">Open '+TABNAME[m]+'</div>';});
+  h+='<div class="'+(best>=NEED?'done':'')+'" data-m="exam">'+NEED+' of '+EQ.length+' examiner cards right in one set (best so far: '+best+')</div>';
+  document.getElementById('missions').innerHTML=h;
+}
+window.__onMode=function(m){cur=MODES.indexOf(m);if(cur>=0&&cur<5)visited[m]=true;updateCode();};
+/* accessibility: the selected state of every segmented button is also announced (aria-pressed) */
+function syncSeg(){Array.prototype.forEach.call(document.querySelectorAll('.seg button'),function(b){b.setAttribute('aria-pressed',b.classList.contains('on')?'true':'false');});}
+new MutationObserver(syncSeg).observe(document.querySelector('main'),{subtree:true,attributes:true,attributeFilter:['class']});
+syncSeg();
+
+/* =========================================================== 6 Mark it like an examiner
+   Example student answers (written for this lab). Each explanation quotes a ledger line. */
+var LAB_EX='<span class="exlab">Example student answer</span>';
+function card(ctx,ans){return '<span class="ctx">'+ctx+'</span>'+LAB_EX+'<span class="ans">“'+ans+'”</span>';}
+function why(t,src){return t+'<span class="src">'+src+'</span>';}
+var Y='Scores 1',N='Scores 0';
+var EQ=[
+ {k:'stored',a:Y,s:card('The stored program concept','Instructions and data are stored in the same memory space.'),
+  f:why('This is the mark scheme line: <q>Instructions and data are stored in the same memory space / in main memory.</q>','9618 Nov 2022 P11 Q5(a) mark scheme')},
+ {k:'cbus',a:N,s:card('The role of the control bus','The control bus carries the data.'),
+  f:why('The examiners: <q>Answers frequently included statements such as “the control bus carries the data” or “the control bus carries the instruction” both of which are incorrect. A control bus carries (control) signals.</q>','Principal Examiner Report, June 2023, Paper 13 Q7(b)')},
+ {k:'gp',a:N,s:card('General purpose registers compared with special purpose registers','A general purpose register is for general purposes.'),
+  f:why('The examiners use this exact answer as their example of one that scores nothing (Principal Examiner Report, November 2024, key messages): <q>Statements that repeat or use the name in a description do not demonstrate any further understanding.</q> The mark scheme compares the two: <q>Special purpose registers hold the status of a program whereas general purpose registers hold the temporary data while performing operations.</q>','9618 Nov 2023 P13 Q9(a)(ii) mark scheme')},
+ {k:'pc',a:N,s:card('The Program Counter (PC)','The Program Counter counts the number of instructions that have been executed.'),
+  f:why('The examiners: <q>A popular incorrect change for statement 1 was that the Program Counter counted the number of statements that had been executed.</q> The mark scheme: <q>The Program Counter (PC) stores the address of the next instruction to be fetched from memory.</q>','Principal Examiner Report, June 2025, Paper 12 Q1(a); 9618 Jun 2025 P12 Q1(a) mark scheme')},
+ {k:'fetch1',a:Y,s:card('Write the register transfer notation for: copy the address of the next instruction into the Memory Address Register','MAR ← [PC]'),
+  f:why('This mark scheme gives <q>1 mark for each correct row:</q> and the first row is <q>MAR ← [PC]</q>. Careful: in June 2025 P13 Q2(a)(ii) the first mark needs both lines together, <q>MAR ← [PC] and PC ← [PC] + 1</q>.','9618 Nov 2022 P12 Q7(c) mark scheme')},
+ {k:'ias',a:N,s:card('The Immediate Access Store (IAS)','Immediate access store is storage that can be accessed immediately.'),
+  f:why('The examiners: <q>Answers such as ‘immediate access store is storage that can be accessed immediately’ which simply return the name are vague and imprecise.</q> The mark scheme: <q>Immediate Access Store holds all the data / instructions / programs currently in use</q>.','Principal Examiner Report, November 2023, Paper 11 Q5(b); 9618 Nov 2023 P11 Q5(b) mark scheme')},
+ {k:'cir',a:Y,s:card('The Current Instruction Register (CIR)','The CIR holds the instruction currently being decoded and executed.'),
+  f:why('This matches the mark scheme line: <q>holds the instruction currently being decoded and/or executed</q>.','9618 Nov 2023 P11 Q5(a) mark scheme')},
+ {k:'stopnow',a:N,s:card('What happens when an interrupt is received','The processor stops what it is doing straight away and deals with the interrupt.'),
+  f:why('The examiners: <q>There seemed to be an assumption that all current processes would be stopped immediately and the interrupt from the keyboard would be processed without any delay.</q> The mark scheme: <q>At the end of the current FE cycle // at the start of the next FE cycle</q>.','Principal Examiner Report, June 2023, Paper 11 Q6; 9618 Jun 2023 P11 Q6 mark scheme')},
+ {k:'endcheck',a:Y,s:card('When the processor checks for interrupts','At the end of the FE cycle the interrupt register is checked.'),
+  f:why('This matches the mark scheme line: <q>At the start / end of FE cycle the interrupt register is checked</q>.','9618 Jun 2025 P12 Q1(c) mark scheme')},
+ {k:'width',a:Y,s:card('The effect of a wider data bus','A wider data bus means more data can be transferred between components at a time.'),
+  f:why('This is the mark scheme line: <q>Wider data bus means more data can be transferred between components at a time</q>.','9618 Jun 2025 P11 Q6(a)(iii) mark scheme')}
+];
+var round=1;
+function eqCount(){document.getElementById('eqcount').textContent='Set '+round+' · '+attempted+' of '+EQ.length+' marked · '+score+' right · best set '+best;}
+function eqStart(){score=0;attempted=0;choice('eq',EQ,[Y,N]);eqCount();}
+document.getElementById('eqAgain').addEventListener('click',function(){round++;eqStart();});
+eqStart();
+visited.vn=true;updateCode();
+window.__exam={items:EQ,state:function(){return {score:score,attempted:attempted,best:best,total:total,visited:Object.keys(visited).sort(),codeShown:codeShown};}};
+</script>
+</body>
+</html>
