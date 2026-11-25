@@ -1,0 +1,1224 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C4 – Assembly Tracer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231D4ED8'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='26' font-weight='700' fill='white' text-anchor='middle'%3EASM%3C/text%3E%3C/svg%3E">
+<!--
+ ASSEMBLY TRACER — C4 Unit 4 lab 2 of 3 (built 23 Nov 2026 with C4 L8 + L9; build script _kit/assembly_tracer/build_asm.py).
+ Instruction explanations, notes and label forms: the 2027-29 syllabus, word for word (sources8.py, verified).
+ Machine code: INVENTED for these lessons (8-bit opcode + 8-bit operand; the same codes as the C4 L8 deck).
+ Relative addressing has no opcode in the table: it is shown as a labelled illustration only.
+ MARK IT LIKE AN EXAMINER: the answers are example student answers written for this lab; every explanation quotes:
+  ldd150   2027–29 syllabus instruction table
+  immed    9618 Jun 2023 P12 Q3(b) mark scheme
+  swap     9618 Jun 2023 P12 Q3(b) mark scheme
+  n24p2    Principal Examiner Report, November 2024, Paper 13; 9618 Nov 2024 P13 Q7(a) mark scheme
+  n24p1    9618 Nov 2024 P13 Q7(a) mark scheme
+  ldi103   9618 Jun 2022 P13 Q3(a) mark scheme; Principal Examiner Report, June 2022, Paper 13
+  ldd102   9618 Jun 2022 P13 Q3(a) mark scheme
+  angle    Principal Examiner Report, November 2025, Paper 31 (an A Level paper; same instruction set)
+  given    Principal Examiner Report, November 2021, Paper 12
+  imm9     2027–29 syllabus; Principal Examiner Report, June 2022, Paper 31
+  ldxdesc  Principal Examiner Report, November 2021, Paper 12; 9618 Nov 2021 P12 Q8(b)(iii) mark scheme
+  bothload Principal Examiner Report, November 2023, Paper 11; 9618 Nov 2023 P11 Q8(b)(ii) mark scheme
+  jpecomp  Principal Examiner Report, November 2023, Paper 12; 9618 Nov 2023 P12 Q9(a) mark scheme
+  addcopy  Principal Examiner Report, November 2023, Paper 12; 9618 Nov 2023 P12 Q9(a) mark scheme
+  readone  9618 Jun 2023 P12 Q3(a) mark scheme; Principal Examiner Report, June 2023, Paper 12
+  objsecond 9618 Jun 2023 P12 Q3(a) mark scheme
+  pass1    9618 Nov 2023 P11 Q8(a) mark scheme; Principal Examiner Report, November 2023, Paper 11
+-->
+<style>
+:root{
+  --paper:#ffffff; --ink:#1f2933; --ink-2:#57616e; --ink-3:#8b95a3;
+  --rule:#dde1e7; --rule-2:#c3cad3; --wash:#f6f7f9;
+  --write:#1d4ed8; --write-wash:#e6efff; --write-deep:#15389e;
+  --run:#15803d; --run-wash:#e5f4ea; --run-deep:#0f5c2c;
+  --fix:#be185d; --fix-wash:#fbe9f1; --fix-deep:#8f1146;
+  --amb:#9a6700; --amb-wash:#fdf3e0;
+  --good:#2c7a4b; --good-wash:#e6f3ea; --bad:#b3352f; --bad-wash:#fbeae9;
+  --kw:#b45309; --bi:#6d28d9; --st:#15803d; --cm:#b91c1c;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+body.board{font-size:21px}
+.rail{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.rail-in{max-width:900px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pips{display:flex;gap:4px;flex:1;min-width:180px}
+.pip{height:5px;flex:1;background:var(--rule);border-radius:3px;cursor:pointer}
+.pip.done{background:var(--ink-2)} .pip.now{background:var(--write)}
+.railtxt,.score{font-size:13px;color:var(--ink-2);white-space:nowrap}
+.score{font-family:var(--mono)}
+main{max-width:900px;margin:0 auto;padding:28px 20px 80px}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:34px;line-height:1.2;margin:0 0 6px;letter-spacing:-0.01em}
+h2{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:27px;line-height:1.25;margin:0 0 4px}
+h3{font-size:16px;font-weight:600;margin:22px 0 8px}
+p{margin:0 0 14px;max-width:70ch}
+.stage-no{font-family:var(--mono);font-size:13px;color:var(--ink-3);margin:0 0 10px}
+.lead{color:var(--ink-2);max-width:68ch}
+.stage{display:none} .stage.on{display:block}
+.panel{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:18px 0}
+.note{border-left:3px solid var(--rule-2);padding:2px 0 2px 14px;margin:16px 0;color:var(--ink-2);font-size:16px}
+.note.warn{border-left-color:var(--fix);color:var(--ink)}
+button{font-family:inherit;font-size:15px;padding:8px 15px;border:1px solid var(--rule-2);background:var(--paper);color:var(--ink);border-radius:7px;cursor:pointer;line-height:1.3}
+button:hover{border-color:var(--ink-3);background:var(--wash)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--write);outline-offset:2px}
+button.go{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:500} button.go:hover{background:#000}
+button.on{background:var(--write-wash);border-color:var(--write);color:var(--write-deep);font-weight:600}
+input[type=text]{font-family:inherit;font-size:17px;padding:8px 11px;border:1px solid var(--rule-2);border-radius:7px;width:260px}
+select{font-family:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--rule-2);border-radius:7px;background:#fff;color:var(--ink);max-width:100%}
+.qbox{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:14px 0}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.qtag{font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+.qtext{font-size:18px;margin:0 0 10px}
+.fb{font-size:15px;margin:10px 0 0;line-height:1.6} .fb.ok{color:var(--good)} .fb.no{color:var(--bad)}
+.mcq{display:grid;gap:8px;margin:10px 0}
+.mcq button{text-align:left;padding:11px 14px;font-size:16px;line-height:1.5}
+.picked-ok{background:var(--good-wash)!important;border-color:var(--good)!important;color:var(--good)!important}
+.picked-no{background:var(--bad-wash)!important;border-color:var(--bad)!important;color:var(--bad)!important}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:32px;padding-top:18px;border-top:1px solid var(--rule);flex-wrap:wrap}
+.hide{display:none!important}
+.code-out{font-family:var(--mono);font-size:30px;letter-spacing:.12em;color:var(--write-deep);background:var(--write-wash);border:1px solid var(--write);border-radius:9px;padding:14px 18px;display:inline-block;margin:10px 0}
+.fam{display:inline-block;font-size:12px;font-weight:700;color:#fff;border-radius:10px;padding:1px 9px;margin-right:6px;vertical-align:2px}
+.fam.w{background:var(--write)} .fam.r{background:var(--run)} .fam.x{background:var(--fix)}
+.kw{color:var(--kw);font-weight:700} .bi{color:var(--bi)} .st{color:var(--st)} .cm{color:var(--cm)}
+
+
+.twins{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.place{border-radius:10px;padding:14px 16px;color:#fff;font-size:16px;line-height:1.5}
+.place.w{background:var(--write)} .place.s{background:#a85a07}
+.sortq{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;margin:10px 0}
+.sortq .s{font-size:16.5px;margin:0 0 8px}
+.sortq .b{display:flex;gap:6px;flex-wrap:wrap}
+.sortq .b button{font-size:14px;padding:6px 11px}
+.missions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.missions div{border:1px solid var(--rule);border-radius:8px;padding:7px 11px;font-size:14.5px;display:flex;gap:8px;align-items:flex-start}
+.missions div:before{content:"";flex:0 0 16px;height:16px;border:2px solid var(--rule-2);border-radius:3px;margin-top:3px}
+.missions div.done{border-color:var(--good);background:var(--good-wash)}
+.missions div.done:before{background:var(--good);border-color:var(--good)}
+.sim{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin:14px 0}
+.code{border:1px solid var(--rule-2);border-radius:10px;overflow:hidden;font-family:var(--mono);font-size:15px;background:#fff}
+.code .ln{padding:2px 10px;white-space:pre;border-left:4px solid transparent}
+.code .ln .n{display:inline-block;width:2em;color:var(--ink-3);text-align:right;margin-right:.8em}
+.code .ln.ran{background:var(--good-wash);border-left-color:var(--good)}
+.code .ln.bad{background:var(--bad-wash);border-left-color:var(--bad);color:var(--bad);font-weight:700}
+.side .btns{display:flex;flex-direction:column;gap:6px}
+.side .btns button{text-align:left}
+.counter{font-family:var(--mono);font-size:13px;color:var(--ink-2);margin:8px 0}
+.out{border:1px solid var(--rule);border-radius:8px;background:#fbfbfc;font-family:var(--mono);font-size:14.5px;padding:8px 10px;min-height:120px;white-space:pre-wrap}
+.out .e{color:var(--cm);font-weight:600} .out .ok{color:var(--good);font-weight:700} .out .s{color:var(--ink-3)}
+.flash{font-size:14.5px;margin:6px 0 0;min-height:1.4em;color:var(--write-deep);font-weight:600}
+.parcel{border-radius:10px;padding:12px 14px;margin:8px 0;font-size:15.5px}
+.parcel.good{background:var(--good-wash);border:1px solid var(--good)} .parcel.bad{background:var(--bad-wash);border:1px solid var(--bad)}
+label.chk2{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:15.5px;cursor:pointer}
+label.chk2 input{margin-top:5px;transform:scale(1.2)}
+@media (max-width:640px){.twins,.missions,.sim{grid-template-columns:1fr}}
+input[type=text]{font-family:var(--mono);font-size:17px;padding:8px 11px;border:1px solid var(--rule-2);border-radius:7px;width:190px;background:var(--paper);color:var(--ink)}
+.qrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 0}
+.err{font-size:14px;color:var(--bad);margin:8px 0 0;min-height:0}
+.dots{display:flex;gap:5px;margin-top:12px;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--rule-2)}
+.dot.hit{background:var(--good);border-color:var(--good)}
+.dotlbl{font-size:13px;color:var(--ink-3);margin-left:6px}
+.wk{display:block;white-space:pre-line;font-family:var(--mono);font-size:14px;line-height:1.65;color:var(--ink-2);margin-top:9px;padding-top:9px;border-top:1px solid var(--rule);word-break:break-word}
+
+/* =========================================================== CPU Explorer on the house engine */
+:root{
+  --ink:#1E293B; --ink-2:#475569; --ink-3:#64748B; --bg:#F8FAFC; --rule:#E2E8F0; --rule-2:#CBD5E1; --wash:#F1F5F9;
+  --blue:#1D4ED8; --blue-t:#EFF6FF; --blue-t2:#DBEAFE; --blue-d:#1E40AF;
+  --pink:#EC4899; --pink-t:#FDF2F8; --pink-t2:#FCE7F3; --pink-d:#BE185D;
+  --green:#16A34A; --green-t:#F0FDF4; --green-t2:#DCFCE7; --green-d:#15803D;
+  --amber:#D97706; --amber-t:#FFFBEB; --amber-t2:#FEF3C7; --amber-d:#B45309;
+  --red:#EF4444; --red-t:#FEF2F2; --red-d:#B91C1C;
+  --write:#1D4ED8; --write-wash:#EFF6FF; --write-deep:#1E40AF;
+  --good:#15803D; --good-wash:#F0FDF4; --bad:#B91C1C; --bad-wash:#FEF2F2;
+}
+body{background:var(--bg);color:var(--ink);font-size:20px;line-height:1.4}
+main p{max-width:none}
+.hidden{display:none !important}
+.mono{font-family:var(--mono)}
+button{font-size:18px}
+button:focus-visible,select:focus-visible,input:focus-visible,.box:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+
+/* ---------- rail (header) */
+header.rail{position:static;background:#fff;border-bottom:1px solid var(--rule)}
+.rail-in{max-width:1440px;margin:0 auto;padding:8px 28px 0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 16px}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 14px;min-width:0}
+.brand h1{font-size:30px;margin:0;line-height:1.15;color:var(--ink)}
+.brand p{margin:0;color:var(--ink-2);font-size:18px}
+.railr{margin-left:auto;display:flex;align-items:center;gap:12px}
+.score{font-family:var(--mono);font-size:18px;color:var(--ink-2);white-space:nowrap}
+#kitchenBtn{font-size:18px;font-weight:600;padding:4px 12px;border:1px solid var(--pink);color:var(--pink-d);background:#fff;border-radius:7px}
+#kitchenBtn.on{background:var(--pink-d);border-color:var(--pink-d);color:#fff}
+.tabs{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:2px 4px;margin:0 -8px}
+.tabs button{position:relative;font-size:18px;font-weight:600;padding:4px 9px 12px;border:0;background:transparent;color:var(--ink-2);border-radius:7px 7px 0 0;line-height:1.3}
+.tabs button:after{content:"";position:absolute;left:9px;right:9px;bottom:4px;height:5px;border-radius:3px;background:var(--rule)}
+.tabs button.done:after{background:var(--ink-2)}
+.tabs button.on{background:transparent;border:0;color:var(--blue-d)}
+.tabs button.on:after{background:var(--blue)}
+.tabs button:hover{background:var(--wash)}
+
+/* ---------- layout + cards */
+main{max-width:1440px;margin:0 auto;padding:14px 28px 28px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+@media (max-width:1100px){.split{grid-template-columns:minmax(0,1fr)}}
+.card{background:#fff;border:1px solid var(--rule-2);border-top:4px solid var(--blue);border-radius:10px;padding:14px 18px;min-width:0;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.card.pink{border-top-color:var(--pink)}
+h2{font-size:26px;margin:0 0 8px;color:var(--ink)}
+aside h2{font-size:22px}
+h3{font-size:20px;margin:0}
+.small{color:var(--ink-2);font-size:18px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button{font-size:18px;font-weight:600;padding:5px 12px;border-radius:7px;color:var(--ink)}
+.btn{font-size:18px;font-weight:600;padding:7px 16px;border-radius:7px;border:1px solid var(--pink-d);background:var(--pink-d);color:#fff;cursor:pointer}
+.btn:hover{background:#9D174D;border-color:#9D174D}
+.btn.ghost,.btn.blue.ghost{background:#fff;color:var(--ink);border-color:var(--rule-2)}
+.btn.ghost:hover,.btn.blue.ghost:hover{background:var(--wash);border-color:var(--ink-3)}
+.btn.blue{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.blue:hover{background:#000}
+.btn:disabled{opacity:.4;cursor:default}
+label.tog{display:inline-flex;gap:8px;align-items:center;font-weight:600;cursor:pointer;font-size:18px}
+label.tog input{width:22px;height:22px;margin:0;accent-color:var(--blue)}
+select{font-size:18px;padding:4px 8px;border:1px solid var(--rule-2);border-radius:7px;background:#fff;color:var(--ink)}
+
+/* ---------- components */
+.box{border:2px solid var(--ink-3);border-radius:10px;background:#fff;padding:8px 10px;cursor:pointer;text-align:center;font-weight:600;transition:box-shadow .25s,background .25s,border-color .25s;min-width:0;overflow-wrap:anywhere;position:relative}
+.box:hover{filter:brightness(.97)}
+.box small{display:block;font-weight:normal;color:var(--ink-2);font-size:18px}
+.box.sel{box-shadow:0 0 0 4px var(--pink)}
+.box.lit{border-color:var(--amber)!important;box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)!important}
+.b-blue{border-color:var(--blue);color:var(--blue-d)}
+.b-green{border-color:var(--green);color:var(--green-d)}
+.b-orange{border-color:var(--amber);color:var(--amber-d)}
+.b-ink{border-color:var(--ink);color:var(--ink)}
+.kt{display:none;margin-top:4px;padding:1px 9px;border-radius:12px;background:var(--pink-t);color:var(--pink-d);border:1px solid var(--pink);font-size:18px;font-weight:600;font-style:italic;white-space:normal;line-height:1.3}
+body.kitchen .kt{display:inline-block}
+.now{border-left:4px solid var(--blue);background:var(--blue-t);border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:10px}
+.now .t{font-size:22px;font-weight:700;color:var(--amber-d);margin:0 0 4px}
+.rtn{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--blue-d);background:#fff;border:2px solid var(--blue);border-radius:8px;padding:4px 12px;display:inline-block;margin:4px 0 6px;max-width:100%;overflow-wrap:anywhere}
+.rtn.tw{color:var(--ink-2);border-style:dashed;border-color:var(--ink-3)}
+.plain{margin:4px 0 0;font-size:20px}
+.ms,.twl,.watch,.kline{padding:8px 12px;margin-top:8px;font-size:19px;border-radius:0 8px 8px 0;border-left:4px solid}
+.ms{background:var(--green-t);border-left-color:var(--green)}
+.twl{background:var(--wash);border-left-color:#94A3B8}
+.watch{background:var(--red-t);border-left-color:var(--red)}
+.kline{background:var(--pink-t);border-left-color:var(--pink)}
+.ms b.lab,.twl b.lab,.watch b.lab,.kline b.lab{display:block;font-size:18px;font-weight:700}
+.ms b.lab{color:var(--green-d)} .twl b.lab{color:var(--ink-2)} .watch b.lab{color:var(--red-d)} .kline b.lab{color:var(--pink-d)}
+.src{display:block;color:var(--ink-3);font-size:18px;font-style:italic;margin-top:2px}
+.badge{display:inline-block;font-size:18px;font-weight:600;font-style:normal;color:var(--ink-2);border:1px dashed var(--ink-3);border-radius:10px;padding:0 8px;margin-left:4px;white-space:nowrap;line-height:1.3}
+ol.steps{margin:0;padding-left:30px;font-size:18px;line-height:1.3}
+ol.steps li{padding:3px 6px;border-radius:6px;cursor:pointer;margin-bottom:2px}
+ol.steps li:hover{background:var(--wash)}
+ol.steps li.cur{background:var(--amber-t2);color:var(--ink);font-weight:700;box-shadow:inset 4px 0 0 var(--amber)}
+ol.steps li.done{color:var(--green-d)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.stepbar{position:sticky;bottom:0;z-index:6;background:#fff;margin:10px -18px -14px;padding:8px 18px 10px;border-top:1px solid var(--rule);border-radius:0 0 10px 10px;box-shadow:0 -6px 14px rgba(15,23,42,.06)}
+.stepbar .btn{padding:6px 16px}
+@media (min-width:1101px){.split > aside.card{position:sticky;top:12px;max-height:calc(100vh - 100px);overflow-y:auto}}
+.count{font-family:var(--mono);font-weight:600;color:var(--ink-2);font-size:18px}
+.keys{font-size:18px;color:var(--ink-2)}
+kbd{font-family:var(--mono);border:1px solid var(--ink-3);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:18px;background:#fff}
+
+/* ---------- Von Neumann */
+.vn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3.2fr) minmax(0,1fr);grid-template-areas:"in cpu out" "c1 c2 c3" "bus bus bus" "x c4 y" "mem mem mem";gap:0 14px;align-items:stretch}
+#vnIn{grid-area:in;align-self:center} #vnOut{grid-area:out;align-self:center} #vnCpu{grid-area:cpu}
+.conn{height:22px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='28' viewBox='0 0 16 28'%3E%3Cpath d='M8 2 L14 9 H10 V19 H14 L8 26 L2 19 H6 V9 H2 Z' fill='%23D97706'/%3E%3C/svg%3E") center/14px 22px no-repeat}
+#c1{grid-area:c1} #c2{grid-area:c2} #c3{grid-area:c3} #c4{grid-area:c4}
+#vnBuses{grid-area:bus;display:grid;gap:5px;padding:6px 8px;border:2px solid var(--amber);border-radius:12px;background:var(--amber-t)}
+#vnMem{grid-area:mem;justify-self:center;max-width:100%;min-width:0}
+table.memt td.mono{white-space:nowrap;font-size:18px}
+table.memt.h td{padding:3px 3px}
+table.memt.h th{padding:3px 6px}
+.cpu-in .box{display:flex;flex-direction:column;justify-content:center;align-items:center}
+.cpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px 10px}
+.cpu .ct{display:block;width:100%;text-align:left;color:var(--blue-d);font-weight:700;cursor:pointer;background:none;border:0;padding:2px 4px;border-radius:8px;font-size:20px}
+.cpu .ct small{font-weight:normal;font-size:18px}
+.cpu-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}
+.busbar{text-align:left;display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;padding:3px 12px}
+.busbar .dir{font-weight:normal;color:var(--ink-2);font-size:18px}
+.bb-a{border-color:var(--blue);color:var(--blue-d)} .bb-d{border-color:var(--green);color:var(--green-d)} .bb-c{border-color:var(--pink);color:var(--pink-d)}
+.mem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px 6px}
+.mem .mt{display:block;width:100%;background:none;border:0;color:var(--green-d);font-weight:700;cursor:pointer;text-align:center;font-size:20px;padding:2px;border-radius:8px}
+table.memt{border-collapse:collapse;margin:6px auto 0;font-size:19px}
+table.memt.h th{text-align:left}
+table.memt.h td{text-align:center;border-left:1px solid var(--rule)}
+.memV{display:none}
+@media (max-width:760px){.memH{display:none}.memV{display:table}}
+table.memt th{background:var(--wash);color:var(--ink-2);font-weight:700;padding:3px 6px;font-size:18px;border-bottom:1px solid var(--rule-2)}
+table.memt td{padding:3px 6px;border-bottom:1px solid var(--rule);background:#fff}
+table.memt td.ad{color:var(--blue-d);font-weight:700}
+.tag{display:inline-block;border-radius:8px;padding:0 5px;font-weight:700;font-size:18px}
+.tag.ins{color:var(--blue-d);border:2px solid var(--blue);background:var(--blue-t)}
+.tag.dat{color:var(--pink-d);border:2px solid var(--pink);background:var(--pink-t)}
+.spcap{text-align:center;margin:6px 0 0;font-size:18px;color:var(--ink-2)}
+@media (max-width:760px){
+  .vn{grid-template-columns:minmax(0,1fr);grid-template-areas:"cpu" "in" "out" "bus" "mem";gap:10px}
+  .conn{display:none}
+}
+
+/* ---------- Registers */
+.rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tray{border:2px solid var(--blue);border-radius:10px;background:#fff;padding:6px 10px 8px;cursor:pointer;min-width:0;text-align:left;position:relative;transition:box-shadow .25s,opacity .25s,background .25s}
+.tray .ab{font-size:26px;font-weight:700;color:var(--blue-d);line-height:1.1}
+.tray .fn{font-size:18px;color:var(--ink-2);line-height:1.2;min-height:2.4em}
+.tray .val{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--ink);background:var(--wash);border-radius:8px;padding:2px 8px;margin-top:4px;overflow-wrap:anywhere;text-align:center}
+.tray.sel{box-shadow:0 0 0 4px var(--pink)}
+.tray.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.tray.gp{border-color:var(--green)} .tray.gp .ab{color:var(--green-d)}
+.tray.dim{opacity:.35}
+.tray.sr{grid-column:span 2}
+.flags{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:6px}
+.flag{border:2px solid var(--blue);border-radius:8px;background:#fff;cursor:pointer;padding:2px 4px;text-align:center;min-width:0}
+.flag .fv{font-family:var(--mono);font-size:28px;font-weight:700;display:block}
+.flag .fl{font-size:18px;color:var(--ink-2);display:block}
+.flag.set{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.flag.set .fl{color:#fff}
+.flag.sel{box-shadow:0 0 0 4px var(--pink)}
+.grouplab{font-weight:700;font-size:20px;margin:10px 0 6px;color:var(--blue-d)}
+.grouplab.g{color:var(--green-d)}
+@media (max-width:1250px){.rgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.tray .val{font-size:24px}}
+@media (max-width:420px){.flag .fv{font-size:24px}.flags{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- Buses */
+.busdia{display:grid;grid-template-columns:170px minmax(0,1fr) 228px;gap:12px;align-items:start;margin-top:12px}
+.bcpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;display:flex;flex-direction:column;gap:8px}
+.bcpu .h,.bright .h{font-weight:700;color:var(--blue-d);font-size:20px}
+.mini{border:2px solid var(--blue);border-radius:8px;background:#fff;padding:4px 8px;min-width:0}
+.mini .ab{font-weight:700;color:var(--blue-d);font-size:19px}
+.mini .val{font-family:var(--mono);font-size:23px;font-weight:700;overflow-wrap:anywhere}
+.mini.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.lanes{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
+.lane{border:2px solid var(--rule-2);border-radius:10px;padding:4px 10px;background:#fff;min-width:0;transition:border-color .25s,box-shadow .25s}
+.lane .lh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 10px;font-weight:700;font-size:19px}
+.lane .ld{font-weight:normal;color:var(--ink-2);font-size:18px}
+.lane .wires{position:relative;margin:4px 0;overflow:hidden;border-radius:4px}
+.lane svg{display:block;width:100%}
+.lane .arrowrow{display:flex;justify-content:space-between;align-items:center;font-size:18px;line-height:1.1;color:var(--ink-2);font-weight:700}
+.lane .arrowrow .act{font-size:24px;color:var(--rule-2)}
+.lane .bits{font-family:var(--mono);font-size:18px;font-weight:700;min-height:1.3em;overflow-wrap:anywhere}
+.lane.on{box-shadow:0 0 0 4px var(--amber-t2);border-color:var(--amber)}
+.lane.on .arrowrow .act{color:var(--amber-d)}
+.lane-a .lh{color:var(--blue-d)} .lane-d .lh{color:var(--green-d)} .lane-c .lh{color:var(--pink-d)}
+.flow{position:absolute;inset:0;pointer-events:none;opacity:0}
+.lane.on .flow{opacity:1}
+.flow.r{background:linear-gradient(90deg,transparent 0,rgba(255,255,255,.85) 50%,transparent 100%);background-size:40% 100%;background-repeat:no-repeat;animation:flowR 1.2s linear infinite}
+.flow.l{background:linear-gradient(90deg,transparent 0,rgba(255,255,255,.85) 50%,transparent 100%);background-size:40% 100%;background-repeat:no-repeat;animation:flowL 1.2s linear infinite}
+@keyframes flowR{from{background-position:-60% 0}to{background-position:160% 0}}
+@keyframes flowL{from{background-position:160% 0}to{background-position:-60% 0}}
+@media (prefers-reduced-motion:reduce){.flow.r,.flow.l{animation:none}}
+.sigs{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 2px}
+.sig{border:2px solid var(--pink);color:var(--pink-d);border-radius:14px;padding:0 9px;font-size:18px;font-weight:700;background:#fff}
+.sig.on{background:var(--pink-d);border-color:var(--pink-d);color:#fff}
+.bright{display:flex;flex-direction:column;gap:10px;min-width:0}
+.bmem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px}
+.bmem .h{color:var(--green-d)}
+table.bm{border-collapse:collapse;width:100%;font-size:19px}
+table.bm td{padding:2px 6px;border-bottom:1px solid var(--rule);background:#fff}
+table.bm td.ad{color:var(--blue-d);font-weight:700;width:3.2em}
+table.bm td.v{font-family:var(--mono);font-weight:700}
+table.bm tr.lit td{background:var(--amber-t);box-shadow:inset 0 0 0 2px var(--amber)}
+.dev{border:2px solid var(--ink);border-radius:10px;background:#fff;padding:6px 8px;min-width:0}
+.dev .h{color:var(--ink);font-weight:700;font-size:19px}
+.dev.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.dev .val{font-family:var(--mono);font-weight:700;font-size:18px}
+@media (max-width:900px){.busdia{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Fetch–Execute */
+.phases{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.phase{border:2px solid var(--rule-2);border-radius:20px;padding:2px 16px;font-weight:700;color:var(--ink-2);font-size:19px}
+.phase.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.fe{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.fecpu{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start}
+.fecpu .h{grid-column:1/-1;font-weight:700;color:var(--blue-d)}
+.fecpu .cu{grid-column:1/-1}
+.mini.cu{border-color:var(--ink)} .mini.cu .ab{color:var(--ink)}
+.mini .dec{font-size:18px;color:var(--ink-2);min-height:1.3em}
+.febus{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
+.febus .fb{border:2px solid var(--rule-2);border-radius:10px;padding:5px 8px;background:#fff;min-width:0;margin:0;font-size:inherit;line-height:1.35}
+.fb .n{font-weight:700;font-size:19px}
+.fb .c{font-family:var(--mono);font-weight:700;font-size:19px;min-height:1.3em;color:var(--ink-3);overflow-wrap:anywhere}
+.febus .fb.on{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.fb.on .c{color:var(--ink)}
+.fb-a .n{color:var(--blue-d)} .fb-d .n{color:var(--green-d)} .fb-c .n{color:var(--pink-d)}
+.femem{border:2px solid var(--green);border-radius:12px;background:var(--green-t);padding:8px;min-width:0}
+.femem .h{font-weight:700;color:var(--green-d)}
+.legend{margin-top:10px;background:var(--wash);border-radius:8px;padding:6px 12px;font-size:18px}
+.legend code{font-family:var(--mono);font-weight:700;color:var(--blue-d);font-size:19px}
+.reveal{font-size:19px;font-weight:700;border:2px dashed var(--blue);background:#fff;color:var(--blue-d);border-radius:8px;padding:6px 14px;cursor:pointer;margin:4px 0 6px}
+@media (max-width:900px){.fe{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Interrupts */
+.intctl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:center}
+.intctl .l{font-weight:700}
+.intgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.9fr);gap:12px;margin-top:10px;align-items:stretch}
+.wro{font-weight:700;color:var(--blue-d)}
+.proc{border:2px solid var(--blue);border-radius:12px;background:var(--blue-t);padding:8px;min-width:0}
+.proc .h,.stackbox .h,.isr .h{font-weight:700;font-size:20px}
+.proc .h{color:var(--blue-d)}
+.cyc{display:flex;gap:6px;margin:6px 0}
+.cyc span{flex:1;text-align:center;border:2px solid var(--rule-2);border-radius:8px;font-weight:700;font-size:18px;padding:2px;background:#fff;color:var(--ink-2)}
+.cyc span.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.pregs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ireg{margin-top:8px}
+.ibits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:4px}
+.ibit{border:2px solid var(--blue);border-radius:8px;background:#fff;padding:2px 8px;min-width:0;display:flex;align-items:center;gap:8px}
+.ibit b{font-family:var(--mono);font-size:24px}
+.ibit span{font-size:18px;color:var(--ink-2);line-height:1.15;overflow-wrap:anywhere;min-width:0}
+.ibit.on{background:var(--amber-d);border-color:var(--amber-d);color:#fff}
+.ibit.on span{color:#fff}
+.status{margin-top:8px;font-weight:700;font-size:19px;border-radius:8px;padding:4px 10px;background:#fff;border:2px solid var(--rule-2)}
+.status.isr{border-color:var(--pink);color:var(--pink-d)}
+.status.wait{border-color:var(--amber);color:var(--amber-d)}
+.status.run{border-color:var(--green);color:var(--green-d)}
+.stackbox{border:2px solid var(--ink);border-radius:12px;background:#fff;padding:8px;display:flex;flex-direction:column;min-width:0;transition:box-shadow .25s}
+.stackbox.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2)}
+.pile{flex:1;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:4px;border:2px solid var(--ink-3);border-top:0;border-radius:0 0 10px 10px;padding:6px;min-height:130px;background:var(--wash)}
+.plate{border:2px solid var(--blue);border-radius:6px;background:#fff;padding:2px 8px;font-family:var(--mono);font-weight:700;font-size:19px;text-align:center;animation:drop .35s ease-out}
+.plate.top{border-color:var(--amber);background:var(--amber-t)}
+@keyframes drop{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.plate{animation:none}}
+.toplab{font-size:18px;color:var(--ink-2);text-align:center;margin-bottom:2px}
+.lifo{font-size:18px;color:var(--ink-2);margin-top:6px}
+.isr{border:2px solid var(--pink);border-radius:12px;background:var(--pink-t);padding:8px;min-width:0}
+.isr .h{color:var(--pink-d)}
+.isr.lit{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2);background:var(--amber-t)}
+.isr ul{margin:4px 0 0;padding-left:20px;font-size:18px}
+.isr li.on{font-weight:700;color:var(--amber-d)}
+.cmp{margin-top:10px;font-size:20px;font-weight:700;text-align:center;border-radius:8px;padding:6px;background:var(--wash);min-height:1.5em}
+.cmp.hi{background:var(--green-d);color:#fff} .cmp.lo{background:var(--amber-d);color:#fff}
+@media (max-width:900px){.intgrid{grid-template-columns:minmax(0,1fr)}.pile{min-height:110px}}
+
+/* ---------- 6 Mark it like an examiner + 7 completion code */
+.wide{max-width:1180px;margin:0 auto}
+.stage-no{font-family:var(--mono);font-size:18px;color:var(--ink-3);margin:0 0 4px}
+.wide h2{font-size:30px}
+.lead{color:var(--ink-2);font-size:20px;margin:0 0 10px;max-width:72ch}
+.roundbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:4px 0 12px}
+.roundbar .counter{font-family:var(--mono);font-size:18px;color:var(--ink-2);margin:0}
+#eq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sortq{border:1px solid var(--rule-2);border-radius:10px;padding:12px 14px;margin:0;background:#fff;min-width:0}
+.sortq .s{font-size:19px;margin:0 0 10px;line-height:1.45}
+.sortq .ctx{font-weight:700;color:var(--ink)}
+.exlab{display:table;margin:6px 0 4px;font-size:18px;font-weight:700;color:var(--pink-d);background:var(--pink-t);border:1px solid var(--pink);border-radius:10px;padding:0 9px}
+.ans{display:block;font-family:Georgia,"Times New Roman",serif;font-size:21px;border-left:3px solid var(--rule-2);padding:2px 0 2px 12px;color:var(--ink)}
+.sortq .b{display:flex;gap:8px;flex-wrap:wrap}
+.sortq .b button{font-size:18px;font-weight:600;padding:6px 14px}
+.sortq .fb{font-size:18px;margin:10px 0 0;line-height:1.45;color:var(--ink)}
+.sortq .fb.ok,.sortq .fb.no{padding:8px 12px;border-left:4px solid;border-radius:0 8px 8px 0}
+.sortq .fb.ok{background:var(--green-t);border-left-color:var(--green)}
+.sortq .fb.no{background:var(--red-t);border-left-color:var(--red)}
+.sortq .fb q{font-style:italic}
+.sortq .fb .src{font-size:18px}
+.missions{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.missions div{font-size:18px;padding:8px 12px}
+.missions div:before{margin-top:5px}
+.namerow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 4px}
+.namerow label{font-weight:600;font-size:19px}
+#uname{font-family:var(--sans);font-size:20px;width:320px;max-width:100%}
+#codemsg{font-size:20px;margin:10px 0 0}
+.code-out{font-size:32px}
+@media (max-width:900px){#eq,.missions{grid-template-columns:minmax(0,1fr)}}
+
+@media (max-width:640px){
+  main{padding:12px 16px 24px} .rail-in{padding:8px 16px 0} .brand h1{font-size:26px}
+  .tabs button{font-size:18px;padding:4px 8px 12px}
+  .card{padding:12px}
+  .rtn{font-size:24px}
+  .stepbar{margin:10px -12px -12px;padding:8px 12px}
+  .stepbar .keys{display:none}
+  .intctl{grid-template-columns:minmax(0,1fr)}
+}
+
+/* =========================================================== Assembly Tracer additions */
+.tour{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+table.it{border-collapse:collapse;width:100%;font-size:17px}
+table.it th{background:var(--blue);color:#fff;text-align:left;padding:4px 8px;font-size:16px}
+table.it td{border:1px solid var(--rule-2);padding:3px 8px;vertical-align:top;cursor:pointer;background:#fff}
+table.it td.o{font-family:var(--mono);font-weight:700;white-space:nowrap}
+table.it tr:hover td{background:var(--blue-t)}
+table.it tr.sel td{background:var(--blue-t2)}
+table.it tr.seen td.o:first-child:after{content:" ✓";color:var(--green-d);font-family:var(--sans)}
+.det h3{margin:0 0 6px;font-size:24px}
+.parts{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.part{border:2px solid;border-radius:10px;padding:6px 12px;text-align:center;min-width:84px}
+.part b{display:block;font-family:var(--mono);font-size:26px}
+.part span{font-size:15px;font-weight:700}
+.part.l{border-color:var(--amber);background:var(--amber-t)} .part.l span{color:var(--amber-d)}
+.part.o{border-color:var(--blue);background:var(--blue-t)} .part.o span{color:var(--blue-d)}
+.part.d{border-color:var(--pink);background:var(--pink-t)} .part.d span{color:var(--pink-d)}
+.mc{font-family:var(--mono);font-size:22px;font-weight:700;margin:6px 0}
+.mc .a{color:var(--blue-d)} .mc .b{color:var(--pink-d)}
+.inv{font-size:15px;color:var(--ink-3)}
+.quote{font-style:italic;border-left:3px solid var(--rule-2);padding-left:10px;margin:6px 0}
+.chk{border:1px solid var(--rule-2);border-radius:10px;background:#fff;padding:12px 14px;margin-top:14px}
+.chk .ins{font-family:var(--mono);font-size:30px;font-weight:700;margin:4px 0 10px}
+.chk .b{display:flex;gap:8px;flex-wrap:wrap}
+.wall{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;margin:8px 0}
+.lock{border:2px solid var(--rule-2);border-radius:8px;background:#fff;text-align:center;overflow:hidden;transition:box-shadow .2s}
+.lock .ad{background:var(--wash);font-weight:700;font-size:17px;border-bottom:1px solid var(--rule-2)}
+.lock .ct{font-family:var(--mono);font-size:24px;font-weight:700;padding:8px 0;background:var(--amber-t)}
+.lock.h1{border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-t2)}
+.lock.h2{border-color:var(--green);box-shadow:0 0 0 4px var(--green-t2)}
+.lock.w{border-color:var(--green)} .lock.w .ct{background:var(--green-t2)}
+.regs{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:6px 0}
+.reg{border:2px solid var(--ink);border-radius:8px;min-width:120px;text-align:center;background:#fff}
+.reg .n{font-size:15px;font-weight:700;color:var(--ink-2)} .reg .v{font-family:var(--mono);font-size:28px;font-weight:700}
+.reg.chg{border-color:var(--green);background:var(--green-t)}
+.ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.ctl select,.ctl input{font-family:var(--mono);font-size:20px}
+.ctl input{width:160px}
+.modepill{display:inline-block;border-radius:999px;padding:2px 14px;font-weight:700;color:#fff;background:var(--ink-3)}
+.modepill.immediate{background:var(--blue)} .modepill.direct{background:var(--pink-d)} .modepill.indirect{background:var(--green-d)}
+.modepill.indexed{background:var(--amber-d)}
+ol.steps{margin:8px 0 0;padding-left:28px;font-size:19px}
+ol.steps li{margin:3px 0;color:var(--ink-3)} ol.steps li.done{color:var(--ink)} ol.steps li.now{color:var(--ink);font-weight:700}
+.err2{color:var(--bad);font-weight:600;min-height:1.2em;margin:4px 0}
+.pred .q{font-size:20px;margin:6px 0}
+.pred input{font-family:var(--mono);font-size:22px;width:120px}
+.rel{border:1px dashed var(--amber);border-radius:10px;padding:10px 14px;background:var(--amber-t);margin-top:14px}
+.later{color:var(--ink-3);font-size:17px}
+.gsq .s .mono{font-weight:700;font-size:18px}
+.gsq .ev{display:block;margin-top:4px;font-size:14.5px;color:var(--ink-3)}
+.gsq.end{background:var(--wash)}
+.stepgrid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.6fr);gap:14px;align-items:start}
+table.lst{border-collapse:collapse;font-size:18px}
+table.lst th{background:var(--ink-3);color:#fff;padding:3px 10px;font-size:15px}
+table.lst td{border:1px solid var(--rule-2);padding:2px 10px;font-family:var(--mono)}
+table.lst td.a{color:var(--ink-3)} table.lst tr.cur td{background:var(--amber-t);outline:2px solid var(--amber)}
+table.ttab{border-collapse:collapse;font-size:17px;width:100%}
+table.ttab th{background:var(--blue);color:#fff;padding:3px 6px;font-size:14px;border:1px solid #fff}
+table.ttab td{border:1px solid var(--rule-2);text-align:center;font-family:var(--mono);height:26px}
+table.ttab tr.init td{color:var(--ink-3)} table.ttab tr.new td{background:var(--green-t)}
+.predict{border:1px solid var(--rule-2);border-radius:10px;padding:10px 14px;margin-top:10px;background:#fff}
+.predict .b{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.predict input{font-family:var(--mono);font-size:20px;width:110px}
+.predict .b button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.rulebox{font-size:15px;color:var(--ink-2);margin:6px 0 0;padding-left:18px}
+table.asrc{border-collapse:collapse;font-size:17px;margin:6px 0}
+table.asrc th{background:var(--ink-3);color:#fff;padding:3px 9px;font-size:14px}
+table.asrc td{border:1px solid var(--rule-2);padding:2px 9px;font-family:var(--mono)}
+table.asrc td.a{color:var(--ink-3)} table.asrc input{font-family:var(--mono);font-size:16px;width:70px}
+table.asrc td.ok{background:var(--green-t)} table.asrc td.no{background:var(--bad-wash,#FEE2E2)}
+@media (max-width:900px){.stepgrid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.tour{grid-template-columns:minmax(0,1fr)}.wall{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:600px){table.it{font-size:14px}table.it th{font-size:13px}table.it td,table.it th{padding:3px 5px}table.it td.o{white-space:normal;font-size:13px}#mctab{font-size:11px!important}#mctab td,#mctab th{padding:2px 3px}#mctab td.o{white-space:nowrap;font-size:11px}}
+</style>
+</head>
+<body>
+<header class="rail">
+  <div class="rail-in">
+    <div class="brand">
+      <h1>Assembly Tracer</h1>
+      <p>9618 AS Level · 4.2 Assembly language · C4 Lessons 8–13</p>
+    </div>
+    <div class="railr"><span class="score" id="scoretxt">Examiner 0/17</span></div>
+    <nav class="tabs" aria-label="Sections">
+      <button data-mode="tour" class="on">1 Instruction set tour</button>
+      <button data-mode="addr">2 Addressing explorer</button>
+      <button data-mode="sort">3 Group sort</button>
+      <button data-mode="step">4 Step mode</button>
+      <button data-mode="asm">5 Assemble mode</button>
+      <button data-mode="exam">6 Mark like an examiner</button>
+      <button data-mode="code">7 Code</button>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section id="m-tour" class="mode">
+  <div class="tour">
+    <div class="card">
+      <h2 style="margin:0 0 4px">The instruction set (2027–29 syllabus)</h2>
+      <p class="lead" style="font-size:18px">Click any row. The explanations are Cambridge’s, word for word.</p>
+      <table class="it" id="itab"><tr><th>Opcode</th><th>Operand</th><th>Explanation</th></tr></table>
+      <p class="small" id="inotes" style="font-size:16px;margin-top:6px"></p>
+    </div>
+    <div>
+      <div class="card det" id="det" data-test="det"></div>
+      <div class="chk" id="opchk">
+        <h3 style="margin:0">Read the operand <span class="counter" id="opcount" data-test="opcount"></span></h3>
+        <p class="small" style="margin:2px 0 0">What form is the operand? (Lesson 8)</p>
+        <div class="ins" id="opins" data-test="opins"></div>
+        <div class="b" id="opbtns"></div>
+        <p class="fb" id="opfb"></p>
+        <button class="btn" id="opnext">Next instruction</button>
+      </div>
+      <div class="chk" id="mcchk">
+        <h3 style="margin:0">Which machine code? <span class="counter" id="mccount" data-test="mccount"></span></h3>
+        <p class="small" style="margin:2px 0 0">One assembly instruction → ONE machine code instruction: an 8-bit opcode, then the operand in binary. The opcodes are INVENTED for these lessons:</p>
+        <table class="it" id="mctab" style="font-size:15px;margin:6px 0"></table>
+        <div class="ins" id="mcins" data-test="mcins"></div>
+        <div class="mcq" id="mcbtns"></div>
+        <p class="fb" id="mcfb"></p>
+        <button class="btn" id="mcnext">Next instruction</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="m-addr" class="mode hidden">
+  <div class="card">
+    <h2 style="margin:0">The locker wall: addressing modes</h2>
+    <p class="lead" style="font-size:18px">Number on the door = ADDRESS. What is inside = CONTENTS. Choose an instruction, then <b>Step</b> one decision at a time.</p>
+    <div class="wall" id="wall" data-test="wall"></div>
+    <div class="regs"><div class="reg" id="rACC"><div class="n">ACC</div><div class="v" id="vACC" data-test="acc">0</div></div>
+      <div class="reg" id="rIX"><div class="n">IX</div><div class="v" id="vIX" data-test="ix">0</div></div>
+      <button class="btn ghost" id="reset">Reset the wall</button><button class="btn ghost" id="shuffle">New wall</button></div>
+    <div class="ctl"><label for="ins">Instruction</label><input type="text" id="ins" value="LDI 20" data-test="ins" autocomplete="off">
+      <button class="btn" id="step" data-test="step">Step</button><button class="btn ghost" id="runall" data-test="runall">Run it</button>
+      <span class="modepill" id="modepill" data-test="mode"></span></div>
+    <p class="err2" id="err" data-test="err"></p>
+    <ol class="steps" id="steps" data-test="steps"></ol>
+    <p class="small" style="margin-top:8px">Try: <span class="mono">LDM #20 · LDD 20 · LDI 20 · ADD #21 · ADD 21 · STO 29 · CMI 20 · LDR #2 · LDX 20 · INC IX</span></p>
+  </div>
+  <div class="card pred">
+    <h2 style="margin:0">Predict the ACC <span class="counter" id="pcount" data-test="pcount"></span></h2>
+    <label class="tog"><input type="checkbox" id="withIX"> Include indexed addressing (Lesson 10)</label>
+    <div class="wall" id="pwall" data-test="pwall"></div>
+    <div id="pq" class="q" data-test="pq"></div>
+    <div class="ctl"><input type="text" id="pans" data-test="pans" autocomplete="off"><button class="btn" id="pcheck" data-test="pcheck">Check</button><button class="btn ghost" id="pnext" data-test="pnext">New question</button></div>
+    <p class="fb" id="pfb" data-test="pfb"></p>
+  </div>
+  <div class="card rel">
+    <h2 style="margin:0">Relative addressing <span class="later">· an illustration only: there is no relative-addressing instruction in the 2027–29 table (Lesson 10)</span></h2>
+    <p style="font-size:18px;margin:4px 0">The address is worked out as <b>base address + offset</b>, so the code still works if it is loaded somewhere else.</p>
+    <div class="ctl"><label>Base address <input type="text" id="rbase" value="22"></label><label>Offset <input type="text" id="roff" value="3"></label>
+      <button class="btn ghost" id="rshow">Show the address</button><span id="rout" class="mono" data-test="rel" style="font-size:22px"></span></div>
+  </div>
+</section>
+
+<section id="m-sort" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 3 of 7 · 4.2 Assembly language · Lesson 11</p>
+    <h2>Group sort: which instruction group?</h2>
+    <p class="lead">Each card is one row of the 2027–29 table, explanation word for word. Choose its <b>instruction group</b> —
+    the syllabus’s five names. The group is the KIND of job; copying the explanation never names it.</p>
+    <div class="roundbar"><span class="counter" id="gscount" data-test="gscount"></span><button id="gsAgain" class="btn ghost">Start a new round</button></div>
+    <div id="gs"></div>
+  </div>
+</section>
+
+<section id="m-step" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 4 of 7 · 4.2 Assembly language · Lesson 12</p>
+    <h2>Step mode: be the processor</h2>
+    <p class="lead">Before each step, predict the next row of the trace table: <b>which column changes</b>, and to what.
+    Then check. One row per instruction carried out; write only the column that changes.</p>
+    <div class="ctl"><label for="stprog">Program</label><select id="stprog" data-test="stprog"></select>
+      <label for="stkey" id="stkeylab">Key pressed</label><select id="stkey" data-test="stkey"></select>
+      <button class="btn ghost" id="streset">Start again</button>
+      <span class="counter" id="stcount" data-test="stcount"></span></div>
+    <p class="small" id="stnote"></p>
+    <div class="stepgrid">
+      <div><table class="lst" id="stlist" data-test="stlist"></table><div id="stmem"></div></div>
+      <div><table class="ttab" id="sttab" data-test="sttab"></table>
+        <div class="predict" id="stpred">
+          <div id="stq" data-test="stq"></div>
+          <div class="b" id="stcols"></div>
+          <div class="ctl"><label for="stval">Value</label><input type="text" id="stval" data-test="stval" autocomplete="off">
+            <button class="btn" id="stcheck" data-test="stcheck">Check</button>
+            <button class="btn ghost" id="stshow" data-test="stshow">Just step</button></div>
+          <p class="fb" id="stfb" data-test="stfb"></p>
+        </div>
+        <ul class="rulebox" id="strules"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="m-asm" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 5 of 7 · 4.2 Assembly language · Lesson 13</p>
+    <h2>Assemble mode: the two-pass assembler</h2>
+    <p class="lead"><b>Pass 1:</b> count addresses from the load address and type each label’s address into the symbol table.
+    <b>Pass 2:</b> type each symbolic operand as its address. Then see the object code (machine code INVENTED for these lessons).</p>
+    <div class="ctl"><label for="asprog">Program</label><select id="asprog" data-test="asprog"></select>
+      <span class="counter" id="ascount" data-test="ascount"></span></div>
+    <div class="stepgrid">
+      <div><table class="asrc" id="assrc" data-test="assrc"></table></div>
+      <div><h3 style="margin:4px 0">Pass 1 — the symbol table</h3><table class="asrc" id="assym" data-test="assym"></table>
+        <button class="btn" id="as1" data-test="as1">Check pass 1</button><p class="fb" id="as1fb" data-test="as1fb"></p>
+        <h3 style="margin:10px 0 4px">Pass 2 — translate</h3><table class="asrc" id="asp2" data-test="asp2"></table>
+        <button class="btn" id="as2" data-test="as2">Check pass 2</button><p class="fb" id="as2fb" data-test="as2fb"></p></div>
+    </div>
+  </div>
+  <div class="card wide">
+    <h2>Which pass?</h2>
+    <p class="lead">First pass, second pass, or both? Every stage is a mark scheme’s wording unless it says otherwise.</p>
+    <div class="roundbar"><span class="counter" id="pqcount" data-test="pqcount"></span><button id="pqAgain" class="btn ghost">Start a new round</button></div>
+    <div id="pq2"></div>
+  </div>
+</section>
+
+<section id="m-exam" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 6 of 7 · 4.2 Assembly language</p>
+    <h2>Mark it like an examiner</h2>
+    <p class="lead">Each card shows an example student answer, written for this lab. Would the published mark scheme give it the mark?
+    Choose <b>Scores 1</b> or <b>Scores 0</b>. Every explanation quotes a mark scheme, an examiner report or the syllabus.</p>
+    <div class="roundbar"><span class="counter" id="eqcount" data-test="eqcount"></span><button id="eqAgain" class="btn ghost">Start the set again</button></div>
+    <div id="eq"></div>
+  </div>
+</section>
+
+<section id="m-code" class="mode hidden">
+  <div class="card wide">
+    <p class="stage-no">Section 7 of 7</p>
+    <h2>Your completion code</h2>
+    <p class="lead">Finish the eight missions, then type your name to get your code.</p>
+    <div class="missions" id="missions"></div>
+    <div class="namerow"><label for="uname">Your name</label><input type="text" id="uname" placeholder="Your name" autocomplete="off"></div>
+    <p id="codemsg"></p>
+    <div class="code-out hide" id="codeout" data-test="code"></div>
+    <p class="small">Submit this code on Teams if your teacher asks for it.</p>
+  </div>
+</section>
+</main>
+<script>
+"use strict";
+const D = {"iset": [{"op": "LDM", "opd": "#n", "expl": "Immediate addressing. Load the number n to ACC", "mode": "immediate", "ex": "LDM #45", "mc": ["00000001", "00101101"]}, {"op": "LDD", "opd": "<address>", "expl": "Direct addressing. Load the contents of the location at the given address to ACC", "mode": "direct", "ex": "LDD 150", "mc": ["00000010", "10010110"]}, {"op": "LDI", "opd": "<address>", "expl": "Indirect addressing. The address to be used is at the given address. Load the contents of this second address to ACC", "mode": "indirect", "ex": "LDI 150", "mc": ["00000011", "10010110"]}, {"op": "LDX", "opd": "<address>", "expl": "Indexed addressing. Form the address from <address> + the contents of the index register. Copy the contents of this calculated address to ACC", "mode": "indexed", "ex": "LDX 150", "mc": ["00000100", "10010110"]}, {"op": "LDR", "opd": "#n", "expl": "Immediate addressing. Load the number n to IX", "mode": "immediate", "ex": "LDR #3", "mc": ["00000101", "00000011"]}, {"op": "MOV", "opd": "<register>", "expl": "Move the contents of the accumulator to the given register (IX)", "mode": "register", "ex": "MOV IX", "mc": ["00000110", "00000001"]}, {"op": "STO", "opd": "<address>", "expl": "Store the contents of ACC at the given address", "mode": "direct", "ex": "STO TOTAL", "mc": ["00000111", "10011000"]}, {"op": "ADD", "opd": "<address>", "expl": "Add the contents of the given address to the ACC", "mode": "direct", "ex": "ADD 151", "mc": ["00001000", "10010111"]}, {"op": "ADD", "opd": "#n/Bn/&n", "expl": "Add the number n to the ACC", "mode": "immediate", "ex": "ADD #5", "mc": ["00001001", "00000101"]}, {"op": "SUB", "opd": "<address>", "expl": "Subtract the contents of the given address from the ACC", "mode": "direct", "ex": "SUB DISCOUNT", "mc": ["00001010", "10010111"]}, {"op": "SUB", "opd": "#n/Bn/&n", "expl": "Subtract the number n from the ACC", "mode": "immediate", "ex": "SUB &0A", "mc": ["00001011", "00001010"]}, {"op": "INC", "opd": "<register>", "expl": "Add 1 to the contents of the register (ACC or IX)", "mode": "register", "ex": "INC ACC", "mc": ["00001100", "00000000"]}, {"op": "DEC", "opd": "<register>", "expl": "Subtract 1 from the contents of the register (ACC or IX)", "mode": "register", "ex": "DEC IX", "mc": ["00001101", "00000001"]}, {"op": "JMP", "opd": "<address>", "expl": "Jump to the given address", "mode": "jump to an address", "ex": "JMP START", "mc": ["00001110", "11001000"]}, {"op": "CMP", "opd": "<address>", "expl": "Compare the contents of ACC with the contents of <address>", "mode": "direct", "ex": "CMP 152", "mc": ["00001111", "10011000"]}, {"op": "CMP", "opd": "#n", "expl": "Compare the contents of ACC with number n", "mode": "immediate", "ex": "CMP #0", "mc": ["00010000", "00000000"]}, {"op": "CMI", "opd": "<address>", "expl": "Indirect addressing. The address to be used is at the given address. Compare the contents of ACC with the contents of this second address", "mode": "indirect", "ex": "CMI 153", "mc": ["00010001", "10011001"]}, {"op": "JPE", "opd": "<address>", "expl": "Following a compare instruction, jump to <address> if the compare was True", "mode": "jump to an address", "ex": "JPE LOOP", "mc": ["00010010", "11001011"]}, {"op": "JPN", "opd": "<address>", "expl": "Following a compare instruction, jump to <address> if the compare was False", "mode": "jump to an address", "ex": "JPN LOOP", "mc": ["00010011", "11001011"]}, {"op": "IN", "opd": "", "expl": "Key in a character and store its ASCII value in ACC", "mode": "no operand", "ex": "IN", "mc": ["00010100", "00000000"]}, {"op": "OUT", "opd": "", "expl": "Output to the screen the character whose ASCII value is stored in ACC", "mode": "no operand", "ex": "OUT", "mc": ["00010101", "00000000"]}, {"op": "END", "opd": "", "expl": "Return control to the operating system", "mode": "no operand", "ex": "END", "mc": ["00010110", "00000000"]}], "labels": [{"form": "<label>: <opcode> <operand>", "expl": "Labels an instruction", "ex": "LOOP: ADD #1"}, {"form": "<label>: <data>", "expl": "Gives a symbolic address <label> to the memory location with contents <data>", "ex": "TOTAL: 0"}], "opcodes": {"LDM|#": 1, "LDD|A": 2, "LDI|A": 3, "LDX|A": 4, "LDR|#": 5, "MOV|R": 6, "STO|A": 7, "ADD|A": 8, "ADD|#": 9, "SUB|A": 10, "SUB|#": 11, "INC|R": 12, "DEC|R": 13, "JMP|A": 14, "CMP|A": 15, "CMP|#": 16, "CMI|A": 17, "JPE|A": 18, "JPN|A": 19, "IN|": 20, "OUT|": 21, "END|": 22}, "regs": {"ACC": 0, "IX": 1}, "exam": [{"id": "ldd150", "ctx": "Explain what the instruction LDD 150 does.", "ans": "It loads 150 into the accumulator.", "a": "Scores 0", "f": "The syllabus explanation of LDD: <q>Direct addressing. Load the contents of the location at the given address to ACC<\/q> LDD 150 loads the CONTENTS of address 150; loading the number 150 is LDM #150.", "src": "2027–29 syllabus instruction table"}, {"id": "immed", "ctx": "Complete: “……… addressing is when the operand is the data.” (June 2023 P12 Q3(b))", "ans": "Immediate", "a": "Scores 1", "f": "The mark scheme: <q>Immediate addressing is when the operand is the data.<\/q>", "src": "9618 Jun 2023 P12 Q3(b) mark scheme"}, {"id": "swap", "ctx": "Complete: “……… addressing is when the operand holds a memory address that stores the memory address of the data.” (June 2023 P12 Q3(b))", "ans": "Direct", "a": "Scores 0", "f": "The mark scheme: <q>Indirect addressing is when the operand holds a memory address that stores the memory address of the data.<\/q> One trip to memory is direct; two trips is indirect.", "src": "9618 Jun 2023 P12 Q3(b) mark scheme"}, {"id": "n24p2", "ctx": "Nov 2024 P13 Q7(a): memory 50 → 54, 51 → 55, 52 → 50, 53 → 52, 54 → 100, 55 → 25, 56 → 50; ACC 50, IX 45. Program 2: LDI 53 · DEC ACC · ADD 56. The ACC content after it has run?", "ans": "105", "a": "Scores 0", "f": "The examiners: <q>The second pair of instructions was the one most likely to have an incorrect value of 105 in the ACC where candidates had applied the instruction ADD #56 instead of the instruction given.<\/q> The mark scheme gives 99.", "src": "Principal Examiner Report, November 2024, Paper 13; 9618 Nov 2024 P13 Q7(a) mark scheme"}, {"id": "n24p1", "ctx": "Nov 2024 P13 Q7(a): memory 50 → 54, 51 → 55, 52 → 50, 53 → 52, 54 → 100, 55 → 25, 56 → 50; ACC 50, IX 45. Program 1: LDD 50 · ADD #4 · ADD 54. The ACC content after it has run?", "ans": "158", "a": "Scores 1", "f": "The mark scheme prints 158 for program 1: 54 + 4 + the contents of 54 (100).", "src": "9618 Nov 2024 P13 Q7(a) mark scheme"}, {"id": "ldi103", "ctx": "June 2022 P13 Q3(a): memory 100 → 101, 101 → 67, 102 → 104, 103 → 100, 104 → 68. The ACC after LDI 103?", "ans": "101", "a": "Scores 1", "f": "The mark scheme gives 101 (103 holds 100; the contents of 100 are 101). The examiners: <q>This question was answered very well. Most of the candidates were able to give the correct accumulator values after each instruction had been carried out.<\/q>", "src": "9618 Jun 2022 P13 Q3(a) mark scheme; Principal Examiner Report, June 2022, Paper 13"}, {"id": "ldd102", "ctx": "Same question and memory. The ACC after LDD 102?", "ans": "102", "a": "Scores 0", "f": "The mark scheme gives 104: direct addressing loads the contents of 102. Writing 102 treats it as LDM #102.", "src": "9618 Jun 2022 P13 Q3(a) mark scheme"}, {"id": "angle", "ctx": "Write an instruction that loads the contents of address 150 into the ACC.", "ans": "LDD <150>", "a": "Scores 0", "f": "The examiners: <q>Some candidates also enclosed the operand part of their assembly language instructions within angle brackets, which is not correct.<\/q> Write LDD 150.", "src": "Principal Examiner Report, November 2025, Paper 31 (an A Level paper; same instruction set)"}, {"id": "given", "ctx": "Using only the instruction set given, write an instruction that stores the ACC at address 160.", "ans": "SAVE 160", "a": "Scores 0", "f": "The examiners: <q>The question instructs candidates to use the given instruction set, yet many answers included mnemonics not included in the table provided.<\/q> The table's instruction is STO 160.", "src": "Principal Examiner Report, November 2021, Paper 12"}, {"id": "imm9", "ctx": "State the mode of addressing used by LDM #9.", "ans": "Direct addressing", "a": "Scores 0", "f": "The syllabus: <q>Immediate addressing. Load the number n to ACC<\/q> The examiners: <q>Fewer candidates successfully identified immediate addressing.<\/q>", "src": "2027–29 syllabus; Principal Examiner Report, June 2022, Paper 31"}, {"id": "ldxdesc", "ctx": "Nov 2021 P12 Q8(b)(iii): Identify and describe one additional mode of addressing. (The DESCRIPTION mark for indexed.)", "ans": "Indexed: the contents of the index register are added to the contents of the operand.", "a": "Scores 0", "f": "The examiners: <q>Indexed addressing was regularly incorrectly described as adding the contents of the index register to the contents of the operand, rather than correctly described as adding the contents of the index register to the actual operand.<\/q> The mark scheme: <q>form the address from the given address plus the contents of the index register<\/q>", "src": "Principal Examiner Report, November 2021, Paper 12; 9618 Nov 2021 P12 Q8(b)(iii) mark scheme"}, {"id": "bothload", "ctx": "Nov 2023 P11 Q8(b)(ii): Give one similarity between direct addressing and indexed addressing.", "ans": "Both load data.", "a": "Scores 0", "f": "The examiners: <q>Statements for the similarity such as ‘both load data’ and for the difference such as ‘indexed addressing uses the index register, direct addressing does not’ are not precise enough at this level.<\/q> The mark scheme: <q>both load the contents of an address into the Accumulator<\/q>", "src": "Principal Examiner Report, November 2023, Paper 11; 9618 Nov 2023 P11 Q8(b)(ii) mark scheme"}, {"id": "jpecomp", "ctx": "Nov 2023 P12 Q9(a): Identify the instruction group for JPE.", "ans": "Compare instructions", "a": "Scores 0", "f": "The examiners: <q>The opcode most likely to be incorrectly placed was JPE; identified in the compare group rather than the unconditional and conditional group.<\/q> The mark scheme: <q>JPE - Unconditional and conditional instructions<\/q>", "src": "Principal Examiner Report, November 2023, Paper 12; 9618 Nov 2023 P12 Q9(a) mark scheme"}, {"id": "addcopy", "ctx": "Nov 2023 P12 Q9(a): Identify the instruction group for ADD.", "ans": "Add the denary number n to the ACC", "a": "Scores 0", "f": "The examiners: <q>Some candidates should understand that just copying the explanation of the opcode from the table does not identify the instruction group for the command.<\/q> The mark scheme: <q>ADD - Arithmetic operations<\/q>", "src": "Principal Examiner Report, November 2023, Paper 12; 9618 Nov 2023 P12 Q9(a) mark scheme"}, {"id": "readone", "ctx": "June 2023 P12 Q3(a): draw lines from each action to the pass(es). The student joins “reads the source code one line at a time” to the FIRST pass only.", "ans": "first pass only", "a": "Scores 0", "f": "The mark scheme: <q>1 mark for reads source code one line at a time to both boxes<\/q> The examiners: <q>Many candidates did not join the action to both passes.<\/q>", "src": "9618 Jun 2023 P12 Q3(a) mark scheme; Principal Examiner Report, June 2023, Paper 12"}, {"id": "objsecond", "ctx": "June 2023 P12 Q3(a): the student joins “generates object code” to the second pass.", "ans": "second pass", "a": "Scores 1", "f": "The mark scheme: <q>1 mark for generates object code to second pass<\/q>", "src": "9618 Jun 2023 P12 Q3(a) mark scheme"}, {"id": "pass1", "ctx": "Nov 2023 P11 Q8(a): Identify the purpose of the first pass of a two-pass assembler.", "ans": "To create a symbol table", "a": "Scores 1", "f": "The mark scheme: <q>To create a symbol table<\/q> The examiners: <q>This question was generally not answered well.<\/q>", "src": "9618 Nov 2023 P11 Q8(a) mark scheme; Principal Examiner Report, November 2023, Paper 11"}], "syms": {"TOTAL": 152, "DISCOUNT": 151, "START": 200, "LOOP": 203}, "sort": [{"op": "LDM", "opd": "#n", "expl": "Immediate addressing. Load the number n to ACC", "g": "Data movement", "why": "puts a number into the ACC", "ev": ["June 2022 P13 Q3(b): “The instructions in part (a) are examples of the data movement group.” (part (a) used LDM, LDD, LDI)", "November 2021 P12 Q8(b)(ii) mark scheme: “LDM #2” (given) · “IN / OUT” · “INC ACC / INC IX” · “JPN 100 / JMP 100” · “CMP 100”"]}, {"op": "LDD", "opd": "<address>", "expl": "Direct addressing. Load the contents of the location at the given address to ACC", "g": "Data movement", "why": "copies a value from memory into the ACC", "ev": ["June 2022 P13 Q3(b): “The instructions in part (a) are examples of the data movement group.” (part (a) used LDM, LDD, LDI)"]}, {"op": "LDI", "opd": "<address>", "expl": "Indirect addressing. The address to be used is at the given address. Load the contents of this second address to ACC", "g": "Data movement", "why": "copies a value from memory into the ACC", "ev": ["June 2022 P13 Q3(b): “The instructions in part (a) are examples of the data movement group.” (part (a) used LDM, LDD, LDI)"]}, {"op": "LDX", "opd": "<address>", "expl": "Indexed addressing. Form the address from <address> + the contents of the index register. Copy the contents of this calculated address to ACC", "g": "Data movement", "why": "copies a value from memory into the ACC", "ev": ["None of our 2021–25 past-paper mark schemes places this one — teacher’s placement"]}, {"op": "LDR", "opd": "#n", "expl": "Immediate addressing. Load the number n to IX", "g": "Data movement", "why": "puts a number into the IX", "ev": ["November 2023 P11 Q8(b)(i) mark scheme: “Data movement: e.g. LDR #50 // STO 201” · “Arithmetic operation: e.g. ADD 100 // INC IX” · “Conditional instruction: e.g. JPE 96”"]}, {"op": "MOV", "opd": "<register>", "expl": "Move the contents of the accumulator to the given register (IX)", "g": "Data movement", "why": "copies the ACC into the IX", "ev": ["None of our 2021–25 past-paper mark schemes places this one — teacher’s placement"]}, {"op": "STO", "opd": "<address>", "expl": "Store the contents of ACC at the given address", "g": "Data movement", "why": "copies the ACC into memory", "ev": ["November 2023 P11 Q8(b)(i) mark scheme: “Data movement: e.g. LDR #50 // STO 201” · “Arithmetic operation: e.g. ADD 100 // INC IX” · “Conditional instruction: e.g. JPE 96”"]}, {"op": "IN", "opd": "", "expl": "Key in a character and store its ASCII value in ACC", "g": "Input and output of data", "why": "a character comes in from the keyboard", "ev": ["November 2023 P12 Q9(a) mark scheme: “IN - Input and output of data” · “ADD - Arithmetic operations” · “JPE - Unconditional and conditional instructions” · “CMI - Compare instructions”", "November 2021 P12 Q8(b)(ii) mark scheme: “LDM #2” (given) · “IN / OUT” · “INC ACC / INC IX” · “JPN 100 / JMP 100” · “CMP 100”"]}, {"op": "OUT", "opd": "", "expl": "Output to the screen the character whose ASCII value is stored in ACC", "g": "Input and output of data", "why": "a character goes out to the screen", "ev": ["November 2021 P12 Q8(b)(ii) mark scheme: “LDM #2” (given) · “IN / OUT” · “INC ACC / INC IX” · “JPN 100 / JMP 100” · “CMP 100”"]}, {"op": "ADD", "opd": "<address>", "expl": "Add the contents of the given address to the ACC", "g": "Arithmetic operations", "why": "adds to the ACC", "ev": ["November 2023 P11 Q8(b)(i) mark scheme: “Data movement: e.g. LDR #50 // STO 201” · “Arithmetic operation: e.g. ADD 100 // INC IX” · “Conditional instruction: e.g. JPE 96”", "November 2023 P12 Q9(a) mark scheme: “IN - Input and output of data” · “ADD - Arithmetic operations” · “JPE - Unconditional and conditional instructions” · “CMI - Compare instructions”"]}, {"op": "ADD", "opd": "#n/Bn/&n", "expl": "Add the number n to the ACC", "g": "Arithmetic operations", "why": "adds to the ACC", "ev": ["November 2023 P12 Q9(a) mark scheme: “IN - Input and output of data” · “ADD - Arithmetic operations” · “JPE - Unconditional and conditional instructions” · “CMI - Compare instructions”"]}, {"op": "SUB", "opd": "<address>", "expl": "Subtract the contents of the given address from the ACC", "g": "Arithmetic operations", "why": "subtracts from the ACC", "ev": ["June 2022 P13 Q3(b) mark scheme: “Arithmetic operations” — “Perform addition and subtraction”"]}, {"op": "SUB", "opd": "#n/Bn/&n", "expl": "Subtract the number n from the ACC", "g": "Arithmetic operations", "why": "subtracts from the ACC", "ev": ["June 2022 P13 Q3(b) mark scheme: “Arithmetic operations” — “Perform addition and subtraction”"]}, {"op": "INC", "opd": "<register>", "expl": "Add 1 to the contents of the register (ACC or IX)", "g": "Arithmetic operations", "why": "adds 1 to a register", "ev": ["November 2023 P11 Q8(b)(i) mark scheme: “Data movement: e.g. LDR #50 // STO 201” · “Arithmetic operation: e.g. ADD 100 // INC IX” · “Conditional instruction: e.g. JPE 96”", "November 2021 P12 Q8(b)(ii) mark scheme: “LDM #2” (given) · “IN / OUT” · “INC ACC / INC IX” · “JPN 100 / JMP 100” · “CMP 100”", "November 2025 P13 Q6(c) mark scheme: loading data into the accumulator → “Data movement”; incrementing the index register → “Arithmetic operations”"]}, {"op": "DEC", "opd": "<register>", "expl": "Subtract 1 from the contents of the register (ACC or IX)", "g": "Arithmetic operations", "why": "subtracts 1 from a register", "ev": ["None of our 2021–25 past-paper mark schemes places this one — teacher’s placement"]}, {"op": "JMP", "opd": "<address>", "expl": "Jump to the given address", "g": "Unconditional and conditional instructions", "why": "always jumps: unconditional", "ev": ["November 2021 P12 Q8(b)(ii) mark scheme: “LDM #2” (given) · “IN / OUT” · “INC ACC / INC IX” · “JPN 100 / JMP 100” · “CMP 100”"]}, {"op": "JPE", "opd": "<address>", "expl": "Following a compare instruction, jump to <address> if the compare was True", "g": "Unconditional and conditional instructions", "why": "jumps only if the compare was True: conditional", "ev": ["November 2023 P11 Q8(b)(i) mark scheme: “Data movement: e.g. LDR #50 // STO 201” · “Arithmetic operation: e.g. ADD 100 // INC IX” · “Conditional instruction: e.g. JPE 96”", "November 2023 P12 Q9(a) mark scheme: “IN - Input and output of data” · “ADD - Arithmetic operations” · “JPE - Unconditional and conditional instructions” · “CMI - Compare instructions”"]}, {"op": "JPN", "opd": "<address>", "expl": "Following a compare instruction, jump to <address> if the compare was False", "g": "Unconditional and conditional instructions", "why": "jumps only if the compare was False: conditional", "ev": ["November 2021 P12 Q8(b)(ii) mark scheme: “LDM #2” (given) · “IN / OUT” · “INC ACC / INC IX” · “JPN 100 / JMP 100” · “CMP 100”"]}, {"op": "CMP", "opd": "<address>", "expl": "Compare the contents of ACC with the contents of <address>", "g": "Compare instructions", "why": "compares the ACC with a value", "ev": ["November 2021 P12 Q8(b)(ii) mark scheme: “LDM #2” (given) · “IN / OUT” · “INC ACC / INC IX” · “JPN 100 / JMP 100” · “CMP 100”"]}, {"op": "CMP", "opd": "#n", "expl": "Compare the contents of ACC with number n", "g": "Compare instructions", "why": "compares the ACC with a number", "ev": ["None of our 2021–25 past-paper mark schemes places this one — teacher’s placement"]}, {"op": "CMI", "opd": "<address>", "expl": "Indirect addressing. The address to be used is at the given address. Compare the contents of ACC with the contents of this second address", "g": "Compare instructions", "why": "compares, using indirect addressing", "ev": ["November 2023 P12 Q9(a) mark scheme: “IN - Input and output of data” · “ADD - Arithmetic operations” · “JPE - Unconditional and conditional instructions” · “CMI - Compare instructions”"]}], "sortEnd": {"op": "END", "expl": "Return control to the operating system", "note": "END is in the table, but none of our 2021–25 mark schemes places END in a group: never choose END as your example for a group."}, "groups": ["Data movement", "Input and output of data", "Arithmetic operations", "Unconditional and conditional instructions", "Compare instructions"], "step": [{"id": "loop", "name": "Lesson 12 I do: a loop", "prog": [[100, "LDM #0"], [101, "CMP 52"], [102, "JPE 106"], [103, "ADD 50"], [104, "STO 51"], [105, "JMP 101"], [106, "DEC ACC"], [107, "END"]], "mem": {"50": 4, "51": 0, "52": 8}, "cols": [50, 51, 52], "keys": "", "note": "Written for Lesson 12. Adds 4 until it reaches 8, then takes 1 off.", "ix": false, "out": false}, {"id": "inout", "name": "Lesson 12: IN and OUT with a digit", "prog": [[30, "IN"], [31, "SUB #48"], [32, "ADD 70"], [33, "ADD #48"], [34, "OUT"], [35, "END"]], "mem": {"70": 2}, "cols": [70], "keys": "3", "note": "Written for Lesson 12. Choose the key that is pressed (0–7). ASCII values: ‘0’ = 48, ‘1’ = 49 … ‘9’ = 57.", "ix": false, "out": true}, {"id": "wagoll", "name": "Lesson 12 WAGOLL program", "prog": [[30, "LDD 80"], [31, "SUB 81"], [32, "STO 82"], [33, "CMP #65"], [34, "JPN 36"], [35, "OUT"], [36, "END"]], "mem": {"80": 66, "81": 1, "82": 0}, "cols": [80, 81, 82], "keys": "", "note": "Written for Lesson 12.", "ix": false, "out": true}, {"id": "n23", "name": "November 2023 P12 Q9(b) (the We do)", "prog": [[10, "LDR #0"], [11, "IN"], [12, "STO 101"], [13, "LDX 110"], [14, "CMP 100"], [15, "JPE 21"], [16, "LDD 101"], [17, "ADD #16"], [18, "INC IX"], [19, "STO 100"], [20, "JMP 13"], [21, "OUT"], [22, "END"]], "mem": {"100": 0, "101": 0, "110": 51, "111": 65}, "cols": [100, 101, 110, 111], "keys": "1", "note": "A real question: the input is ‘1’, as the paper says. ASCII: 49 = ‘1’, 50 = ‘2’, 51 = ‘3’, 52 = ‘4’, 65 = ‘A’ … 68 = ‘D’. The published scheme writes 65 again in the ACC for the second LDX 110 (the value was already 65): both ways are accepted here.", "ix": true, "out": true}], "asm": [{"id": "ido", "name": "Lesson 13 I do", "start": 200, "lines": [["", "LDD", "TOTAL"], ["AGAIN", "ADD", "STEP"], ["", "CMP", "LIMIT"], ["", "JPE", "DONE"], ["", "JMP", "AGAIN"], ["DONE", "STO", "TOTAL"], ["", "END", ""], ["TOTAL", "0", ""], ["STEP", "5", ""], ["LIMIT", "15", ""]], "table": [["AGAIN", 201], ["DONE", 205], ["TOTAL", 207], ["STEP", 208], ["LIMIT", 209]], "obj": [[200, "LDD 207", "00000010 11001111"], [201, "ADD 208", "00001000 11010000"], [202, "CMP 209", "00001111 11010001"], [203, "JPE 205", "00010010 11001101"], [204, "JMP 201", "00001110 11001001"], [205, "STO 207", "00000111 11001111"], [206, "END", "00010110 00000000"], [207, "0", "00000000 00000000"], [208, "5", "00000000 00000101"], [209, "15", "00000000 00001111"]], "note": "Written for Lesson 13."}, {"id": "ext", "name": "Lesson 13 extension", "start": 60, "lines": [["START", "LDM", "#0"], ["NEXT", "ADD", "STEP"], ["", "CMP", "TARGET"], ["", "JPN", "NEXT"], ["", "STO", "RESULT"], ["", "END", ""], ["STEP", "3", ""], ["TARGET", "12", ""], ["RESULT", "0", ""]], "table": [["START", 60], ["NEXT", 61], ["STEP", 66], ["TARGET", 67], ["RESULT", 68]], "obj": [[60, "LDM #0", "00000001 00000000"], [61, "ADD 66", "00001000 01000010"], [62, "CMP 67", "00001111 01000011"], [63, "JPN 61", "00010011 00111101"], [64, "STO 68", "00000111 01000100"], [65, "END", "00010110 00000000"], [66, "3", "00000000 00000011"], [67, "12", "00000000 00001100"], [68, "0", "00000000 00000000"]], "note": "Written for Lesson 13."}, {"id": "t1", "name": "Lesson 13 Task 1", "start": 20, "lines": [["TOP", "LDD", "NUM"], ["", "ADD", "#1"], ["", "STO", "NUM"], ["", "END", ""], ["NUM", "7", ""]], "table": [["TOP", 20], ["NUM", 24]], "obj": [[20, "LDD 24", "00000010 00011000"], [21, "ADD #1", "00001001 00000001"], [22, "STO 24", "00000111 00011000"], [23, "END", "00010110 00000000"], [24, "7", "00000000 00000111"]], "note": "Written for Lesson 13."}], "passq": [["reads the source code one line at a time", "both", "June 2023 P12 Q3(a) mark scheme: 1 mark for reads source code one line at a time to both boxes"], ["removes white space", "first", "June 2023 P12 Q3(a) mark scheme: 1 mark for removes white space and adds labels to first pass"], ["adds labels to the symbol table", "first", "June 2023 P12 Q3(a) mark scheme: 1 mark for removes white space and adds labels to first pass"], ["generates object code", "second", "June 2023 P12 Q3(a) mark scheme: 1 mark for generates object code to second pass"], ["Remove comments.", "first", "November 2022 P11 Q6(c) mark scheme (ticked: first pass)"], ["Check the opcode is in the instruction set.", "first", "November 2022 P11 Q6(c) mark scheme (ticked: first pass)"], ["replaces each symbolic address with its address from the symbol table", "second", "Teacher’s words: how the second pass uses the symbol table to generate the object code"]], "rules": [["One row for each instruction carried out", "Write its address in the Instruction address column. A loop repeats addresses: 13, 14, 15 … 13, 14, 15."], ["Write a value only where it changes", "Leave every other cell in the row blank. The first row under the headings is the starting contents."], ["STO copies — the ACC keeps its value", "The memory column gets the ACC’s value. Nothing is written in the ACC column."], ["Compares and jumps change no column", "CMP, JPE, JPN and JMP: the address only. Never write True or False in the Output column."], ["IN: the key’s ASCII value goes in the ACC", "Key ‘1’ → 49 in the ACC (the question gives the ASCII values)."], ["OUT: the character goes in Output", "65 in the ACC → A in Output. No quotation marks."]], "reload": "Re-loading a value the ACC already holds: the November 2023 P12 scheme writes it again; the November 2022 P13 scheme leaves it blank. Both are published — no mark rests on it.", "notes": ["ACC denotes Accumulator", "IX denotes Index Register", "<address> can be an absolute or symbolic address", "# denotes a denary number, e.g. #123", "B denotes a binary number, e.g. B01001010", "& denotes a hexadecimal number, e.g. &4A"], "angle": "Some candidates also enclosed the operand part of their assembly language instructions within angle brackets, which is not correct.", "operandRep": "Candidates who correctly used the term ‘operand’ in their answers were often able to give a better description than candidates who attempted a description with alternative names."};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function hex(v,n){let s=v.toString(16).toUpperCase();while(s.length<n)s='0'+s;return s;}
+const bin8 = v => v.toString(2).padStart(8,'0');
+
+/* ---------------------------------------------------------------- progress (drives the code) */
+const P = {seenRows:new Set(), opOk:0, opDone:0, mcOk:0, mcDone:0, modesRun:new Set(), predOk:0, predDone:0,
+           eqBest:0, eqScore:0, eqDone:0, gsBest:0, gsScore:0, gsDone:0, total:0,
+           stOk:0, stDone:0, asDone:new Set(), pqBest:0, pqScore:0, pqDone:0};
+
+/* ---------------------------------------------------------------- tabs */
+function setMode(m){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));
+  document.querySelectorAll('.mode').forEach(s=>s.classList.toggle('hidden', s.id!=='m-'+m));
+  if(m==='code') drawCode();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+
+/* ---------------------------------------------------------------- operand parsing (the 2027-29 notation) */
+function parseOperand(s){
+  s = (s||'').trim();
+  if(s==='') return {kind:'none'};
+  if(/^<.*>$/.test(s)) return {kind:'angle'};
+  if(s==='ACC'||s==='IX') return {kind:'reg', reg:s};
+  let m;
+  if((m=/^#(-?\d+)$/.exec(s))) return {kind:'num', form:'denary', v:parseInt(m[1],10)};
+  if((m=/^B([01]+)$/.exec(s))) return {kind:'num', form:'binary', v:parseInt(m[1],2)};
+  if((m=/^&([0-9A-Fa-f]+)$/.exec(s))) return {kind:'num', form:'hexadecimal', v:parseInt(m[1],16)};
+  if(/^\d+$/.test(s)) return {kind:'addr', form:'absolute', v:parseInt(s,10)};
+  if(/^[A-Za-z][A-Za-z0-9]*$/.test(s)) return {kind:'addr', form:'symbolic', name:s.toUpperCase()};
+  return {kind:'bad'};
+}
+function operandForm(s){
+  const p = parseOperand(s);
+  return {none:'no operand', reg:'register', angle:'not valid'}[p.kind] ||
+         (p.kind==='num' ? p.form+' number' : p.kind==='addr' ? p.form+' address' : 'not valid');
+}
+/* the invented machine code (same table as the C4 L8 deck) */
+function assemble(ins, syms){
+  syms = syms || D.syms;
+  const [op, opd=''] = ins.trim().split(/\s+/);
+  const p = parseOperand(opd);
+  let kind = p.kind==='num' ? '#' : p.kind==='addr' ? 'A' : p.kind==='reg' ? 'R' : '';
+  const code = D.opcodes[op+'|'+kind];
+  if(code===undefined) return null;
+  let v = p.kind==='num' ? p.v : p.kind==='reg' ? D.regs[p.reg] : p.kind==='addr' ? (p.form==='absolute' ? p.v : syms[p.name]) : 0;
+  if(v===undefined || v<0 || v>255) return null;
+  return [bin8(code), bin8(v)];
+}
+
+/* ---------------------------------------------------------------- 1 TOUR */
+function rowHTML(r,i){return '<tr data-i="'+i+'" tabindex="0" role="button"><td class="o">'+esc(r.op)+'</td><td class="o">'+esc(r.opd)+'</td><td>'+esc(r.expl)+'</td></tr>';}
+(function buildTable(){
+  let h='';
+  D.iset.forEach((r,i)=>h+=rowHTML(r,i));
+  D.labels.forEach((l,j)=>h+='<tr data-l="'+j+'" tabindex="0" role="button"><td class="o" colspan="2">'+esc(l.form)+'</td><td>'+esc(l.expl)+'</td></tr>');
+  $('itab').insertAdjacentHTML('beforeend', h);
+  $('inotes').innerHTML = D.notes.map(esc).join(' &nbsp;·&nbsp; ');
+  $('itab').querySelectorAll('tr[data-i],tr[data-l]').forEach(tr=>{tr.onclick=()=>showRow(tr);
+    tr.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showRow(tr);}};});
+})();
+function showRow(tr){
+  $('itab').querySelectorAll('tr').forEach(t=>t.classList.remove('sel'));
+  tr.classList.add('sel'); tr.classList.add('seen');
+  let h;
+  if(tr.dataset.l!==undefined){
+    const l = D.labels[+tr.dataset.l]; P.seenRows.add('L'+tr.dataset.l);
+    const [lb, rest] = l.ex.split(': ');
+    const bits = rest.split(' ');
+    h = '<h3 class="mono">'+esc(l.form)+'</h3><p class="quote">“'+esc(l.expl)+'”</p><div class="parts">'+
+        '<div class="part l"><b>'+esc(lb)+':</b><span>LABEL</span></div>'+
+        (bits.length>1 ? '<div class="part o"><b>'+esc(bits[0])+'</b><span>OPCODE</span></div><div class="part d"><b>'+esc(bits[1])+'</b><span>OPERAND</span></div>'
+                       : '<div class="part d"><b>'+esc(bits[0])+'</b><span>DATA</span></div>')+
+        '</div><p>'+(bits.length>1 ? 'The label names this line, so a jump can use it: <span class="mono">JMP '+esc(lb)+'</span>.'
+                    : 'The label is a symbolic address for a memory location that holds '+esc(bits[0])+': <span class="mono">LDD '+esc(lb)+'</span> loads it.')+
+        ' The colon marks where the label is defined.</p>';
+  } else {
+    const r = D.iset[+tr.dataset.i]; P.seenRows.add(+tr.dataset.i);
+    const [eo, ed=''] = r.ex.split(' ');
+    h = '<h3><span class="mono">'+esc(r.op)+' '+esc(r.opd)+'</span> &nbsp;<span class="modepill '+r.mode.split(' ')[0]+'">'+esc(r.mode)+'</span></h3>'+
+        '<p class="quote">“'+esc(r.expl)+'”</p><p style="margin:4px 0">Example (written for this lab):</p><div class="parts">'+
+        '<div class="part o"><b>'+esc(eo)+'</b><span>OPCODE</span></div>'+
+        (ed ? '<div class="part d"><b>'+esc(ed)+'</b><span>OPERAND: '+esc(operandForm(ed))+'</span></div>' : '<div class="part d"><b>—</b><span>NO OPERAND</span></div>')+
+        '</div><div class="mc" data-test="mc"><span class="a">'+r.mc[0]+'</span> <span class="b">'+r.mc[1]+'</span></div>'+
+        '<p class="inv">One machine code instruction: opcode, then operand. These binary codes are INVENTED for these lessons — every processor has its own. '+
+        (/^[A-Z]+$/.test(ed) && ed!=='ACC' && ed!=='IX' ? 'Here '+esc(ed)+' stands for address '+D.syms[ed]+'.' : '')+'</p>';
+  }
+  $('det').innerHTML = h;
+  drawCode();
+}
+$('det').innerHTML = '<h3>Pick an instruction</h3><p>Click a row of the table to see its parts, its addressing mode and its (invented) machine code.</p>';
+
+/* read the operand */
+const OP_ITEMS = ['LDM #45','ADD &1F','SUB B00000110','LDD 150','STO TOTAL','END','ADD #5','LDI 153','CMP #0','JMP START',
+                  'SUB &0A','LDD PRICE','ADD B00001010','STO 160','OUT','INC ACC','CMP 152','LDR #3','JPE LOOP','IN'];
+const FORMS = ['denary number','binary number','hexadecimal number','absolute address','symbolic address','register','no operand'];
+let opCur = null, opAnswered = false, opQueue = [];
+function opNext(){
+  if(!opQueue.length) opQueue = shuffle(OP_ITEMS.slice());
+  opCur = opQueue.pop(); opAnswered = false;
+  $('opins').textContent = opCur; $('opfb').textContent=''; $('opfb').className='fb';
+  $('opbtns').innerHTML = FORMS.map(f=>'<button class="btn ghost">'+f+'</button>').join('');
+  $('opbtns').querySelectorAll('button').forEach(b=>b.onclick=()=>opAnswer(b));
+}
+function opAnswer(b){
+  if(opAnswered) return; opAnswered = true;
+  const opd = opCur.split(' ')[1] || '', right = operandForm(opd), ok = b.textContent===right;
+  P.opDone++; P.total++; if(ok) P.opOk++;
+  b.classList.add(ok?'picked-ok':'picked-no');
+  if(!ok) $('opbtns').querySelectorAll('button').forEach(x=>{if(x.textContent===right) x.classList.add('picked-ok');});
+  const why = {'denary number':'# denotes a denary number.','binary number':'B denotes a binary number.',
+     'hexadecimal number':'& denotes a hexadecimal number.','absolute address':'No sign and a number: an actual address.',
+     'symbolic address':'A name: the assembler swaps it for an address.','register':'INC and DEC take a register (ACC or IX).',
+     'no operand':'IN, OUT and END have no operand.'}[right];
+  const art = /^[aeiou]/.test(right) ? 'an ' : 'a ';
+  $('opfb').className = 'fb '+(ok?'ok':'no'); $('opfb').textContent = (ok?'✓ ':'✗ It is '+(right==='no operand'?'':art)+right+'. ')+why;
+  $('opcount').textContent = P.opOk+' right of '+P.opDone; drawCode();
+}
+$('opnext').onclick = opNext;
+
+/* which machine code */
+const MC_ITEMS = ['LDD 150','LDM #150','ADD #5','ADD 5','STO 152','SUB #10','SUB 10','LDI 150','CMP #0','CMP 152','LDD TOTAL','STO DISCOUNT'];
+let mcCur=null, mcAnswered=false, mcQueue=[];
+function mcOptions(ins){
+  const right = assemble(ins); const [op, opd] = ins.split(' ');
+  const p = parseOperand(opd);
+  const opts = [right.join(' ')];
+  const alt = (o, d) => { const a = assemble(o+' '+d); if(a){ const s=a.join(' '); if(!opts.includes(s)) opts.push(s);} };
+  if(p.kind==='num') alt(op==='LDM'?'LDD':op, String(p.v)); else alt(op==='LDD'?'LDM':op, '#'+(p.form==='absolute'?p.v:D.syms[p.name]));
+  const v = p.kind==='num'?p.v:(p.form==='absolute'?p.v:D.syms[p.name]);
+  opts.push(right[0]+' '+bin8((v+1)%256));
+  const other = op==='STO' ? 'LDD' : op==='SUB' ? 'ADD' : 'SUB';
+  alt(other, opd);
+  return shuffle(opts.slice(0,4));
+}
+function mcNext(){
+  if(!mcQueue.length) mcQueue = shuffle(MC_ITEMS.slice());
+  mcCur = mcQueue.pop(); mcAnswered=false;
+  $('mcins').textContent = mcCur; $('mcfb').textContent=''; $('mcfb').className='fb';
+  const r = assemble(mcCur).join(' ');
+  $('mcbtns').innerHTML = mcOptions(mcCur).map(o=>'<button class="btn ghost mono" data-r="'+(o===r?1:0)+'">'+o+'</button>').join('');
+  $('mcbtns').querySelectorAll('button').forEach(b=>b.onclick=()=>mcAnswer(b));
+}
+function mcAnswer(b){
+  if(mcAnswered) return; mcAnswered=true;
+  const ok = b.dataset.r==='1'; P.mcDone++; P.total++; if(ok) P.mcOk++;
+  b.classList.add(ok?'picked-ok':'picked-no');
+  if(!ok) $('mcbtns').querySelectorAll('button[data-r="1"]').forEach(x=>x.classList.add('picked-ok'));
+  const r = assemble(mcCur), opd = mcCur.split(' ')[1], p = parseOperand(opd);
+  $('mcfb').className='fb '+(ok?'ok':'no');
+  $('mcfb').textContent = (ok?'✓ ':'✗ ')+'Opcode '+r[0]+' is '+mcCur.split(' ')[0]+(p.kind==='num'?' with a NUMBER (#)':' with an ADDRESS')+
+     '; the operand '+(p.kind==='addr'&&p.form==='symbolic' ? p.name+' = '+D.syms[p.name] : (p.v))+' in binary is '+r[1]+'. ADD #5 and ADD 5 have different opcodes.';
+  $('mccount').textContent = P.mcOk+' right of '+P.mcDone; drawCode();
+}
+$('mcnext').onclick = mcNext;
+(function(){ const keys=[['LDM','#'],['LDD','A'],['LDI','A'],['STO','A'],['ADD','#'],['ADD','A'],['SUB','#'],['SUB','A'],['CMP','#'],['CMP','A']];
+  let h='<tr><th>Instruction</th><th>Opcode</th><th>Instruction</th><th>Opcode</th></tr>';
+  for(let i=0;i<keys.length;i+=2){ h+='<tr>'+[keys[i],keys[i+1]].map(([o,k])=>'<td class="o">'+o+(k==='#'?' #n':' &lt;address&gt;')+'</td><td class="o">'+bin8(D.opcodes[o+'|'+k])+'</td>').join('')+'</tr>'; }
+  $('mctab').innerHTML=h; })();
+
+/* ---------------------------------------------------------------- 2 ADDRESSING EXPLORER */
+const WALL0 = {20:23,21:5,22:9,23:41,24:7,25:28,26:2,27:20,28:24,29:0};
+const ST = {mem:Object.assign({},WALL0), acc:0, ix:0};
+function drawWall(h1, h2, w){
+  $('wall').innerHTML = Object.keys(ST.mem).sort((a,b)=>a-b).map(a=>'<div class="lock'+(a==h1?' h1':'')+(a==h2?' h2':'')+(a==w?' w':'')+'" data-a="'+a+'"><div class="ad">'+a+'</div><div class="ct">'+ST.mem[a]+'</div></div>').join('');
+  $('vACC').textContent = ST.acc; $('vIX').textContent = ST.ix;
+}
+/* plan(): one decision per step. Returns {mode, steps:[{t, h1, h2, w, acc, ix, mem}]} or {err}. Pure: works on a copy. */
+function plan(insText, st){
+  const s = {mem:Object.assign({},st.mem), acc:st.acc, ix:st.ix};
+  const parts = insText.trim().toUpperCase().split(/\s+/); const op = parts[0]; const opd = parts[1]||'';
+  if(parts.length>2) return {err:'One opcode and one operand only.'};
+  const p = parseOperand(opd);
+  if(p.kind==='angle') return {err:'No angle brackets: write LDD 20, not LDD <20>. The examiners: “'+D.angle+'”'};
+  const has = a => Object.prototype.hasOwnProperty.call(s.mem, a);
+  const need = a => { if(!has(a)) throw new Error('There is no locker '+a+' on this wall (20–29).'); return s.mem[a]; };
+  const steps = []; let mode = '';
+  const say = (t, extra) => steps.push(Object.assign({t:t, acc:s.acc, ix:s.ix, mem:Object.assign({},s.mem)}, extra||{}));
+  const addrOnly = ['LDD','LDI','LDX','STO','CMI'];
+  try{
+    if(['LDM','LDR'].includes(op)){
+      if(!(p.kind==='num' && p.form==='denary')) return {err:op+' takes #n (a denary number) in the table, e.g. '+op+' #20.'};
+      mode='immediate';
+      say('Read the operand: #'+p.v+'. The # says it is a NUMBER.');
+      if(op==='LDM'){s.acc=p.v; say('Put '+p.v+' straight into the ACC. Memory is not used.');}
+      else{s.ix=p.v; say('Put '+p.v+' straight into the IX (the index register). Memory is not used.');}
+    } else if(addrOnly.includes(op)){
+      if(p.kind!=='addr' || p.form!=='absolute') return {err:op+' takes an address, e.g. '+op+' 20 (no #).'};
+      const a = p.v;
+      if(op==='LDD'){mode='direct'; say('Read the operand: '+a+'. No # — so it is an ADDRESS.');
+        const v=need(a); say('Go to locker '+a+'.',{h2:a}); s.acc=v; say('Copy its contents, '+v+', into the ACC.',{h2:a});}
+      if(op==='STO'){mode='direct'; say('Read the operand: '+a+'. It is an ADDRESS.'); need(a);
+        say('Go to locker '+a+'.',{h2:a}); s.mem[a]=s.acc; say('Store the contents of the ACC ('+s.acc+') in locker '+a+'. The ACC keeps its value.',{w:a});}
+      if(op==='LDI'||op==='CMI'){mode='indirect'; say('Read the operand: '+a+'. It is an address.');
+        const b=need(a); say('Go to locker '+a+'. It holds '+b+': not the value — the ADDRESS to use.',{h1:a});
+        const v=need(b); say('Go to locker '+b+'.',{h1:a,h2:b});
+        if(op==='LDI'){s.acc=v; say('Copy its contents, '+v+', into the ACC.',{h1:a,h2:b});}
+        else say('Compare the ACC ('+s.acc+') with '+v+': '+(s.acc===v?'TRUE':'FALSE')+'. Nothing changes; a jump (JPE/JPN) can use the result.',{h1:a,h2:b});}
+      if(op==='LDX'){mode='indexed'; say('Read the operand: '+a+'. It is an address.');
+        const e=a+s.ix; say('Add the contents of the IX: '+a+' + '+s.ix+' = '+e+'. (The operand + IX — not the contents of '+a+'.)');
+        const v=need(e); say('Go to locker '+e+'.',{h2:e}); s.acc=v; say('Copy its contents, '+v+', into the ACC.',{h2:e});}
+    } else if(['ADD','SUB','CMP'].includes(op)){
+      if(p.kind==='num'){
+        if(op==='CMP' && p.form!=='denary') return {err:'CMP takes #n (denary) or an address in the table.'};
+        mode='immediate'; say('Read the operand: '+opd+'. A NUMBER: '+p.v+'.');
+        if(op==='ADD'){s.acc+=p.v; say('Add the number '+p.v+' to the ACC: '+s.acc+'.');}
+        else if(op==='SUB'){s.acc-=p.v; say('Subtract the number '+p.v+' from the ACC: '+s.acc+'.');}
+        else say('Compare the ACC ('+s.acc+') with the number '+p.v+': '+(s.acc===p.v?'TRUE':'FALSE')+'.');
+      } else if(p.kind==='addr' && p.form==='absolute'){
+        mode='direct'; const a=p.v; say('Read the operand: '+a+'. No # — an ADDRESS.');
+        const v=need(a); say('Go to locker '+a+'. It holds '+v+'.',{h2:a});
+        if(op==='ADD'){s.acc+=v; say('Add the contents ('+v+') to the ACC: '+s.acc+'.',{h2:a});}
+        else if(op==='SUB'){s.acc-=v; say('Subtract the contents ('+v+') from the ACC: '+s.acc+'.',{h2:a});}
+        else say('Compare the ACC ('+s.acc+') with '+v+': '+(s.acc===v?'TRUE':'FALSE')+'.',{h2:a});
+      } else return {err:op+' needs a number (#n'+(op==='CMP'?'':', Bn or &n')+') or an address.'};
+    } else if(['INC','DEC'].includes(op)){
+      if(p.kind!=='reg') return {err:op+' takes a register: ACC or IX — never an address.'};
+      mode='register'; const d = op==='INC'?1:-1;
+      if(p.reg==='ACC') s.acc+=d; else s.ix+=d;
+      say((op==='INC'?'Add 1 to':'Subtract 1 from')+' the contents of '+p.reg+': '+(p.reg==='ACC'?s.acc:s.ix)+'. No memory used.');
+    } else if(op==='MOV'){
+      if(!(p.kind==='reg' && p.reg==='IX')) return {err:'MOV takes the register IX: MOV IX.'};
+      mode='register'; s.ix=s.acc; say('Move the contents of the ACC ('+s.acc+') to the IX.');
+    } else if(['JMP','JPE','JPN','IN','OUT','END'].includes(op)){
+      return {err:op+' is in the instruction set, but it does not use the locker wall. Step mode (Lesson 12) traces programs with jumps.'};
+    } else return {err:'“'+op+'” is not in the 2027–29 instruction set. Use only the instructions in the table.'};
+  }catch(e){return {err:e.message};}
+  return {mode:mode, steps:steps, final:s};
+}
+let PL=null, k=0;
+function load(){
+  $('err').textContent=''; const r = plan($('ins').value, ST);
+  if(r.err){$('err').textContent=r.err; $('steps').innerHTML=''; $('modepill').textContent=''; $('modepill').className='modepill'; PL=null; return false;}
+  PL=r; k=0; $('modepill').textContent=r.mode; $('modepill').className='modepill '+r.mode;
+  $('steps').innerHTML = r.steps.map(x=>'<li>'+esc(x.t)+'</li>').join(''); return true;
+}
+function showStep(i){
+  const x = PL.steps[i];
+  $('steps').querySelectorAll('li').forEach((li,j)=>li.className = j<i?'done':j===i?'now':'');
+  ST.acc=x.acc; ST.ix=x.ix; ST.mem=Object.assign({},x.mem);
+  drawWall(x.h1,x.h2,x.w);
+}
+$('ins').oninput = ()=>{PL=null; $('steps').innerHTML=''; $('err').textContent=''; $('modepill').textContent='';};
+$('step').onclick = ()=>{ if(!PL && !load()) return; if(k<PL.steps.length){showStep(k); k++;}
+  if(k===PL.steps.length){P.modesRun.add(PL.mode); PL=null; drawCode();} };
+$('runall').onclick = ()=>{ if(!load()) return; showStep(PL.steps.length-1); $('steps').querySelectorAll('li').forEach(li=>li.className='done');
+  P.modesRun.add(PL.mode); PL=null; drawCode(); };
+$('reset').onclick = ()=>{ST.mem=Object.assign({},WALL0); ST.acc=0; ST.ix=0; PL=null; $('steps').innerHTML=''; drawWall();};
+$('shuffle').onclick = ()=>{ for(let a=20;a<=29;a++) ST.mem[a] = Math.random()<0.5 ? rnd(20,29) : rnd(0,60); ST.acc=0; ST.ix=0; PL=null; $('steps').innerHTML=''; drawWall();};
+
+/* predict the ACC */
+let PQ=null, pAnswered=false;
+function genPred(){
+  const mem={}; for(let a=20;a<=29;a++) mem[a] = Math.random()<0.45 ? rnd(20,29) : rnd(1,60);
+  const st={mem:mem, acc:rnd(1,30), ix:rnd(0,4)};
+  const ptrs = Object.keys(mem).map(Number).filter(a=>mem[a]>=20&&mem[a]<=29);
+  if(!ptrs.length){mem[21]=25; ptrs.push(21);}
+  const kinds = ['LDM','LDD','LDI','LDI','ADDn','ADDa','SUBn','SUBa'].concat($('withIX').checked?['LDX','LDX']:[]);
+  const kd = pick(kinds); let ins;
+  if(kd==='LDM') ins='LDM #'+rnd(20,29);
+  else if(kd==='LDD') ins='LDD '+rnd(20,29);
+  else if(kd==='LDI') ins='LDI '+pick(ptrs);
+  else if(kd==='ADDn') ins='ADD #'+rnd(20,29);
+  else if(kd==='ADDa') ins='ADD '+rnd(20,29);
+  else if(kd==='SUBn') ins='SUB #'+rnd(1,st.acc);
+  else if(kd==='SUBa') ins='SUB '+rnd(20,29);
+  else ins='LDX '+rnd(20,29-st.ix);
+  const r = plan(ins, st);
+  return {st:st, ins:ins, r:r};
+}
+function pNext(){
+  PQ = genPred(); pAnswered=false;
+  $('pwall').innerHTML = Object.keys(PQ.st.mem).sort((a,b)=>a-b).map(a=>'<div class="lock"><div class="ad">'+a+'</div><div class="ct">'+PQ.st.mem[a]+'</div></div>').join('');
+  $('pq').innerHTML = 'This wall. ACC = <b class="mono">'+PQ.st.acc+'</b>'+($('withIX').checked?', IX = <b class="mono">'+PQ.st.ix+'</b>':'')+
+     '. What is in the ACC after <b class="mono">'+PQ.ins+'</b>?';
+  $('pans').value=''; $('pfb').textContent=''; $('pfb').className='fb';
+}
+function pCheck(){
+  if(!PQ || pAnswered) return;
+  const v = $('pans').value.trim(); if(!/^-?\d+$/.test(v)){ $('pfb').className='fb no'; $('pfb').textContent='Type a whole number.'; return; }
+  pAnswered=true; const right = PQ.r.final.acc, ok = parseInt(v,10)===right;
+  P.predDone++; P.total++; if(ok) P.predOk++;
+  $('pfb').className='fb '+(ok?'ok':'no');
+  $('pfb').innerHTML = (ok?'✓ ':'✗ The ACC holds '+right+'. ')+'<b>'+PQ.r.mode+'</b>: '+PQ.r.steps.map(x=>esc(x.t)).join(' → ');
+  $('pcount').textContent = P.predOk+' right of '+P.predDone; drawCode();
+}
+$('pnext').onclick=pNext; $('pcheck').onclick=pCheck; $('pans').onkeydown=e=>{if(e.key==='Enter') pCheck();};
+$('withIX').onchange=pNext;
+
+/* relative addressing — illustration */
+$('rshow').onclick = ()=>{
+  const b=parseInt($('rbase').value,10), o=parseInt($('roff').value,10);
+  if(isNaN(b)||isNaN(o)){$('rout').textContent='Type two whole numbers.'; return;}
+  const e=b+o; $('rout').textContent = b+' + '+o+' = address '+e;
+  drawWall(ST.mem[b]!==undefined?b:null, ST.mem[e]!==undefined?e:null);
+};
+
+/* ---------------------------------------------------------------- 4 MARK IT LIKE AN EXAMINER */
+let EQ=[];
+function eqSet(){
+  EQ = shuffle(D.exam.slice()); P.eqScore=0; P.eqDone=0;
+  $('eq').innerHTML = EQ.map((q,i)=>'<div class="sortq" data-q="'+q.id+'"><p class="s"><span class="ctx">'+esc(q.ctx)+'</span></p>'+
+    '<span class="exlab">Example student answer</span><span class="ans">'+esc(q.ans)+'</span><div class="b" id="eb'+i+'">'+
+    '<button class="btn ghost">Scores 1</button><button class="btn ghost">Scores 0</button></div><p class="fb" id="ef'+i+'"></p></div>').join('');
+  EQ.forEach((q,i)=>{ const box=$('eb'+i); let done=false;
+    box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(done) return; done=true; const ok=b.textContent===q.a;
+      b.classList.add(ok?'picked-ok':'picked-no');
+      if(!ok) box.querySelectorAll('button').forEach(x=>{if(x.textContent===q.a) x.classList.add('picked-ok');});
+      const f=$('ef'+i); f.className='fb '+(ok?'ok':'no'); f.innerHTML=(ok?'✓ ':'✗ It '+q.a.toLowerCase()+'. ')+q.f+' <span class="src">('+esc(q.src)+')</span>';
+      P.eqDone++; P.total++; if(ok) P.eqScore++; if(P.eqDone===EQ.length) P.eqBest=Math.max(P.eqBest,P.eqScore);
+      eqCount(); drawCode(); });});
+  eqCount();
+}
+function eqCount(){ $('eqcount').textContent = 'This set: '+P.eqScore+' right of '+P.eqDone+' answered (of '+EQ.length+') · best complete set: '+P.eqBest;
+  $('scoretxt').textContent = 'Examiner '+Math.max(P.eqBest, P.eqDone===EQ.length?P.eqScore:0)+'/'+EQ.length; }
+$('eqAgain').onclick = eqSet;
+
+/* ---------------------------------------------------------------- 3 GROUP SORT (Lesson 11) */
+let GS=[];
+function gsRound(){
+  GS = shuffle(D.sort.slice()); P.gsScore=0; P.gsDone=0;
+  const btns = D.groups.map(g=>'<button class="btn ghost">'+esc(g)+'</button>').join('');
+  $('gs').innerHTML = GS.map((c,i)=>'<div class="sortq gsq" data-op="'+esc(c.op+' '+c.opd)+'"><p class="s"><span class="mono">'+esc((c.op+' '+c.opd).trim())+
+    '</span> — <q>'+esc(c.expl)+'</q></p><div class="b" id="gb'+i+'">'+btns+'</div><p class="fb" id="gf'+i+'"></p></div>').join('')+
+    '<div class="sortq gsq end"><p class="s"><span class="mono">END</span> — <q>'+esc(D.sortEnd.expl)+'</q></p><p class="small" style="margin:0">'+esc(D.sortEnd.note)+'</p></div>';
+  GS.forEach((c,i)=>{ const box=$('gb'+i); let done=false;
+    box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(done) return; done=true; const ok=b.textContent===c.g;
+      b.classList.add(ok?'picked-ok':'picked-no');
+      if(!ok) box.querySelectorAll('button').forEach(x=>{if(x.textContent===c.g) x.classList.add('picked-ok');});
+      const f=$('gf'+i); f.className='fb '+(ok?'ok':'no');
+      f.innerHTML=(ok?'✓ ':'✗ It is in '+esc(c.g)+'. ')+esc((c.op+' ').trim())+' '+esc(c.why)+'.<span class="ev">'+c.ev.map(esc).join('<br>')+'</span>';
+      P.gsDone++; P.total++; if(ok) P.gsScore++; if(P.gsDone===GS.length) P.gsBest=Math.max(P.gsBest,P.gsScore);
+      gsCount(); drawCode(); });});
+  gsCount();
+}
+function gsCount(){ $('gscount').textContent = 'This round: '+P.gsScore+' right of '+P.gsDone+' answered (of '+GS.length+') · best complete round: '+P.gsBest; }
+$('gsAgain').onclick = gsRound;
+
+/* ---------------------------------------------------------------- 4 STEP MODE (Lesson 12) */
+/* traceProg: one row per instruction carried out; a value only where it changes (the published schemes' convention).
+   Each row: {addr, ins, acc, ix, mem:{}, out, reload} — reload = the column a load re-wrote with the SAME value (the
+   N23/12 scheme writes it again; N22/13 leaves it blank: both are accepted). Mirrors t12.trace (tested). */
+function traceProg(progList, mem0, keys, limit){
+  const prog = {}; progList.forEach(([a,i])=>prog[a]=i);
+  const mem = {}; Object.keys(mem0).forEach(k=>mem[+k]=mem0[k]);
+  keys = (keys||'').split(''); limit = limit||200;
+  let pc = Math.min(...progList.map(p=>p[0])), acc=null, ix=null, flag=null; const rows=[];
+  const val = op => op[0]==='#' ? parseInt(op.slice(1),10) : op[0]==='B' ? parseInt(op.slice(1),2) : parseInt(op.slice(1),16);
+  for(let n=0;n<limit;n++){
+    const ins = prog[pc]; if(ins===undefined) break;
+    const [op, opd=''] = ins.split(/\s+/); const here = pc; pc++;
+    const imm = '#B&'.includes(opd[0]||'x') && opd!=='ACC';
+    let nacc=acc, nix=ix, mch={}, out=null, reload=null;
+    if(op==='END'){ rows.push({addr:here, ins:ins, acc:null, ix:null, mem:{}, out:null, reload:null, end:true}); break; }
+    else if(op==='LDM') nacc=val(opd);
+    else if(op==='LDD') nacc=mem[+opd];
+    else if(op==='LDI') nacc=mem[mem[+opd]];
+    else if(op==='LDX') nacc=mem[+opd+ix];
+    else if(op==='LDR') nix=val(opd);
+    else if(op==='MOV') nix=acc;
+    else if(op==='STO'){ if(mem[+opd]!==acc) mch[+opd]=acc; else reload='mem'+opd; mem[+opd]=acc; }
+    else if(op==='ADD') nacc=acc+(imm?val(opd):mem[+opd]);
+    else if(op==='SUB') nacc=acc-(imm?val(opd):mem[+opd]);
+    else if(op==='INC'||op==='DEC'){ const d=op==='INC'?1:-1; if(opd==='ACC') nacc=acc+d; else nix=ix+d; }
+    else if(op==='CMP') flag = acc===(imm?val(opd):mem[+opd]);
+    else if(op==='CMI') flag = acc===mem[mem[+opd]];
+    else if(op==='JPE'){ if(flag) pc=+opd; }
+    else if(op==='JPN'){ if(!flag) pc=+opd; }
+    else if(op==='JMP') pc=+opd;
+    else if(op==='IN') nacc=keys.shift().charCodeAt(0);
+    else if(op==='OUT') out=String.fromCharCode(acc);
+    else throw new Error(op);
+    const wa = (nacc!==null && nacc!==acc) ? nacc : null;
+    if(nacc!==null && nacc===acc && ['LDM','LDD','LDI','LDX','IN'].includes(op)) reload='ACC';
+    const wx = (nix!==null && nix!==ix) ? nix : null;
+    rows.push({addr:here, ins:ins, acc:wa, ix:wx, mem:mch, out:out, reload:reload});
+    acc=nacc; ix=nix;
+  }
+  return rows;
+}
+let SP=null, SR=[], SK=0;
+function stCols(p){ return ['ACC'].concat(p.ix?['IX']:[]).concat(p.cols.map(c=>'mem'+c)).concat(p.out?['Output']:[]); }
+function colName(c){ return c.startsWith('mem') ? 'address '+c.slice(3) : c; }
+function changed(r){
+  const ch=[]; if(r.acc!==null) ch.push(['ACC', String(r.acc)]); if(r.ix!==null) ch.push(['IX', String(r.ix)]);
+  Object.keys(r.mem).forEach(a=>ch.push(['mem'+a, String(r.mem[a])])); if(r.out!==null) ch.push(['Output', r.out]);
+  return ch;
+}
+function stLoad(){
+  SP = D.step.find(p=>p.id===$('stprog').value);
+  const keyed = SP.keys!=='' && SP.id==='inout';
+  $('stkey').style.display = $('stkeylab').style.display = keyed ? '' : 'none';
+  const key = keyed ? $('stkey').value : SP.keys;
+  SR = traceProg(SP.prog, SP.mem, key); SK=0;
+  $('stnote').textContent = SP.note + (SP.keys ? ' Key pressed: ‘'+key+'’.' : '');
+  $('stmem').innerHTML = '<table class="lst" style="margin-top:8px"><tr><th>Address</th><th>Contents</th></tr>'+
+    Object.keys(SP.mem).map(a=>'<tr><td class="a">'+a+'</td><td>'+SP.mem[a]+'</td></tr>').join('')+'</table>';
+  stDraw();
+}
+function stDraw(){
+  const cols = stCols(SP), cur = SK<SR.length ? SR[SK].addr : null;
+  $('stlist').innerHTML = '<tr><th>Address</th><th>Instruction</th></tr>'+SP.prog.map(([a,i])=>'<tr class="'+(a===cur?'cur':'')+'"><td class="a">'+a+'</td><td>'+esc(i)+'</td></tr>').join('');
+  let h = '<tr><th>Instruction address</th>'+cols.map(c=>'<th>'+(c.startsWith('mem')?c.slice(3):c)+'</th>').join('')+'</tr>';
+  h += '<tr class="init"><td></td>'+cols.map(c=>'<td>'+(c.startsWith('mem')?SP.mem[c.slice(3)]:'')+'</td>').join('')+'</tr>';
+  SR.slice(0,SK).forEach((r,i)=>{ const m={}; changed(r).forEach(([c,v])=>m[c]=v);
+    h += '<tr class="'+(i===SK-1?'new':'')+'"><td>'+r.addr+'</td>'+cols.map(c=>'<td>'+(m[c]!==undefined?esc(m[c]):'')+'</td>').join('')+'</tr>'; });
+  $('sttab').innerHTML = h;
+  if(SK>=SR.length){ $('stq').innerHTML='<b>Finished.</b> The program reached END. Choose another program, or start again.';
+    $('stcols').innerHTML=''; return; }
+  $('stq').innerHTML = 'Next: <b class="mono">'+SR[SK].addr+'  '+esc(SR[SK].ins)+'</b>. Which column of the trace table changes?';
+  $('stcols').innerHTML = cols.concat(['Nothing']).map(c=>'<button class="btn ghost" data-c="'+c+'">'+(c==='Nothing'?'Nothing changes':colName(c))+'</button>').join('');
+  $('stcols').querySelectorAll('button').forEach(b=>b.onclick=()=>{ $('stcols').querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); });
+  $('stval').value=''; $('stfb').textContent=''; $('stfb').className='fb';
+}
+function stWhy(r){
+  const op = r.ins.split(' ')[0];
+  if(op==='STO') return 'STO copies the ACC into memory; the ACC keeps its value.';
+  if(['CMP','CMI','JPE','JPN','JMP'].includes(op)) return 'Compares and jumps change no column: the row has only its address.';
+  if(op==='OUT') return 'OUT puts the CHARACTER in the Output column — no quotation marks.';
+  if(op==='IN') return 'IN stores the ASCII value of the key in the ACC.';
+  if(op==='END') return 'END: return control to the operating system. Stop.';
+  return 'Only the column that changes is written.';
+}
+function stCheck(){
+  if(!SP || SK>=SR.length) return;
+  const b = $('stcols').querySelector('button.on'); if(!b){ $('stfb').className='fb no'; $('stfb').textContent='Choose a column first.'; return; }
+  const r = SR[SK], ch = changed(r), c = b.dataset.c, v = $('stval').value.trim().replace(/^['‘’"“”]+|['‘’"“”]+$/g,'');
+  let ok;
+  if(c==='Nothing') ok = ch.length===0;
+  else ok = (ch.length===1 && ch[0][0]===c && ch[0][1]===v) || (ch.length===0 && r.reload===c && v===String(SR.slice(0,SK).reverse().map(x=>x.acc).find(x=>x!==null)));
+  P.stDone++; P.total++; if(ok) P.stOk++;
+  const right = ch.length ? ch.map(([cc,vv])=>colName(cc)+' = '+vv).join(', ') : 'nothing changes';
+  $('stfb').className = 'fb '+(ok?'ok':'no');
+  $('stfb').textContent = (ok?'✓ ':'✗ ')+r.addr+' '+r.ins+': '+right+'. '+stWhy(r)+(r.reload?' ('+D.reload+')':'');
+  SK++; stCount(); const fb=$('stfb').textContent, cls=$('stfb').className; stDraw(); $('stfb').textContent=fb; $('stfb').className=cls; drawCode();
+}
+function stCount(){ $('stcount').textContent = 'Rows predicted right: '+P.stOk+' of '+P.stDone; }
+(function(){
+  $('stprog').innerHTML = D.step.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('');
+  $('stkey').innerHTML = '01234567'.split('').map(k=>'<option'+(k==='3'?' selected':'')+'>'+k+'</option>').join('');
+  $('strules').innerHTML = D.rules.map(([t,d])=>'<li><b>'+esc(t)+'.</b> '+esc(d)+'</li>').join('');
+  $('stprog').onchange = stLoad; $('stkey').onchange = stLoad; $('streset').onclick = stLoad;
+  $('stcheck').onclick = stCheck;
+  $('stshow').onclick = ()=>{ if(SK<SR.length){ const r=SR[SK]; SK++; stDraw();
+    $('stfb').className='fb'; $('stfb').textContent=r.addr+' '+r.ins+': '+(changed(r).map(([c,v])=>colName(c)+' = '+v).join(', ')||'nothing changes')+'. '+stWhy(r);} };
+  $('stval').onkeydown = e=>{ if(e.key==='Enter') stCheck(); };
+})();
+
+/* ---------------------------------------------------------------- 5 ASSEMBLE MODE (Lesson 13) */
+let AP=null;
+function asLoad(){
+  AP = D.asm.find(p=>p.id===$('asprog').value);
+  $('assrc').innerHTML = '<tr><th>Address</th><th>Label</th><th>Opcode</th><th>Operand</th></tr>'+
+    AP.lines.map(([l,o,d],i)=>'<tr><td class="a">'+(AP.start+i)+'</td><td>'+esc(l?l+':':'')+'</td><td>'+esc(o)+'</td><td>'+esc(d)+'</td></tr>').join('');
+  $('assym').innerHTML = '<tr><th>Symbol</th><th>Address</th></tr>'+AP.table.map(([k,v],i)=>'<tr><td>'+esc(k)+'</td><td data-i="'+i+'"><input data-sym="'+esc(k)+'" autocomplete="off"></td></tr>').join('');
+  const syms = AP.table.map(t=>t[0]);
+  $('asp2').innerHTML = '<tr><th>Address</th><th>Source</th><th>After pass 2</th><th>Object code (invented)</th></tr>'+
+    AP.lines.map(([l,o,d],i)=>{ const a=AP.start+i, sym=syms.includes(d);
+      return '<tr><td class="a">'+a+'</td><td>'+esc((o+' '+d).trim())+'</td><td>'+(sym?esc(o)+' <input data-l="'+i+'" autocomplete="off">':esc(AP.obj[i][1]))+'</td><td class="mc" data-l="'+i+'"></td></tr>'; }).join('');
+  ['as1fb','as2fb'].forEach(x=>{$(x).textContent=''; $(x).className='fb';});
+  $('asp2').style.opacity = 0.45; $('as2').disabled = true;
+}
+function asCheck1(){
+  let all=true;
+  $('assym').querySelectorAll('input').forEach(inp=>{ const want=AP.table.find(t=>t[0]===inp.dataset.sym)[1];
+    const ok = inp.value.trim()===String(want); inp.parentNode.className = ok?'ok':'no'; if(!ok) all=false; });
+  $('as1fb').className='fb '+(all?'ok':'no');
+  $('as1fb').textContent = all ? '✓ Symbol table complete. A label goes in the table where it is DEFINED (with a colon), with that line’s address. Now pass 2.'
+    : '✗ Not yet. Count one address per line from '+AP.start+'. A label goes in the table at the line where it has a colon.';
+  if(all){ $('asp2').style.opacity=1; $('as2').disabled=false; }
+  P.total++; drawCode(); return all;
+}
+function asCheck2(){
+  let all=true;
+  $('asp2').querySelectorAll('input').forEach(inp=>{ const i=+inp.dataset.l, want=AP.obj[i][1].split(' ')[1];
+    const ok = inp.value.trim()===want; inp.parentNode.className = ok?'ok':'no'; if(!ok) all=false; });
+  if(all){ $('asp2').querySelectorAll('td.mc').forEach(td=>td.textContent=AP.obj[+td.dataset.l][2]); P.asDone.add(AP.id); }
+  $('as2fb').className='fb '+(all?'ok':'no');
+  $('as2fb').textContent = all ? '✓ Every symbolic address replaced from the symbol table; the object code is generated (second pass).'
+    : '✗ Not yet. Look each label up in your symbol table.';
+  P.total++; asCount(); drawCode(); return all;
+}
+function asCount(){ $('ascount').textContent = 'Programs assembled: '+P.asDone.size+' of '+D.asm.length; }
+let PQ2=[];
+function pqRound(){
+  PQ2 = shuffle(D.passq.slice()); P.pqScore=0; P.pqDone=0;
+  $('pq2').innerHTML = PQ2.map((q,i)=>'<div class="sortq" data-q="'+esc(q[0])+'"><p class="s">'+esc(q[0])+'</p><div class="b" id="pqb'+i+'">'+
+    ['first','second','both'].map(x=>'<button class="btn ghost">'+x+'</button>').join('')+'</div><p class="fb" id="pqf'+i+'"></p></div>').join('');
+  PQ2.forEach((q,i)=>{ const box=$('pqb'+i); let done=false;
+    box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(done) return; done=true; const ok=b.textContent===q[1];
+      b.classList.add(ok?'picked-ok':'picked-no');
+      if(!ok) box.querySelectorAll('button').forEach(x=>{if(x.textContent===q[1]) x.classList.add('picked-ok');});
+      const f=$('pqf'+i); f.className='fb '+(ok?'ok':'no'); f.textContent=(ok?'✓ ':'✗ It is '+q[1]+'. ')+q[2];
+      P.pqDone++; P.total++; if(ok) P.pqScore++; if(P.pqDone===PQ2.length) P.pqBest=Math.max(P.pqBest,P.pqScore);
+      pqCount(); drawCode(); });});
+  pqCount();
+}
+function pqCount(){ $('pqcount').textContent = 'This round: '+P.pqScore+' right of '+P.pqDone+' (of '+PQ2.length+') · best complete round: '+P.pqBest; }
+(function(){
+  $('asprog').innerHTML = D.asm.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('');
+  $('asprog').onchange = asLoad; $('as1').onclick = asCheck1; $('as2').onclick = asCheck2; $('pqAgain').onclick = pqRound;
+})();
+
+/* ---------------------------------------------------------------- 7 CODE */
+const NEED_TOUR=8, NEED_OP=8, NEED_PRED=8, NEED_EQ=13, NEED_GS=19, NEED_ST=12, NEED_AS=2;
+function missions(){
+  return [
+    {t:'Tour: open '+NEED_TOUR+' rows of the table ('+Math.min(P.seenRows.size,NEED_TOUR)+'/'+NEED_TOUR+')', ok:P.seenRows.size>=NEED_TOUR},
+    {t:'Read the operand: '+NEED_OP+' right ('+Math.min(P.opOk,NEED_OP)+'/'+NEED_OP+')', ok:P.opOk>=NEED_OP},
+    {t:'Explorer: step an immediate, a direct, an indirect and an indexed instruction', ok:['immediate','direct','indirect','indexed'].every(m=>P.modesRun.has(m))},
+    {t:'Predict the ACC: '+NEED_PRED+' right ('+Math.min(P.predOk,NEED_PRED)+'/'+NEED_PRED+')', ok:P.predOk>=NEED_PRED},
+    {t:'Group sort: '+NEED_GS+' of '+D.sort.length+' right in one complete round (best '+P.gsBest+')', ok:P.gsBest>=NEED_GS},
+    {t:'Step mode: '+NEED_ST+' rows predicted right ('+Math.min(P.stOk,NEED_ST)+'/'+NEED_ST+')', ok:P.stOk>=NEED_ST},
+    {t:'Assemble mode: both passes right for '+NEED_AS+' programs, and every “which pass?” right in one round ('+P.asDone.size+'/'+NEED_AS+'; best '+P.pqBest+'/'+D.passq.length+')', ok:P.asDone.size>=NEED_AS && P.pqBest===D.passq.length},
+    {t:'Examiner: '+NEED_EQ+' of '+D.exam.length+' right in one complete set (best '+P.eqBest+')', ok:P.eqBest>=NEED_EQ}];
+}
+function drawCode(){
+  const ms = missions();
+  $('missions').innerHTML = ms.map(m=>'<div class="'+(m.ok?'done':'')+'">'+esc(m.t)+'</div>').join('');
+  const n = ($('uname').value||'').trim(), box=$('codeout'), msg=$('codemsg');
+  if(!ms.every(m=>m.ok)){ msg.textContent='Keep going: '+ms.filter(m=>m.ok).length+' of '+ms.length+' missions done.'; box.classList.add('hide'); return; }
+  if(!n){ msg.textContent='All missions done. Type your name to get your code.'; box.classList.add('hide'); return; }
+  let h=0; for(let i=0;i<n.length;i++) h=(h*31+n.toUpperCase().charCodeAt(i))&0xFFF;
+  msg.textContent='Best examiner set: '+P.eqBest+' of '+D.exam.length+' · best group sort: '+P.gsBest+' of '+D.sort.length+' · predictions right: '+P.predOk+' · answers in all: '+P.total+'.';
+  box.textContent='ASM-'+hex(h,3)+'-'+hex(P.eqBest&0xFF,2)+'-'+hex(P.total&0xFF,2); box.classList.remove('hide');
+}
+$('uname').oninput = drawCode;
+
+/* ---------------------------------------------------------------- start */
+drawWall(); opNext(); mcNext(); pNext(); eqSet(); gsRound(); stLoad(); asLoad(); pqRound(); stCount(); asCount(); drawCode();
+window.ASM = {plan:plan, assemble:assemble, operandForm:operandForm, P:P, ST:ST, WALL0:WALL0, genPred:genPred,
+              traceProg:traceProg};
+</script>
+</body>
+</html>
